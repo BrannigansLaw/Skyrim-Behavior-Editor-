@@ -85,6 +85,31 @@ bool hkbMirrorModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbMirrorModifier::getIsAdditive() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return isAdditive;
+}
+
+void hkbMirrorModifier::setIsAdditive(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != isAdditive) ? isAdditive = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'isAdditive' was not set!");
+}
+
+bool hkbMirrorModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbMirrorModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbMirrorModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbMirrorModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -101,7 +126,7 @@ void hkbMirrorModifier::unlink(){
 QString hkbMirrorModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

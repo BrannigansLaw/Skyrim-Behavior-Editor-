@@ -17,13 +17,17 @@ class hkbVariableBindingSet;
 class QuadVariableWidget;
 class ComboBox;
 
-class HandUI: public QGroupBox
+class HandUI final: public QGroupBox
 {
     Q_OBJECT
     friend class hkbHandIkControlsModifierUI;
     friend class HandIkControlsModifierUI;
 public:
     HandUI();
+    HandUI& operator=(const HandUI&) = delete;
+    HandUI(const HandUI &) = delete;
+    ~HandUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, hkbHandIkControlsModifier::hkHand *bon, hkbHandIkControlsModifier *par, int ind);
 signals:
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -45,15 +49,12 @@ private slots:
     void setEnable();
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void toggleSignals(bool toggleconnections);
     void setBindingVariable(int index, const QString & name);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void selectTableToView(bool viewproperties, const QString & path);
     void variableRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbHandIkControlsModifier::hkHand *bsData;
     hkbHandIkControlsModifier *parent;

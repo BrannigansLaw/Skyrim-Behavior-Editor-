@@ -100,6 +100,52 @@ bool hkbGetHandleOnBoneModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+int hkbGetHandleOnBoneModifier::getAnimationBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return animationBoneIndex;
+}
+
+void hkbGetHandleOnBoneModifier::setAnimationBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != animationBoneIndex && animationBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? animationBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'animationBoneIndex' was not set!");
+}
+
+int hkbGetHandleOnBoneModifier::getRagdollBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return ragdollBoneIndex;
+}
+
+void hkbGetHandleOnBoneModifier::setRagdollBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != ragdollBoneIndex && ragdollBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)) ? ragdollBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'ragdollBoneIndex' was not set!");
+}
+
+QString hkbGetHandleOnBoneModifier::getLocalFrameName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return localFrameName;
+}
+
+void hkbGetHandleOnBoneModifier::setLocalFrameName(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto localframes = static_cast<BehaviorFile *>(getParentFile())->getLocalFrameNames();
+    (index >= 0 && index < localframes.size() && localframes.at(index) != localFrameName) ? localFrameName = localframes.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'localFrameName' was not set!");
+}
+
+bool hkbGetHandleOnBoneModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbGetHandleOnBoneModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbGetHandleOnBoneModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbGetHandleOnBoneModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -116,7 +162,7 @@ void hkbGetHandleOnBoneModifier::unlink(){
 QString hkbGetHandleOnBoneModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

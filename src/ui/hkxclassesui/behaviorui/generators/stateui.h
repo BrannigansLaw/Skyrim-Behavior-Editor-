@@ -4,6 +4,7 @@
 #include <QStackedWidget>
 
 #include "src/utility.h"
+#include "src/hkxclasses/hkxobject.h"
 
 class HkxObject;
 class BehaviorGraphView;
@@ -21,15 +22,22 @@ class EventUI;
 class QGroupBox;
 class GenericTableWidget;
 
-class StateUI: public QStackedWidget
+class StateUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
     friend class StateMachineUI;
 public:
     StateUI();
-    virtual ~StateUI(){}
+    StateUI& operator=(const StateUI&) = delete;
+    StateUI(const StateUI &) = delete;
+    ~StateUI() = default;
+public:
     void loadData(HkxObject *data, int stateindex);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *events);
+    void eventRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
+    void generatorRenamed(const QString & name, int index);
+    void setReturnPushButonVisability(bool visible);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void stateNameChanged(const QString & newName, int index);
@@ -40,7 +48,7 @@ signals:
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setStateId(int id);
     void setProbability();
     void setEnable();
@@ -50,8 +58,9 @@ private slots:
     void transitionRenamed(const QString &name, int index);
     void generatorTableElementSelected(int index, const QString &name);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
+    void removeEvent(HkxSharedPtr & eventarray, int index);
+    void addEvent(HkxSharedPtr & eventarray);
     void setGenerator(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
     void addEnterEvent();
@@ -61,18 +70,14 @@ private:
     void addTransition();
     void removeTransition(int index);
     void loadDynamicTableRows();
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *events);
-    void eventRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
-    void generatorRenamed(const QString & name, int index);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
+        MAIN_WIDGET,
         EVENT_PAYLOAD_WIDGET = 1,
         TRANSITION_WIDGET = 2
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     int exitEventsButtonRow;
     int transitionsButtonRow;
     BehaviorGraphView *behaviorView;

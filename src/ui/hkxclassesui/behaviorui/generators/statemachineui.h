@@ -24,14 +24,21 @@ class EventUI;
 class hkbVariableBindingSet;
 class CheckButtonCombo;
 
-class StateMachineUI: public QStackedWidget
+class StateMachineUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     StateMachineUI();
-    virtual ~StateMachineUI(){}
+    StateMachineUI& operator=(const StateMachineUI&) = delete;
+    StateMachineUI(const StateMachineUI &) = delete;
+    ~StateMachineUI() = default;
+public:
     void loadData(HkxObject *data);
+    void variableRenamed(const QString & name, int index);
+    void eventRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -39,7 +46,7 @@ signals:
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setStartStateId(int index);
     void setReturnToPreviousStateEventId(int index, const QString &name);
     void setRandomTransitionEventId(int index, const QString &name);
@@ -63,27 +70,17 @@ private slots:
     void transitionRenamed(const QString &name, int index);
     void swapGeneratorIndices(int index1, int index2);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void addStateWithGenerator();
     void addTransition();
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
-    void variableRenamed(const QString & name, int index);
-    void eventRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void generatorRenamed(const QString & name, int index);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
-    void loadTableValue(int row, const QString & value);
     void removeState(int index);
     void removeTransition(int index);
     void selectTableToView(bool properties, const QString & path);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
+        MAIN_WIDGET,
         STATE_WIDGET = 1,
         TRANSITION_WIDGET = 2,
         EVENT_PAYLOAD_WIDGET = 3
@@ -103,8 +100,9 @@ private:
         BEHAVIOR_REFERENCE_GENERATOR,
         GAMEBYRO_SEQUENCE_GENERATOR
     };
-    static QStringList types;
-    static QStringList headerLabels;
+private:
+    static const QStringList types;
+    static const QStringList headerLabels;
     int transitionsButtonRow;
     BehaviorGraphView *behaviorView;
     hkbStateMachine *bsData;

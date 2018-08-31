@@ -117,6 +117,81 @@ bool hkbEvaluateHandleModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+QString hkbEvaluateHandleModifier::getHandleChangeMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return handleChangeMode;
+}
+
+void hkbEvaluateHandleModifier::setHandleChangeMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < HandleChangeMode.size() && handleChangeMode != HandleChangeMode.at(index)) ? handleChangeMode = HandleChangeMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'handleChangeMode' was not set!");
+}
+
+qreal hkbEvaluateHandleModifier::getHandleChangeSpeed() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return handleChangeSpeed;
+}
+
+void hkbEvaluateHandleModifier::setHandleChangeSpeed(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != handleChangeSpeed) ? handleChangeSpeed = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'handleChangeSpeed' was not set!");
+}
+
+qreal hkbEvaluateHandleModifier::getExtrapolationTimeStep() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return extrapolationTimeStep;
+}
+
+void hkbEvaluateHandleModifier::setExtrapolationTimeStep(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != extrapolationTimeStep) ? extrapolationTimeStep = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'extrapolationTimeStep' was not set!");
+}
+
+bool hkbEvaluateHandleModifier::getIsValidOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return isValidOut;
+}
+
+void hkbEvaluateHandleModifier::setIsValidOut(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != isValidOut) ? isValidOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'isValidOut' was not set!");
+}
+
+hkQuadVariable hkbEvaluateHandleModifier::getHandleRotationOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return handleRotationOut;
+}
+
+void hkbEvaluateHandleModifier::setHandleRotationOut(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != handleRotationOut) ? handleRotationOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'handleRotationOut' was not set!");
+}
+
+hkQuadVariable hkbEvaluateHandleModifier::getHandlePositionOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return handlePositionOut;
+}
+
+void hkbEvaluateHandleModifier::setHandlePositionOut(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != handlePositionOut) ? handlePositionOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'handlePositionOut' was not set!");
+}
+
+bool hkbEvaluateHandleModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbEvaluateHandleModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbEvaluateHandleModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbEvaluateHandleModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -133,7 +208,7 @@ void hkbEvaluateHandleModifier::unlink(){
 QString hkbEvaluateHandleModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

@@ -358,7 +358,7 @@ hkQsTransform HkxObject::readQsTransform(const QByteArray &lineIn, bool *ok) con
             valueindex >= size ? size = size*2, value.resize(size) : NULL;
             if ((lineIn.at(lineindex) >= '0' && lineIn.at(lineindex) <= '9') || (lineIn.at(lineindex) == '-' && valueindex != 0)){
                 value[valueindex] = lineIn.at(lineindex);
-            }else if (lineIn.at(lineindex) == '.' && (dotcount == 0 && valueindex > 0)){
+            }else if (lineIn.at(lineindex) == '.' && (!dotcount && valueindex > 0)){
                 value[valueindex] = lineIn.at(lineindex);
                 ++dotcount;
             }else if (lineIn.at(lineindex) == '('){

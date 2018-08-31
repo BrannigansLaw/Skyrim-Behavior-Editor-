@@ -44,7 +44,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList SenseHandleModifierUI::collisionLayers = {
+const QStringList SenseHandleModifierUI::collisionLayers = {
     "NONE",
     "L_UNIDENTIFIED",
     "L_STATIC",
@@ -103,7 +103,7 @@ QStringList SenseHandleModifierUI::collisionLayers = {
     "L_TRAP_TRIGGER"
 };
 
-QStringList SenseHandleModifierUI::headerLabels = {
+const QStringList SenseHandleModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -214,350 +214,185 @@ SenseHandleModifierUI::SenseHandleModifierUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(rangeUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void SenseHandleModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(sensorLocalOffset, SIGNAL(editingFinished()), this, SLOT(setSensorLocalOffset()), Qt::UniqueConnection);
-    connect(localFrameName, SIGNAL(currentTextChanged(QString)), this, SLOT(setLocalFrameName(QString)), Qt::UniqueConnection);
-    connect(sensorLocalFrameName, SIGNAL(currentTextChanged(QString)), this, SLOT(setSensorLocalFrameName(QString)), Qt::UniqueConnection);
-    connect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()), Qt::UniqueConnection);
-    connect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()), Qt::UniqueConnection);
-    connect(distanceOut, SIGNAL(editingFinished()), this, SLOT(setDistanceOut()), Qt::UniqueConnection);
-    connect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)), Qt::UniqueConnection);
-    connect(sensorRagdollBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorRagdollBoneIndex(int)), Qt::UniqueConnection);
-    connect(sensorAnimationBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorAnimationBoneIndex(int)), Qt::UniqueConnection);
-    connect(sensingMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensingMode(int)), Qt::UniqueConnection);
-    connect(extrapolateSensorPosition, SIGNAL(released()), this, SLOT(setExtrapolateSensorPosition()), Qt::UniqueConnection);
-    connect(keepFirstSensedHandle, SIGNAL(released()), this, SLOT(setKeepFirstSensedHandle()), Qt::UniqueConnection);
-    connect(foundHandleOut, SIGNAL(released()), this, SLOT(setFoundHandleOut()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-}
-
-void SenseHandleModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(sensorLocalOffset, SIGNAL(editingFinished()), this, SLOT(setSensorLocalOffset()));
-    disconnect(localFrameName, SIGNAL(currentTextChanged(QString)), this, SLOT(setLocalFrameName(QString)));
-    disconnect(sensorLocalFrameName, SIGNAL(currentTextChanged(QString)), this, SLOT(setSensorLocalFrameName(QString)));
-    disconnect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()));
-    disconnect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()));
-    disconnect(distanceOut, SIGNAL(editingFinished()), this, SLOT(setDistanceOut()));
-    disconnect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)));
-    disconnect(sensorRagdollBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorRagdollBoneIndex(int)));
-    disconnect(sensorAnimationBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorAnimationBoneIndex(int)));
-    disconnect(sensingMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensingMode(int)));
-    disconnect(extrapolateSensorPosition, SIGNAL(released()), this, SLOT(setExtrapolateSensorPosition()));
-    disconnect(keepFirstSensedHandle, SIGNAL(released()), this, SLOT(setKeepFirstSensedHandle()));
-    disconnect(foundHandleOut, SIGNAL(released()), this, SLOT(setFoundHandleOut()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    disconnect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
-    disconnect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+void SenseHandleModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(sensorLocalOffset, SIGNAL(editingFinished()), this, SLOT(setSensorLocalOffset()), Qt::UniqueConnection);
+        connect(localFrameName, SIGNAL(currentIndexChanged(int)), this, SLOT(setLocalFrameName(int)), Qt::UniqueConnection);
+        connect(sensorLocalFrameName, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorLocalFrameName(int)), Qt::UniqueConnection);
+        connect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()), Qt::UniqueConnection);
+        connect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()), Qt::UniqueConnection);
+        connect(distanceOut, SIGNAL(editingFinished()), this, SLOT(setDistanceOut()), Qt::UniqueConnection);
+        connect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)), Qt::UniqueConnection);
+        connect(sensorRagdollBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorRagdollBoneIndex(int)), Qt::UniqueConnection);
+        connect(sensorAnimationBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorAnimationBoneIndex(int)), Qt::UniqueConnection);
+        connect(sensingMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensingMode(int)), Qt::UniqueConnection);
+        connect(extrapolateSensorPosition, SIGNAL(released()), this, SLOT(setExtrapolateSensorPosition()), Qt::UniqueConnection);
+        connect(keepFirstSensedHandle, SIGNAL(released()), this, SLOT(setKeepFirstSensedHandle()), Qt::UniqueConnection);
+        connect(foundHandleOut, SIGNAL(released()), this, SLOT(setFoundHandleOut()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(sensorLocalOffset, SIGNAL(editingFinished()), this, SLOT(setSensorLocalOffset()));
+        disconnect(localFrameName, SIGNAL(currentIndexChanged(int)), this, SLOT(setLocalFrameName(int)));
+        disconnect(sensorLocalFrameName, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorLocalFrameName(int)));
+        disconnect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()));
+        disconnect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()));
+        disconnect(distanceOut, SIGNAL(editingFinished()), this, SLOT(setDistanceOut()));
+        disconnect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)));
+        disconnect(sensorRagdollBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorRagdollBoneIndex(int)));
+        disconnect(sensorAnimationBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensorAnimationBoneIndex(int)));
+        disconnect(sensingMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSensingMode(int)));
+        disconnect(extrapolateSensorPosition, SIGNAL(released()), this, SLOT(setExtrapolateSensorPosition()));
+        disconnect(keepFirstSensedHandle, SIGNAL(released()), this, SLOT(setKeepFirstSensedHandle()));
+        disconnect(foundHandleOut, SIGNAL(released()), this, SLOT(setFoundHandleOut()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+        disconnect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+        disconnect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    }
 }
 
 void SenseHandleModifierUI::addRange(){
-    if (bsData){
-        bsData->ranges.append(hkbSenseHandleModifier::hkRanges());
-        bsData->setIsFileChanged(true);
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::addRange(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->addRange(), loadDynamicTableRows() : LogFile::writeToLog("SenseHandleModifierUI::addRange(): The data is nullptr!!");
 }
 
 void SenseHandleModifierUI::removeRange(int index){
-    if (bsData){
-        if (!bsData->ranges.isEmpty()){
-            if (index < bsData->ranges.size() && index >= 0){
-                bsData->ranges.removeAt(index);
-            }else{
-                WARNING_MESSAGE("SenseHandleModifierUI::removeExpression(): Invalid row index selected!!");
-                return;
-            }
-            bsData->setIsFileChanged(true);
-            loadDynamicTableRows();
-        }else{
-            WARNING_MESSAGE("SenseHandleModifierUI::removeExpression(): Ranges is empty!!");
-            return;
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::removeExpression(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->removeRange(index), loadDynamicTableRows() : LogFile::writeToLog("SenseHandleModifierUI::removeRange(): The data is nullptr!!");
 }
 
 void SenseHandleModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
     if (data){
         if (data->getSignature() == HKB_SENSE_HANDLE_MODIFIER){
-            int index = -1;
-            QStringList localFrames;
-            localFrames.append("None");
-            QStringList boneNames;
-            boneNames.append("None");
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbSenseHandleModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            sensorLocalOffset->setValue(bsData->sensorLocalOffset);
-            if (localFrameName->count() == 0){
-                localFrames = localFrames + static_cast<BehaviorFile *>(bsData->getParentFile())->getLocalFrameNames();
-                localFrameName->insertItems(0, localFrames);
-            }
-            index = localFrameName->findText(bsData->localFrameName);
-            if (index < 0){
-                localFrameName->setCurrentIndex(0);
-            }else{
-                localFrameName->setCurrentIndex(localFrameName->findText(bsData->localFrameName));
-            }
-            if (sensorLocalFrameName->count() == 0){
-                sensorLocalFrameName->insertItems(0, localFrames);
-            }
-            index = sensorLocalFrameName->findText(bsData->sensorLocalFrameName);
-            if (index < 0){
-                sensorLocalFrameName->setCurrentIndex(0);
-            }else{
-                sensorLocalFrameName->setCurrentIndex(sensorLocalFrameName->findText(bsData->sensorLocalFrameName));
-            }
-            minDistance->setValue(bsData->minDistance);
-            maxDistance->setValue(bsData->maxDistance);
-            distanceOut->setValue(bsData->distanceOut);
-            if (bsData->collisionFilterInfo < collisionLayers.size() && bsData->collisionFilterInfo > -1){
-                index = collisionFilterInfo->findText(collisionLayers.at(bsData->collisionFilterInfo));
-                if (index < 0){
-                    CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
+            enable->setChecked(bsData->getEnable());
+            sensorLocalOffset->setValue(bsData->getSensorLocalOffset());
+            auto loadlocalframes = [&](ComboBox *combobox, const QString & localframename){
+                if (!combobox->count()){
+                    auto localFrames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getLocalFrameNames();
+                    combobox->insertItems(0, localFrames);
                 }
+                auto index = combobox->findText(localframename);
+                if (index < 0 || index >= combobox->count()){
+                    LogFile::writeToLog("The local frame name was not loaded correctly!!!");
+                }else{
+                    combobox->setCurrentIndex(index);
+                }
+            };
+            loadlocalframes(localFrameName, bsData->getLocalFrameName());
+            loadlocalframes(sensorLocalFrameName, bsData->getSensorLocalFrameName());
+            minDistance->setValue(bsData->getMinDistance());
+            maxDistance->setValue(bsData->getMaxDistance());
+            distanceOut->setValue(bsData->getDistanceOut());
+            auto collinfo = bsData->getCollisionFilterInfo();
+            if (collinfo < collisionLayers.size() && collinfo > -1){
+                auto index = collisionFilterInfo->findText(collisionLayers.at(collinfo));
+                (index < 0) ? LogFile::writeToLog("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!") : NULL;
                 collisionFilterInfo->setCurrentIndex(index);
             }else{
-                CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
+                LogFile::writeToLog("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
             }
-            if (sensorRagdollBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
-                sensorRagdollBoneIndex->insertItems(0, boneNames);
-            }
-            sensorRagdollBoneIndex->setCurrentIndex(bsData->sensorRagdollBoneIndex + 1);
-            boneNames.clear();
-            boneNames.append("None");
-            if (sensorAnimationBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                sensorAnimationBoneIndex->insertItems(0, boneNames);
-            }
-            sensorAnimationBoneIndex->setCurrentIndex(bsData->sensorAnimationBoneIndex + 1);
-            if (sensingMode->count() == 0){
-                sensingMode->insertItems(0, bsData->SensingMode);
-            }
-            sensingMode->setCurrentIndex(bsData->SensingMode.indexOf(bsData->sensingMode));
-            extrapolateSensorPosition->setChecked(bsData->extrapolateSensorPosition);
-            keepFirstSensedHandle->setChecked(bsData->keepFirstSensedHandle);
-            foundHandleOut->setChecked(bsData->foundHandleOut);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN, varBind, "sensorLocalOffset");
-                loadBinding(HANDLE_OUT_ROW, BINDING_COLUMN, varBind, "handleOut");
-                loadBinding(HANDLE_IN_ROW, BINDING_COLUMN, varBind, "handleIn");
-                loadBinding(MIN_DISTANCE_ROW, BINDING_COLUMN, varBind, "minDistance");
-                loadBinding(MAX_DISTANCE_ROW, BINDING_COLUMN, varBind, "maxDistance");
-                loadBinding(DISTANCE_OUT_ROW, BINDING_COLUMN, varBind, "distanceOut");
-                loadBinding(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN, varBind, "collisionFilterInfo");
-                loadBinding(SENSOR_RAGDOLL_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "sensorRagdollBoneIndex");
-                loadBinding(SENSOR_ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "sensorAnimationBoneIndex");
-                loadBinding(EXTRAPOLATE_SENSOR_POSITION_ROW, BINDING_COLUMN, varBind, "extrapolateSensorPosition");
-                loadBinding(KEEP_FIRST_SENSED_HANDLE_ROW, BINDING_COLUMN, varBind, "keepFirstSensedHandle");
-                loadBinding(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN, varBind, "foundHandleOut");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(HANDLE_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(HANDLE_IN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(MIN_DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(MAX_DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DISTANCE_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SENSOR_RAGDOLL_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SENSOR_ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(EXTRAPOLATE_SENSOR_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(KEEP_FIRST_SENSED_HANDLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            auto loadbones = [&](ComboBox *combobox, int indextoset, const QStringList & bonenames){
+                if (!combobox->count()){
+                    auto bones = QStringList("None") + bonenames;
+                    combobox->insertItems(0, bones);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(sensorRagdollBoneIndex, bsData->getSensorRagdollBoneIndex() + 1, static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames());
+            loadbones(sensorAnimationBoneIndex, bsData->getSensorAnimationBoneIndex() + 1, static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames());
+            (!sensingMode->count()) ? sensingMode->insertItems(0, bsData->SensingMode) : NULL;
+            sensingMode->setCurrentIndex(bsData->SensingMode.indexOf(bsData->getSensingMode()));
+            extrapolateSensorPosition->setChecked(bsData->getExtrapolateSensorPosition());
+            keepFirstSensedHandle->setChecked(bsData->getKeepFirstSensedHandle());
+            foundHandleOut->setChecked(bsData->getFoundHandleOut());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN, varBind, "sensorLocalOffset", table, bsData);
+            UIHelper::loadBinding(HANDLE_OUT_ROW, BINDING_COLUMN, varBind, "handleOut", table, bsData);
+            UIHelper::loadBinding(HANDLE_IN_ROW, BINDING_COLUMN, varBind, "handleIn", table, bsData);
+            UIHelper::loadBinding(MIN_DISTANCE_ROW, BINDING_COLUMN, varBind, "minDistance", table, bsData);
+            UIHelper::loadBinding(MAX_DISTANCE_ROW, BINDING_COLUMN, varBind, "maxDistance", table, bsData);
+            UIHelper::loadBinding(DISTANCE_OUT_ROW, BINDING_COLUMN, varBind, "distanceOut", table, bsData);
+            UIHelper::loadBinding(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN, varBind, "collisionFilterInfo", table, bsData);
+            UIHelper::loadBinding(SENSOR_RAGDOLL_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "sensorRagdollBoneIndex", table, bsData);
+            UIHelper::loadBinding(SENSOR_ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "sensorAnimationBoneIndex", table, bsData);
+            UIHelper::loadBinding(EXTRAPOLATE_SENSOR_POSITION_ROW, BINDING_COLUMN, varBind, "extrapolateSensorPosition", table, bsData);
+            UIHelper::loadBinding(KEEP_FIRST_SENSED_HANDLE_ROW, BINDING_COLUMN, varBind, "keepFirstSensedHandle", table, bsData);
+            UIHelper::loadBinding(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN, varBind, "foundHandleOut", table, bsData);
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("SenseHandleModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("SenseHandleModifierUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void SenseHandleModifierUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_RANGE_ROW + bsData->getNumberOfRanges() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
+        auto temp = ADD_RANGE_ROW + bsData->getNumberOfRanges() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
         for (auto i = ADD_RANGE_ROW + 1, j = 0; j < bsData->getNumberOfRanges(); i++, j++){
-            setRowItems(i, "Range "+QString::number(j), "hkRange", "Remove", "Edit", "Double click to remove this range", "Double click to edit this range");
+            UIHelper::setRowItems(i, "Range "+QString::number(j), "hkRange", "Remove", "Edit", "Double click to remove this range", "Double click to edit this range", table);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
-}
-
-void SenseHandleModifierUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
-    }
-}
-
-bool SenseHandleModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void SenseHandleModifierUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case SENSOR_LOCAL_OFFSET_ROW:
-            if (table->item(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "sensorLocalOffset", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(SENSOR_LOCAL_OFFSET_ROW, "sensorLocalOffset", VARIABLE_TYPE_VECTOR4); break;
         case HANDLE_OUT_ROW:
-            if (table->item(HANDLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "handleOut", VARIABLE_TYPE_POINTER, isProperty);
-            break;
+            checkisproperty(HANDLE_OUT_ROW, "handleOut", VARIABLE_TYPE_POINTER); break;
         case HANDLE_IN_ROW:
-            if (table->item(HANDLE_IN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "handleIn", VARIABLE_TYPE_POINTER, isProperty);
-            break;
+            checkisproperty(HANDLE_IN_ROW, "handleIn", VARIABLE_TYPE_POINTER); break;
         case MIN_DISTANCE_ROW:
-            if (table->item(MIN_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "minDistance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MIN_DISTANCE_ROW, "minDistance", VARIABLE_TYPE_REAL); break;
         case MAX_DISTANCE_ROW:
-            if (table->item(MAX_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "maxDistance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MAX_DISTANCE_ROW, "maxDistance", VARIABLE_TYPE_REAL); break;
         case DISTANCE_OUT_ROW:
-            if (table->item(DISTANCE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "distanceOut", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(DISTANCE_OUT_ROW, "distanceOut", VARIABLE_TYPE_REAL); break;
         case COLLISION_FILTER_INFO_ROW:
-            if (table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "collisionFilterInfo", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(COLLISION_FILTER_INFO_ROW, "collisionFilterInfo", VARIABLE_TYPE_INT32); break;
         case SENSOR_RAGDOLL_BONE_INDEX_ROW:
-            if (table->item(SENSOR_RAGDOLL_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "sensorRagdollBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(SENSOR_RAGDOLL_BONE_INDEX_ROW, "sensorRagdollBoneIndex", VARIABLE_TYPE_INT32); break;
         case SENSOR_ANIMATION_BONE_INDEX_ROW:
-            if (table->item(SENSOR_ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "sensorAnimationBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(SENSOR_ANIMATION_BONE_INDEX_ROW, "sensorAnimationBoneIndex", VARIABLE_TYPE_INT32); break;
         case EXTRAPOLATE_SENSOR_POSITION_ROW:
-            if (table->item(EXTRAPOLATE_SENSOR_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "extrapolateSensorPosition", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(EXTRAPOLATE_SENSOR_POSITION_ROW, "extrapolateSensorPosition", VARIABLE_TYPE_BOOL); break;
         case KEEP_FIRST_SENSED_HANDLE_ROW:
-            if (table->item(KEEP_FIRST_SENSED_HANDLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "keepFirstSensedHandle", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(KEEP_FIRST_SENSED_HANDLE_ROW, "keepFirstSensedHandle", VARIABLE_TYPE_BOOL); break;
         case FOUND_HANDLE_OUT_ROW:
-            if (table->item(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "foundHandleOut", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(FOUND_HANDLE_OUT_ROW, "foundHandleOut", VARIABLE_TYPE_BOOL); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -566,250 +401,114 @@ void SenseHandleModifierUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void SenseHandleModifierUI::setName(){
+void SenseHandleModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void SenseHandleModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("SenseHandleModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setSensorLocalOffset(){
-    if (bsData){
-        if (bsData->sensorLocalOffset != sensorLocalOffset->value()){
-            bsData->sensorLocalOffset = sensorLocalOffset->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorLocalOffset(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSensorLocalOffset(sensorLocalOffset->value()) : LogFile::writeToLog("SenseHandleModifierUI::setSensorLocalOffset(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setMinDistance(){
-    if (bsData){
-        if (bsData->minDistance != minDistance->value()){
-            bsData->minDistance = minDistance->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setMinDistance(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMinDistance(minDistance->value()) : LogFile::writeToLog("SenseHandleModifierUI::setMinDistance(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setMaxDistance(){
-    if (bsData){
-        if (bsData->maxDistance != maxDistance->value()){
-            bsData->maxDistance = maxDistance->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setMaxDistance(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMaxDistance(maxDistance->value()) : LogFile::writeToLog("SenseHandleModifierUI::setMaxDistance(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setDistanceOut(){
-    if (bsData){
-        if (bsData->distanceOut != distanceOut->value()){
-            bsData->distanceOut = distanceOut->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setDistanceOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDistanceOut(distanceOut->value()) : LogFile::writeToLog("SenseHandleModifierUI::setDistanceOut(): The 'bsData' pointer is nullptr!!");
 }
 
-void SenseHandleModifierUI::setLocalFrameName(const QString & text){
-    if (bsData){
-        bsData->localFrameName = text;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setLocalFrameName(): The data is nullptr!!");
-    }
+void SenseHandleModifierUI::setLocalFrameName(int index){
+    (bsData) ? bsData->setLocalFrameName(index - 1) : LogFile::writeToLog("SenseHandleModifierUI::setLocalFrameName(): The 'bsData' pointer is nullptr!!");
 }
 
-void SenseHandleModifierUI::setSensorLocalFrameName(const QString & text){
-    if (bsData){
-        bsData->sensorLocalFrameName = text;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorLocalFrameName(): The data is nullptr!!");
-    }
+void SenseHandleModifierUI::setSensorLocalFrameName(int index){
+    (bsData) ? bsData->setSensorLocalFrameName(index - 1) : LogFile::writeToLog("SenseHandleModifierUI::setSensorLocalFrameName(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setCollisionFilterInfo(int index){
-    if (bsData){
-        bsData->collisionFilterInfo = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setCollisionFilterInfo(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCollisionFilterInfo(index - 1) : LogFile::writeToLog("SenseHandleModifierUI::setCollisionFilterInfo(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setSensorRagdollBoneIndex(int index){
-    if (bsData){
-        bsData->sensorRagdollBoneIndex = index - 1;
-        if (bsData->sensorRagdollBoneIndex > -1){   //sensorRagdollBoneIndex and sensorAnimationBoneIndex cannot simultaneously have nonnegative values!!!
-            setSensorAnimationBoneIndex(-1);
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorRagdollBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSensorRagdollBoneIndex(index - 1) : LogFile::writeToLog("SenseHandleModifierUI::setSensorRagdollBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setSensorAnimationBoneIndex(int index){
-    if (bsData){
-        bsData->sensorAnimationBoneIndex = index - 1;
-        if (bsData->sensorAnimationBoneIndex > -1){   //sensorRagdollBoneIndex and sensorAnimationBoneIndex cannot simultaneously have nonnegative values!!!
-            setSensorRagdollBoneIndex(-1);
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorAnimationBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSensorAnimationBoneIndex(index - 1) : LogFile::writeToLog("SenseHandleModifierUI::setSensorAnimationBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setSensingMode(int index){
-    if (bsData){
-        bsData->sensingMode = bsData->SensingMode.at(index);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensingMode(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSensingMode(index) : LogFile::writeToLog("SenseHandleModifierUI::setSensingMode(): The data is nullptr!!");
 }
 
 void SenseHandleModifierUI::setExtrapolateSensorPosition(){
-    if (bsData){
-        bsData->extrapolateSensorPosition = extrapolateSensorPosition->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setExtrapolateSensorPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setExtrapolateSensorPosition(extrapolateSensorPosition->isChecked()) : LogFile::writeToLog("SenseHandleModifierUI::setExtrapolateSensorPosition(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setKeepFirstSensedHandle(){
-    if (bsData){
-        bsData->keepFirstSensedHandle = keepFirstSensedHandle->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setKeepFirstSensedHandle(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setKeepFirstSensedHandle(keepFirstSensedHandle->isChecked()) : LogFile::writeToLog("SenseHandleModifierUI::setKeepFirstSensedHandle(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::setFoundHandleOut(){
-    if (bsData){
-        bsData->foundHandleOut = foundHandleOut->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setFoundHandleOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setFoundHandleOut(foundHandleOut->isChecked()) : LogFile::writeToLog("SenseHandleModifierUI::setFoundHandleOut(): The 'bsData' pointer is nullptr!!");
 }
 
 void SenseHandleModifierUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
+    auto checkisproperty = [&](int row, const QString & fieldname){
+        bool properties;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+        selectTableToView(properties, fieldname);
+    };
     if (bsData){
         if (row < ADD_RANGE_ROW && row >= 0){
             if (column == BINDING_COLUMN){
                 switch (row){
                 case ENABLE_ROW:
-                    if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "enable");
-                    break;
+                    checkisproperty(ENABLE_ROW, "enable"); break;
                 case SENSOR_LOCAL_OFFSET_ROW:
-                    if (table->item(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "sensorLocalOffset");
-                    break;
+                    checkisproperty(SENSOR_LOCAL_OFFSET_ROW, "sensorLocalOffset"); break;
                 case HANDLE_OUT_ROW:
-                    if (table->item(HANDLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "handleOut");
-                    break;
+                    checkisproperty(HANDLE_OUT_ROW, "handleOut"); break;
                 case HANDLE_IN_ROW:
-                    if (table->item(HANDLE_IN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "handleIn");
-                    break;
+                    checkisproperty(HANDLE_IN_ROW, "handleIn"); break;
                 case MIN_DISTANCE_ROW:
-                    if (table->item(MIN_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "minDistance");
-                    break;
+                    checkisproperty(MIN_DISTANCE_ROW, "minDistance"); break;
                 case MAX_DISTANCE_ROW:
-                    if (table->item(MAX_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "maxDistance");
-                    break;
+                    checkisproperty(MAX_DISTANCE_ROW, "maxDistance"); break;
                 case DISTANCE_OUT_ROW:
-                    if (table->item(DISTANCE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "distanceOut");
-                    break;
+                    checkisproperty(DISTANCE_OUT_ROW, "distanceOut"); break;
                 case COLLISION_FILTER_INFO_ROW:
-                    if (table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "collisionFilterInfo");
-                    break;
+                    checkisproperty(COLLISION_FILTER_INFO_ROW, "collisionFilterInfo"); break;
                 case SENSOR_RAGDOLL_BONE_INDEX_ROW:
-                    if (table->item(SENSOR_RAGDOLL_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "sensorRagdollBoneIndex");
-                    break;
+                    checkisproperty(SENSOR_RAGDOLL_BONE_INDEX_ROW, "sensorRagdollBoneIndex"); break;
                 case SENSOR_ANIMATION_BONE_INDEX_ROW:
-                    if (table->item(SENSOR_ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "sensorAnimationBoneIndex");
-                    break;
+                    checkisproperty(SENSOR_ANIMATION_BONE_INDEX_ROW, "sensorAnimationBoneIndex"); break;
                 case EXTRAPOLATE_SENSOR_POSITION_ROW:
-                    if (table->item(EXTRAPOLATE_SENSOR_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "extrapolateSensorPosition");
-                    break;
+                    checkisproperty(EXTRAPOLATE_SENSOR_POSITION_ROW, "extrapolateSensorPosition"); break;
                 case KEEP_FIRST_SENSED_HANDLE_ROW:
-                    if (table->item(KEEP_FIRST_SENSED_HANDLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "keepFirstSensedHandle");
-                    break;
+                    checkisproperty(KEEP_FIRST_SENSED_HANDLE_ROW, "keepFirstSensedHandle"); break;
                 case FOUND_HANDLE_OUT_ROW:
-                    if (table->item(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "foundHandleOut");
-                    break;
+                    checkisproperty(FOUND_HANDLE_OUT_ROW, "foundHandleOut"); break;
                 }
             }
         }else if (row == ADD_RANGE_ROW && column == NAME_COLUMN){
             addRange();
         }else if (row > ADD_RANGE_ROW && row < ADD_RANGE_ROW + bsData->getNumberOfRanges() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfRanges() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     rangeUI->loadData(((BehaviorFile *)(bsData->getParentFile())), &bsData->ranges[result], bsData, result);
@@ -820,22 +519,20 @@ void SenseHandleModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::viewSelectedChild(): Invalid index of range to view!!");
+                LogFile::writeToLog("SenseHandleModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void SenseHandleModifierUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     case CHILD_WIDGET:
-        rangeUI->setBindingVariable(index, name);
-        break;
+        rangeUI->setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("SenseHandleModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -853,32 +550,7 @@ void SenseHandleModifierUI::connectToTables(GenericTableWidget *variables, Gener
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::connectToTables(): One or more arguments are nullptr!!");
-    }
-}
-
-void SenseHandleModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -898,89 +570,45 @@ void SenseHandleModifierUI::selectTableToView(bool viewproperties, const QString
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void SenseHandleModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (currentIndex() == CHILD_WIDGET){
-            rangeUI->eventRenamed(name, index);
-        }
+        (currentIndex() == CHILD_WIDGET) ? rangeUI->eventRenamed(name, index) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void SenseHandleModifierUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("SenseHandleModifierUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
-        if (currentIndex() == MAIN_WIDGET){
-            bind = bsData->getVariableBindingSetData();
-            if (bind){
-                bindIndex = bind->getVariableIndexOfBinding("enable");
-                if (bindIndex == index){
-                    table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("sensorLocalOffset");
-                if (bindIndex == index){
-                    table->item(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("handleOut");
-                if (bindIndex == index){
-                    table->item(HANDLE_OUT_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("handleIn");
-                if (bindIndex == index){
-                    table->item(HANDLE_IN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("minDistance");
-                if (bindIndex == index){
-                    table->item(MIN_DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("maxDistance");
-                if (bindIndex == index){
-                    table->item(MAX_DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("distanceOut");
-                if (bindIndex == index){
-                    table->item(DISTANCE_OUT_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("collisionFilterInfo");
-                if (bindIndex == index){
-                    table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("sensorRagdollBoneIndex");
-                if (bindIndex == index){
-                    table->item(SENSOR_RAGDOLL_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("sensorAnimationBoneIndex");
-                if (bindIndex == index){
-                    table->item(SENSOR_ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("extrapolateSensorPosition");
-                if (bindIndex == index){
-                    table->item(EXTRAPOLATE_SENSOR_POSITION_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("keepFirstSensedHandle");
-                if (bindIndex == index){
-                    table->item(KEEP_FIRST_SENSED_HANDLE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("foundHandleOut");
-                if (bindIndex == index){
-                    table->item(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN)->setText(name);
-                }
-            }
+        auto bind = bsData->getVariableBindingSetData();
+        if (bind){
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("sensorLocalOffset", SENSOR_LOCAL_OFFSET_ROW);
+            setname("handleOut", HANDLE_OUT_ROW);
+            setname("handleIn", HANDLE_IN_ROW);
+            setname("minDistance", MIN_DISTANCE_ROW);
+            setname("maxDistance", MAX_DISTANCE_ROW);
+            setname("distanceOut", DISTANCE_OUT_ROW);
+            setname("collisionFilterInfo", COLLISION_FILTER_INFO_ROW);
+            setname("sensorRagdollBoneIndex", SENSOR_RAGDOLL_BONE_INDEX_ROW);
+            setname("sensorAnimationBoneIndex", SENSOR_ANIMATION_BONE_INDEX_ROW);
+            setname("extrapolateSensorPosition", EXTRAPOLATE_SENSOR_POSITION_ROW);
+            setname("keepFirstSensedHandle", KEEP_FIRST_SENSED_HANDLE_ROW);
+            setname("foundHandleOut", FOUND_HANDLE_OUT_ROW);
         }else{
             rangeUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("SenseHandleModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

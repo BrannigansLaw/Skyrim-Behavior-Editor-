@@ -37,7 +37,7 @@ bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
 
 bool BSModifyOnceModifier::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0){
+    if (!index){
         pOnActivateModifier = HkxSharedPtr();
     }else if (index == 1){
         pOnDeactivateModifier = HkxSharedPtr();
@@ -48,6 +48,31 @@ bool BSModifyOnceModifier::removeObjectAt(int index){
         return false;
     }
     return true;
+}
+
+hkbModifier * BSModifyOnceModifier::getPOnDeactivateModifier() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbModifier *>(pOnDeactivateModifier.data());
+}
+
+hkbModifier * BSModifyOnceModifier::getPOnActivateModifier() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbModifier *>(pOnActivateModifier.data());
+}
+
+bool BSModifyOnceModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSModifyOnceModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSModifyOnceModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 bool BSModifyOnceModifier::hasChildren() const{
@@ -176,7 +201,7 @@ void BSModifyOnceModifier::unlink(){
 QString BSModifyOnceModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

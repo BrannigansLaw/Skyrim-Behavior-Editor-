@@ -16,6 +16,45 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    struct hkRanges{
+        hkRanges() : minDistance(0), maxDistance(0), ignoreHandle(false){}
+        hkEventPayload event;
+        qreal minDistance;
+        qreal maxDistance;
+        bool ignoreHandle;
+    };
+private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkQuadVariable getSensorLocalOffset() const;
+    void setSensorLocalOffset(const hkQuadVariable &value);
+    QString getLocalFrameName() const;
+    void setLocalFrameName(int index);
+    QString getSensorLocalFrameName() const;
+    void setSensorLocalFrameName(int index);
+    qreal getMinDistance() const;
+    void setMinDistance(const qreal &value);
+    qreal getMaxDistance() const;
+    void setMaxDistance(const qreal &value);
+    qreal getDistanceOut() const;
+    void setDistanceOut(const qreal &value);
+    int getCollisionFilterInfo() const;
+    void setCollisionFilterInfo(int value);
+    int getSensorRagdollBoneIndex() const;
+    void setSensorRagdollBoneIndex(int value);
+    int getSensorAnimationBoneIndex() const;
+    void setSensorAnimationBoneIndex(int value);
+    QString getSensingMode() const;
+    void setSensingMode(int index);
+    bool getExtrapolateSensorPosition() const;
+    void setExtrapolateSensorPosition(bool value);
+    bool getKeepFirstSensedHandle() const;
+    void setKeepFirstSensedHandle(bool value);
+    bool getFoundHandleOut() const;
+    void setFoundHandleOut(bool value);
+    void addRange(hkRanges range = hkRanges());
+    void removeRange(int index);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
@@ -29,14 +68,6 @@ private:
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
-private:
-    struct hkRanges{
-        hkRanges() : minDistance(0), maxDistance(0), ignoreHandle(false){}
-        hkEventPayload event;
-        qreal minDistance;
-        qreal maxDistance;
-        bool ignoreHandle;
-    };
 private:
     static uint refCount;
     static const QString classname;

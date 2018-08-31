@@ -25,7 +25,7 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-QStringList ClipTriggerUI::headerLabels = {
+const QStringList ClipTriggerUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -72,91 +72,66 @@ ClipTriggerUI::ClipTriggerUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ClipTriggerUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()), Qt::UniqueConnection);
-    connect(relativeToEndOfClip, SIGNAL(released()), this, SLOT(setRelativeToEndOfClip()), Qt::UniqueConnection);
-    connect(acyclic, SIGNAL(released()), this, SLOT(setAcyclic()), Qt::UniqueConnection);
-    connect(isAnnotation, SIGNAL(released()), this, SLOT(setIsAnnotation()), Qt::UniqueConnection);
-    connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void ClipTriggerUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()));
-    disconnect(relativeToEndOfClip, SIGNAL(released()), this, SLOT(setRelativeToEndOfClip()));
-    disconnect(acyclic, SIGNAL(released()), this, SLOT(setAcyclic()));
-    disconnect(isAnnotation, SIGNAL(released()), this, SLOT(setIsAnnotation()));
-    disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void ClipTriggerUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()), Qt::UniqueConnection);
+        connect(relativeToEndOfClip, SIGNAL(released()), this, SLOT(setRelativeToEndOfClip()), Qt::UniqueConnection);
+        connect(acyclic, SIGNAL(released()), this, SLOT(setAcyclic()), Qt::UniqueConnection);
+        connect(isAnnotation, SIGNAL(released()), this, SLOT(setIsAnnotation()), Qt::UniqueConnection);
+        connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()));
+        disconnect(relativeToEndOfClip, SIGNAL(released()), this, SLOT(setRelativeToEndOfClip()));
+        disconnect(acyclic, SIGNAL(released()), this, SLOT(setAcyclic()));
+        disconnect(isAnnotation, SIGNAL(released()), this, SLOT(setIsAnnotation()));
+        disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipGenerator *parent, int index, hkbClipTriggerArray::HkTrigger *trigger){
-    disconnectSignals();
-    QString text;
+    toggleSignals(false);
     if (parentFile && parent && trigger){
         file = parentFile;
         parentClipGen = parent;
         indexOfTrigger = index;
         bsData = trigger;
-        text = file->getEventNameAt(trigger->event.id);
-        if (text == ""){
-            if (trigger->event.id != -1){
-                WARNING_MESSAGE("ClipTriggerUI::loadData(): Invalid event id!!!");
-            }
-            text = "NONE";
-        }
-        QString eventName = file->getEventNameAt(bsData->event.id);
-        if (eventName != ""){
-            table->item(EVENT_ROW, VALUE_COLUMN)->setText(eventName);
-        }else{
-            table->item(EVENT_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        if (trigger->event.payload.data()){
-            payload->setText(static_cast<hkbStringEventPayload *>(trigger->event.payload.data())->getData());
-        }else{
-            payload->setText("");
-        }
+        auto item = table->item(EVENT_ROW, VALUE_COLUMN);
+        auto eventName = file->getEventNameAt(bsData->event.id);
+        (eventName != "") ? item->setText(eventName) : item->setText("NONE");
+        (trigger->event.payload.data()) ? payload->setText(static_cast<hkbStringEventPayload *>(trigger->event.payload.data())->getData()) : payload->setText("");
         localTime->setValue(bsData->localTime);
         relativeToEndOfClip->setChecked(bsData->relativeToEndOfClip);
         acyclic->setChecked(bsData->acyclic);
         isAnnotation->setChecked(bsData->isAnnotation);
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::loadData(): Behavior file, parent clip generator or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::loadData(): Behavior file, parent clip generator or data is null!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
-
-/*QSize ClipTriggerUI::sizeHint() const{
-    return QSize(1600, 800);
-}
-
-QSize ClipTriggerUI::minimumSizeHint() const{
-    return QSize(1200, 600);
-}*/
 
 void ClipTriggerUI::setEventId(int index, const QString & name){
     if (bsData && file){
-        index--;
-        if (bsData->event.id != index){
+        if (bsData->event.id != --index){
             bsData->event.id = index;
             //file->setEventNameForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, index);
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::setEventId(): Behavior file or data is null!!!");
     }
 }
 
 void ClipTriggerUI::setEventPayload(){
-    hkbStringEventPayload *payloadData;
     if (bsData && file){
-        payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
+        auto payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
         if (payload->text() != ""){
             if (payloadData){
                 if (payloadData->getData() != payload->text()){
@@ -165,73 +140,66 @@ void ClipTriggerUI::setEventPayload(){
                     return;
                 }
             }else{
-                payloadData = new hkbStringEventPayload(file, payload->text());
-                bsData->event.payload = HkxSharedPtr(payloadData);
+                bsData->event.payload = HkxSharedPtr(new hkbStringEventPayload(file, payload->text()));
             }
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setEventPayload(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::setEventPayload(): Behavior file or data is null!!!");
     }
 }
 
 void ClipTriggerUI::setLocalTime(){
-    qreal trigtime;
     if (bsData && file){
+        //qreal trigtime;
         if (bsData->localTime != localTime->value()){
             bsData->localTime = localTime->value();
-            if (bsData->relativeToEndOfClip){
+            file->setIsChanged(true);
+            /*if (bsData->relativeToEndOfClip){
                 trigtime = localTime->value() + file->getAnimationDurationFromAnimData(parentClipGen->getAnimationName());
             }else{
                 trigtime = localTime->value();
             }
-            //file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
-            file->setIsChanged(true);
+            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);*/
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setLocalTime(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::setLocalTime(): Behavior file or data is null!!!");
     }
 }
 
 void ClipTriggerUI::setRelativeToEndOfClip(){
-    qreal trigtime;
     if (bsData && file){
+        //qreal trigtime;
         if (bsData->relativeToEndOfClip != relativeToEndOfClip->isChecked()){
             bsData->relativeToEndOfClip = relativeToEndOfClip->isChecked();
-            if (bsData->relativeToEndOfClip){
+            file->setIsChanged(true);
+            /*if (bsData->relativeToEndOfClip){
                 trigtime = localTime->value() + file->getAnimationDurationFromAnimData(parentClipGen->getAnimationName());
             }else{
                 trigtime = localTime->value();
             }
-            //file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
-            file->setIsChanged(true);
+            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);*/
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or data is null!!!");
     }
 }
 
 void ClipTriggerUI::setAcyclic(){
     if (bsData && file){
-        if (bsData->acyclic != acyclic->isChecked()){
-            bsData->acyclic = acyclic->isChecked();
-            file->setIsChanged(true);
-        }
+        (bsData->acyclic != acyclic->isChecked()) ? bsData->acyclic = acyclic->isChecked(), file->setIsChanged(true) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setAcyclic(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::setAcyclic(): Behavior file or data is null!!!");
     }
 }
 
 void ClipTriggerUI::setIsAnnotation(){
     if (bsData && file){
-        if (bsData->isAnnotation != isAnnotation->isChecked()){
-            bsData->isAnnotation = isAnnotation->isChecked();
-            file->setIsChanged(true);
-        }
+        (bsData->isAnnotation != isAnnotation->isChecked()) ? bsData->isAnnotation = isAnnotation->isChecked(), file->setIsChanged(true) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setIsAnnotation(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ClipTriggerUI::setIsAnnotation(): Behavior file or data is null!!!");
     }
 }
 
@@ -241,7 +209,7 @@ void ClipTriggerUI::viewSelectedChild(int row, int column){
             emit viewEvents(bsData->event.id + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("ClipTriggerUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -251,6 +219,6 @@ void ClipTriggerUI::eventRenamed(const QString & name, int index){
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("ClipTriggerUI::eventRenamed(): The data is nullptr!!");
     }
 }

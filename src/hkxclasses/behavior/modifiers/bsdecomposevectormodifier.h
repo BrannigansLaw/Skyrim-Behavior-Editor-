@@ -15,6 +15,19 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkQuadVariable getVector() const;
+    void setVector(const hkQuadVariable &value);
+    qreal getX() const;
+    void setX(const qreal &value);
+    qreal getY() const;
+    void setY(const qreal &value);
+    qreal getZ() const;
+    void setZ(const qreal &value);
+    qreal getW() const;
+    void setW(const qreal &value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

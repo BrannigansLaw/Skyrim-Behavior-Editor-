@@ -13,11 +13,7 @@
 #include <QHeaderView>
 #include <QSpinBox>
 
-/*
- * FootIkDriverInfoLegUI
- */
-
-QStringList FootIkDriverInfoLegUI::headerLabels1 = {
+const QStringList FootIkDriverInfoLegUI::headerLabels1 = {
     "Name",
     "Type",
     "Value"
@@ -115,91 +111,57 @@ void FootIkDriverInfoLegUI::loadData(hkbFootIkDriverInfoLeg *data){
         hipIndex->setCurrentIndex(bsData->hipIndex + 1);
         kneeIndex->setCurrentIndex(bsData->kneeIndex + 1);
         ankleIndex->setCurrentIndex(bsData->ankleIndex + 1);
+    }else{
+        LogFile::writeToLog("FootIkDriverInfoLegUI: The data is nullptr!!");
     }
 }
 
 void FootIkDriverInfoLegUI::setKneeAxisLS(){
-    if (bsData && bsData->parent){
-        bsData->kneeAxisLS = kneeAxisLS->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->kneeAxisLS != kneeAxisLS->value()) ? bsData->kneeAxisLS = kneeAxisLS->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: kneeAxisLS was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setFootEndLS(){
-    if (bsData && bsData->parent){
-        bsData->footEndLS = footEndLS->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->footEndLS != footEndLS->value()) ? bsData->footEndLS = footEndLS->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: footEndLS was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setFootPlantedAnkleHeightMS(){
-    if (bsData && bsData->parent){
-        bsData->footPlantedAnkleHeightMS = footPlantedAnkleHeightMS->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->footPlantedAnkleHeightMS != footPlantedAnkleHeightMS->value()) ? bsData->footPlantedAnkleHeightMS = footPlantedAnkleHeightMS->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: footPlantedAnkleHeightMS was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setFootRaisedAnkleHeightMS(){
-    if (bsData && bsData->parent){
-        bsData->footRaisedAnkleHeightMS = footRaisedAnkleHeightMS->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->footRaisedAnkleHeightMS != footRaisedAnkleHeightMS->value()) ? bsData->footRaisedAnkleHeightMS = footRaisedAnkleHeightMS->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: footRaisedAnkleHeightMS was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setMaxAnkleHeightMS(){
-    if (bsData && bsData->parent){
-        bsData->maxAnkleHeightMS = maxAnkleHeightMS->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->maxAnkleHeightMS != maxAnkleHeightMS->value()) ? bsData->maxAnkleHeightMS = maxAnkleHeightMS->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: maxAnkleHeightMS was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setMinAnkleHeightMS(){
-    if (bsData && bsData->parent){
-        bsData->minAnkleHeightMS = minAnkleHeightMS->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->minAnkleHeightMS != minAnkleHeightMS->value()) ? bsData->minAnkleHeightMS = minAnkleHeightMS->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: minAnkleHeightMS was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setMaxKneeAngleDegrees(){
-    if (bsData && bsData->parent){
-        bsData->maxKneeAngleDegrees = maxKneeAngleDegrees->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->maxKneeAngleDegrees != maxKneeAngleDegrees->value()) ? bsData->maxKneeAngleDegrees = maxKneeAngleDegrees->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: maxKneeAngleDegrees was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setMinKneeAngleDegrees(){
-    if (bsData && bsData->parent){
-        bsData->minKneeAngleDegrees = minKneeAngleDegrees->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->minKneeAngleDegrees != minKneeAngleDegrees->value()) ? bsData->minKneeAngleDegrees = minKneeAngleDegrees->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: minKneeAngleDegrees was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setMaxAnkleAngleDegrees(){
-    if (bsData && bsData->parent){
-        bsData->maxAnkleAngleDegrees = maxAnkleAngleDegrees->value();
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent && bsData->maxAnkleAngleDegrees != maxAnkleAngleDegrees->value()) ? bsData->maxAnkleAngleDegrees = maxAnkleAngleDegrees->value(), bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: maxAnkleAngleDegrees was not set!!");
 }
 
 void FootIkDriverInfoLegUI::setHipIndex(int index){
-    if (bsData && bsData->parent){
-        bsData->hipIndex = index - 1;
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent) ? bsData->hipIndex = index - 1, bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: The data is nullptr!!");
 }
 
 void FootIkDriverInfoLegUI::setKneeIndex(int index){
-    if (bsData && bsData->parent){
-        bsData->kneeIndex = index - 1;
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent) ? bsData->kneeIndex = index - 1, bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: The data is nullptr!!");
 }
 
 void FootIkDriverInfoLegUI::setAnkleIndex(int index){
-    if (bsData && bsData->parent){
-        bsData->ankleIndex = index - 1;
-        bsData->parent->setIsFileChanged(true);
-    }
+    (bsData && bsData->parent) ? bsData->ankleIndex = index - 1, bsData->parent->setIsFileChanged(true) : LogFile::writeToLog("FootIkDriverInfoLegUI: The data is nullptr!!");
 }
 
 void FootIkDriverInfoLegUI::loadBoneList(QStringList & bones){

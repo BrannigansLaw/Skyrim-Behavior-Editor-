@@ -28,7 +28,7 @@
 class BehaviorGraphView;
 class hkbVariableBindingSet;
 
-class CheckBox: public QWidget
+class CheckBox final: public QWidget
 {
     Q_OBJECT
 signals:
@@ -39,7 +39,7 @@ public:
         : QWidget(parent),
           checkbox(new QCheckBox(text, parent))
     {
-        QHBoxLayout *lyt = new QHBoxLayout;
+        auto lyt = new QHBoxLayout;
         lyt->addSpacing(1);
         lyt->addWidget(checkbox, Qt::AlignCenter);
         lyt->addSpacing(1);
@@ -59,7 +59,7 @@ private:
     QCheckBox *checkbox;
 };
 
-class ProgressDialog: public QProgressDialog
+class ProgressDialog final: public QProgressDialog
 {
 public:
     ProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags())
@@ -76,7 +76,7 @@ public:
     }
 };
 
-class Validator: public QValidator
+class Validator final: public QValidator
 {
 public:
     QValidator::State validate(QString & input, int &) const Q_DECL_OVERRIDE{
@@ -88,7 +88,7 @@ public:
     }
 };
 
-class LineEdit: public QLineEdit
+class LineEdit final: public QLineEdit
 {
     Q_OBJECT
 public:
@@ -99,7 +99,7 @@ public:
     }
 };
 
-class CheckButtonCombo: public QWidget{
+class CheckButtonCombo final: public QWidget{
     Q_OBJECT
 public:
     CheckButtonCombo(const QString & buttontip = "", const QString & boxtext = "Enable:", bool disablebutton = true, const QString & buttontext = "Edit", QWidget * par = 0)
@@ -109,10 +109,10 @@ public:
           pushButton(new QPushButton(buttontext)),
           disableButton(disablebutton)
     {
-        QPalette p = palette();
-        p.setColor(QPalette::Base, Qt::lightGray);
-        setPalette(p);
-        QHBoxLayout *lyt = new QHBoxLayout;
+        auto pal = palette();
+        pal.setColor(QPalette::Base, Qt::lightGray);
+        setPalette(pal);
+        auto lyt = new QHBoxLayout;
         pushButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         pushButton->setDisabled(disablebutton);
         pushButton->setToolTip(buttontip);
@@ -152,7 +152,7 @@ private:
     bool disableButton;
 };
 
-class ConditionValidator: public QValidator
+class ConditionValidator final: public QValidator
 {
 public:
     QValidator::State validate(QString & input, int &) const Q_DECL_OVERRIDE{
@@ -169,7 +169,7 @@ public:
     }
 };
 
-class ConditionLineEdit: public QLineEdit{
+class ConditionLineEdit final: public QLineEdit{
     Q_OBJECT
 public:
     ConditionLineEdit(const QString & text = "", QWidget * par = 0)
@@ -179,7 +179,7 @@ public:
     }
 };
 
-class TableWidgetItem: public QTableWidgetItem
+class TableWidgetItem final: public QTableWidgetItem
 {
 public:
     TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::white), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "", bool checkable = false)
@@ -195,7 +195,7 @@ public:
     }
 };
 
-class TableWidget: public QTableWidget
+class TableWidget final: public QTableWidget
 {
     Q_OBJECT
 signals:
@@ -204,9 +204,9 @@ public:
     TableWidget(const QColor & background = QColor(Qt::white), QWidget *parent = 0)
         : QTableWidget(parent)
     {
-        QPalette p = palette();
-        p.setColor(QPalette::Base, background);
-        setPalette(p);
+        QPalette pal = palette();
+        pal.setColor(QPalette::Base, background);
+        setPalette(pal);
         setMouseTracking(true);
         //setStyleSheet("QTableWidget { background:cyan }");
         setStyleSheet("QHeaderView::section { background-color:grey }");
@@ -221,9 +221,9 @@ public:
     }
 
     void dropEvent(QDropEvent *event) Q_DECL_OVERRIDE{
-        QTableWidgetItem *item = itemAt(event->pos());
-        int oldRow = currentRow();
-        int newRow = row(item);
+        auto item = itemAt(event->pos());
+        auto oldRow = currentRow();
+        auto newRow = row(item);
         if ((oldRow >= range.min && newRow >= range.min) && (oldRow <= range.max && newRow <= range.max)){
             if (swapRowItems(oldRow, newRow)){
                 emit itemDropped(oldRow, newRow);
@@ -235,18 +235,15 @@ public:
 
     bool swapRowItems(int row1, int row2){
         if (rowCount() > row1 && rowCount() > row2 && row1 != row2 && row1 >= 0 && row2 >= 0){
-            QTableWidgetItem *item1 = nullptr;
-            QTableWidgetItem *item2 = nullptr;
             for (auto i = 0; i < columnCount(); i++){
-                item1 = takeItem(row1, i);
-                item2 = takeItem(row2, i);
+                auto item1 = takeItem(row1, i);
+                auto item2 = takeItem(row2, i);
                 setItem(row2, i, item1);
                 setItem(row1, i, item2);
             }
             return true;
-        }else{
-            return false;
         }
+        return false;
     }
 
     QSize sizeHint() const{
@@ -268,7 +265,7 @@ private:
     RowSwapRange range;
 };
 
-class SpinBox: public QSpinBox
+class SpinBox final: public QSpinBox
 {
     Q_OBJECT
 public:
@@ -288,7 +285,7 @@ public:
     }
 };
 
-class DoubleSpinBox: public QDoubleSpinBox
+class DoubleSpinBox final: public QDoubleSpinBox
 {
     Q_OBJECT
 public:
@@ -311,7 +308,7 @@ public:
     }
 };
 
-class ComboBox: public QComboBox
+class ComboBox final: public QComboBox
 {
     Q_OBJECT
 public:
@@ -330,7 +327,7 @@ public:
     }
 };
 
-class QuadVariableWidget: public QWidget
+class QuadVariableWidget final: public QWidget
 {
     Q_OBJECT
 public:
@@ -370,10 +367,6 @@ public:
         connect(spinBoxW, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()), Qt::UniqueConnection);
     }
 
-    /*QSize sizeHint() const{
-        return QSize(800, 100);
-    }*/
-
     void setVector4(){
         spinBoxW->setVisible(true);
     }
@@ -402,8 +395,6 @@ public:
         spinBoxY->setValue(value.y);
         spinBoxZ->setValue(value.z);
     }
-
-    virtual ~QuadVariableWidget(){}
 signals:
     void editingFinished();
 private:
@@ -414,7 +405,7 @@ private:
     DoubleSpinBox *spinBoxW;
 };
 
-class GenericTableWidget: public QWidget
+class GenericTableWidget final: public QWidget
 {
     Q_OBJECT
     friend class HkDataUI;
@@ -426,15 +417,12 @@ public:
     void renameItem(int index, const QString & newname);
     void removeItem(int index);
     int getNumRows() const;
-    //void setTypes(const QStringList & typeNames);
 signals:
     void elementSelected(int index, const QString & name);
     void elementAdded(int index, const QString & type);
-protected:
 private slots:
     void itemSelected();
     void itemSelectedAt(int row, int );
-    //void itemAdded();
     void showTable(int index, const QString &typeallowed = "", const QStringList &typesdisallowed = QStringList());
     void showTable(const QString & name, const QString &typeallowed = "", const QStringList &typesdisallowed = QStringList());
     void filterItems();
@@ -450,8 +438,6 @@ private:
     QLineEdit *filterLE;
     QPushButton *selectPB;
     QPushButton *cancelPB;
-    //QPushButton *newPB;
-    //ComboBox *typeSelector;
     int lastSelectedRow;
 };
 

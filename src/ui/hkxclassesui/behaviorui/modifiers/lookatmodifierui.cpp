@@ -40,7 +40,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList LookAtModifierUI::headerLabels = {
+const QStringList LookAtModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -158,54 +158,55 @@ LookAtModifierUI::LookAtModifierUI()
     table->setCellWidget(IS_TARGET_INSIDE_LIMIT_CONE_ROW, VALUE_COLUMN, isTargetInsideLimitCone);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void LookAtModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(targetWS, SIGNAL(released()), this, SLOT(setTargetWS()), Qt::UniqueConnection);
-    connect(headForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setHeadForwardLS(int)), Qt::UniqueConnection);
-    connect(neckForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckForwardLS(int)), Qt::UniqueConnection);
-    connect(neckRightLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckRightLS(int)), Qt::UniqueConnection);
-    connect(eyePositionHS, SIGNAL(editingFinished()), this, SLOT(setEyePositionHS()), Qt::UniqueConnection);
-    connect(newTargetGain, SIGNAL(editingFinished()), this, SLOT(setNewTargetGain()), Qt::UniqueConnection);
-    connect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()), Qt::UniqueConnection);
-    connect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()), Qt::UniqueConnection);
-    connect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()), Qt::UniqueConnection);
-    connect(limitAngleLeft, SIGNAL(editingFinished()), this, SLOT(setLimitAngleLeft()), Qt::UniqueConnection);
-    connect(limitAngleRight, SIGNAL(editingFinished()), this, SLOT(setLimitAngleRight()), Qt::UniqueConnection);
-    connect(limitAngleUp, SIGNAL(editingFinished()), this, SLOT(setLimitAngleUp()), Qt::UniqueConnection);
-    connect(limitAngleDown, SIGNAL(released()), this, SLOT(setLimitAngleDown()), Qt::UniqueConnection);
-    connect(headIndex, SIGNAL(editingFinished()), this, SLOT(setHeadIndex()), Qt::UniqueConnection);
-    connect(neckIndex, SIGNAL(editingFinished()), this, SLOT(setNeckIndex()), Qt::UniqueConnection);
-    connect(isOn, SIGNAL(editingFinished()), this, SLOT(setIsOn()), Qt::UniqueConnection);
-    connect(individualLimitsOn, SIGNAL(released()), this, SLOT(setIndividualLimitsOn()), Qt::UniqueConnection);
-    connect(isTargetInsideLimitCone, SIGNAL(editingFinished()), this, SLOT(setIsTargetInsideLimitCone()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void LookAtModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(targetWS, SIGNAL(released()), this, SLOT(setTargetWS()));
-    disconnect(headForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setHeadForwardLS(int)));
-    disconnect(neckForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckForwardLS(int)));
-    disconnect(neckRightLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckRightLS(int)));
-    disconnect(eyePositionHS, SIGNAL(editingFinished()), this, SLOT(setEyePositionHS()));
-    disconnect(newTargetGain, SIGNAL(editingFinished()), this, SLOT(setNewTargetGain()));
-    disconnect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()));
-    disconnect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()));
-    disconnect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()));
-    disconnect(limitAngleLeft, SIGNAL(editingFinished()), this, SLOT(setLimitAngleLeft()));
-    disconnect(limitAngleRight, SIGNAL(editingFinished()), this, SLOT(setLimitAngleRight()));
-    disconnect(limitAngleUp, SIGNAL(editingFinished()), this, SLOT(setLimitAngleUp()));
-    disconnect(limitAngleDown, SIGNAL(released()), this, SLOT(setLimitAngleDown()));
-    disconnect(headIndex, SIGNAL(editingFinished()), this, SLOT(setHeadIndex()));
-    disconnect(neckIndex, SIGNAL(editingFinished()), this, SLOT(setNeckIndex()));
-    disconnect(isOn, SIGNAL(editingFinished()), this, SLOT(setIsOn()));
-    disconnect(individualLimitsOn, SIGNAL(released()), this, SLOT(setIndividualLimitsOn()));
-    disconnect(isTargetInsideLimitCone, SIGNAL(editingFinished()), this, SLOT(setIsTargetInsideLimitCone()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void LookAtModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(targetWS, SIGNAL(released()), this, SLOT(setTargetWS()), Qt::UniqueConnection);
+        connect(headForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setHeadForwardLS(int)), Qt::UniqueConnection);
+        connect(neckForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckForwardLS(int)), Qt::UniqueConnection);
+        connect(neckRightLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckRightLS(int)), Qt::UniqueConnection);
+        connect(eyePositionHS, SIGNAL(editingFinished()), this, SLOT(setEyePositionHS()), Qt::UniqueConnection);
+        connect(newTargetGain, SIGNAL(editingFinished()), this, SLOT(setNewTargetGain()), Qt::UniqueConnection);
+        connect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()), Qt::UniqueConnection);
+        connect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()), Qt::UniqueConnection);
+        connect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()), Qt::UniqueConnection);
+        connect(limitAngleLeft, SIGNAL(editingFinished()), this, SLOT(setLimitAngleLeft()), Qt::UniqueConnection);
+        connect(limitAngleRight, SIGNAL(editingFinished()), this, SLOT(setLimitAngleRight()), Qt::UniqueConnection);
+        connect(limitAngleUp, SIGNAL(editingFinished()), this, SLOT(setLimitAngleUp()), Qt::UniqueConnection);
+        connect(limitAngleDown, SIGNAL(released()), this, SLOT(setLimitAngleDown()), Qt::UniqueConnection);
+        connect(headIndex, SIGNAL(editingFinished()), this, SLOT(setHeadIndex()), Qt::UniqueConnection);
+        connect(neckIndex, SIGNAL(editingFinished()), this, SLOT(setNeckIndex()), Qt::UniqueConnection);
+        connect(isOn, SIGNAL(editingFinished()), this, SLOT(setIsOn()), Qt::UniqueConnection);
+        connect(individualLimitsOn, SIGNAL(released()), this, SLOT(setIndividualLimitsOn()), Qt::UniqueConnection);
+        connect(isTargetInsideLimitCone, SIGNAL(editingFinished()), this, SLOT(setIsTargetInsideLimitCone()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(targetWS, SIGNAL(released()), this, SLOT(setTargetWS()));
+        disconnect(headForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setHeadForwardLS(int)));
+        disconnect(neckForwardLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckForwardLS(int)));
+        disconnect(neckRightLS, SIGNAL(currentIndexChanged(int)), this, SLOT(setNeckRightLS(int)));
+        disconnect(eyePositionHS, SIGNAL(editingFinished()), this, SLOT(setEyePositionHS()));
+        disconnect(newTargetGain, SIGNAL(editingFinished()), this, SLOT(setNewTargetGain()));
+        disconnect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()));
+        disconnect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()));
+        disconnect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()));
+        disconnect(limitAngleLeft, SIGNAL(editingFinished()), this, SLOT(setLimitAngleLeft()));
+        disconnect(limitAngleRight, SIGNAL(editingFinished()), this, SLOT(setLimitAngleRight()));
+        disconnect(limitAngleUp, SIGNAL(editingFinished()), this, SLOT(setLimitAngleUp()));
+        disconnect(limitAngleDown, SIGNAL(released()), this, SLOT(setLimitAngleDown()));
+        disconnect(headIndex, SIGNAL(editingFinished()), this, SLOT(setHeadIndex()));
+        disconnect(neckIndex, SIGNAL(editingFinished()), this, SLOT(setNeckIndex()));
+        disconnect(isOn, SIGNAL(editingFinished()), this, SLOT(setIsOn()));
+        disconnect(individualLimitsOn, SIGNAL(released()), this, SLOT(setIndividualLimitsOn()));
+        disconnect(isTargetInsideLimitCone, SIGNAL(editingFinished()), this, SLOT(setIsTargetInsideLimitCone()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void LookAtModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -217,431 +218,208 @@ void LookAtModifierUI::connectToTables(GenericTableWidget *variables, GenericTab
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void LookAtModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_LOOK_AT_MODIFIER){
-            QStringList boneNames("None");
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbLookAtModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            targetWS->setValue(bsData->targetWS);
-            headForwardLS->setValue(bsData->headForwardLS);
-            neckForwardLS->setValue(bsData->neckForwardLS);
-            neckRightLS->setValue(bsData->neckRightLS);
-            eyePositionHS->setValue(bsData->eyePositionHS);
-            newTargetGain->setValue(bsData->newTargetGain);
-            onGain->setValue(bsData->onGain);
-            offGain->setValue(bsData->offGain);
-            limitAngleDegrees->setValue(bsData->onGain);
-            limitAngleLeft->setValue(bsData->limitAngleLeft);
-            limitAngleRight->setValue(bsData->limitAngleRight);
-            limitAngleUp->setValue(bsData->limitAngleUp);
-            limitAngleDown->setValue(bsData->limitAngleDown);
-            if (headIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                headIndex->insertItems(0, boneNames);
-            }
-            headIndex->setCurrentIndex(bsData->headIndex + 1);
-            if (neckIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                neckIndex->insertItems(0, boneNames);
-            }
-            neckIndex->setCurrentIndex(bsData->neckIndex + 1);
-            isOn->setChecked(bsData->isOn);
-            individualLimitsOn->setChecked(bsData->individualLimitsOn);
-            isTargetInsideLimitCone->setChecked(bsData->isTargetInsideLimitCone);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(TARGET_WS_ROW, BINDING_COLUMN, varBind, "targetWS");
-                loadBinding(HEAD_FORWARD_LS_ROW, BINDING_COLUMN, varBind, "headForwardLS");
-                loadBinding(NECK_FORWARD_LS_ROW, BINDING_COLUMN, varBind, "neckForwardLS");
-                loadBinding(NECK_RIGHT_LS_ROW, BINDING_COLUMN, varBind, "neckRightLS");
-                loadBinding(EYE_POSITION_HS_ROW, BINDING_COLUMN, varBind, "eyePositionHS");
-                loadBinding(NEW_TARGET_GAIN_ROW, BINDING_COLUMN, varBind, "newTargetGain");
-                loadBinding(ON_GAIN_ROW, BINDING_COLUMN, varBind, "onGain");
-                loadBinding(OFF_GAIN_ROW, BINDING_COLUMN, varBind, "offGain");
-                loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees");
-                loadBinding(LIMIT_ANGLE_LEFT_ROW, BINDING_COLUMN, varBind, "limitAngleLeft");
-                loadBinding(LIMIT_ANGLE_RIGHT_ROW, BINDING_COLUMN, varBind, "limitAngleRight");
-                loadBinding(LIMIT_ANGLE_UP_ROW, BINDING_COLUMN, varBind, "limitAngleUp");
-                loadBinding(LIMIT_ANGLE_DOWN_ROW, BINDING_COLUMN, varBind, "limitAngleDown");
-                loadBinding(HEAD_INDEX_ROW, BINDING_COLUMN, varBind, "headIndex");
-                loadBinding(NECK_INDEX_ROW, BINDING_COLUMN, varBind, "neckIndex");
-                loadBinding(IS_ON_ROW, BINDING_COLUMN, varBind, "isOn");
-                loadBinding(INDIVIDUAL_LIMITS_ON_ROW, BINDING_COLUMN, varBind, "individualLimitsOn");
-                loadBinding(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN, varBind, "isTargetInsideLimitCone");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_WS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(HEAD_FORWARD_LS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(NECK_FORWARD_LS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(NECK_RIGHT_LS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(EYE_POSITION_HS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(NEW_TARGET_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ON_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(OFF_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_ANGLE_LEFT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_ANGLE_RIGHT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_ANGLE_UP_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_ANGLE_DOWN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(HEAD_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(NECK_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(IS_ON_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(INDIVIDUAL_LIMITS_ON_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            targetWS->setValue(bsData->getTargetWS());
+            headForwardLS->setValue(bsData->getHeadForwardLS());
+            neckForwardLS->setValue(bsData->getNeckForwardLS());
+            neckRightLS->setValue(bsData->getNeckRightLS());
+            eyePositionHS->setValue(bsData->getEyePositionHS());
+            newTargetGain->setValue(bsData->getNewTargetGain());
+            onGain->setValue(bsData->getOnGain());
+            offGain->setValue(bsData->getOffGain());
+            limitAngleDegrees->setValue(bsData->getLimitAngleDegrees());
+            limitAngleLeft->setValue(bsData->getLimitAngleLeft());
+            limitAngleRight->setValue(bsData->getLimitAngleRight());
+            limitAngleUp->setValue(bsData->getLimitAngleUp());
+            limitAngleDown->setValue(bsData->getLimitAngleDown());
+            auto loadbones = [&](ComboBox *combobox, int indextoset){
+                if (!combobox->count()){
+                    auto boneNames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(headIndex, bsData->getHeadIndex() + 1);
+            loadbones(neckIndex, bsData->getNeckIndex() + 1);
+            isOn->setChecked(bsData->getIsOn());
+            individualLimitsOn->setChecked(bsData->getIndividualLimitsOn());
+            isTargetInsideLimitCone->setChecked(bsData->getIsTargetInsideLimitCone());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(TARGET_WS_ROW, BINDING_COLUMN, varBind, "targetWS", table, bsData);
+            UIHelper::loadBinding(HEAD_FORWARD_LS_ROW, BINDING_COLUMN, varBind, "headForwardLS", table, bsData);
+            UIHelper::loadBinding(NECK_FORWARD_LS_ROW, BINDING_COLUMN, varBind, "neckForwardLS", table, bsData);
+            UIHelper::loadBinding(NECK_RIGHT_LS_ROW, BINDING_COLUMN, varBind, "neckRightLS", table, bsData);
+            UIHelper::loadBinding(EYE_POSITION_HS_ROW, BINDING_COLUMN, varBind, "eyePositionHS", table, bsData);
+            UIHelper::loadBinding(NEW_TARGET_GAIN_ROW, BINDING_COLUMN, varBind, "newTargetGain", table, bsData);
+            UIHelper::loadBinding(ON_GAIN_ROW, BINDING_COLUMN, varBind, "onGain", table, bsData);
+            UIHelper::loadBinding(OFF_GAIN_ROW, BINDING_COLUMN, varBind, "offGain", table, bsData);
+            UIHelper::loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees", table, bsData);
+            UIHelper::loadBinding(LIMIT_ANGLE_LEFT_ROW, BINDING_COLUMN, varBind, "limitAngleLeft", table, bsData);
+            UIHelper::loadBinding(LIMIT_ANGLE_RIGHT_ROW, BINDING_COLUMN, varBind, "limitAngleRight", table, bsData);
+            UIHelper::loadBinding(LIMIT_ANGLE_UP_ROW, BINDING_COLUMN, varBind, "limitAngleUp", table, bsData);
+            UIHelper::loadBinding(LIMIT_ANGLE_DOWN_ROW, BINDING_COLUMN, varBind, "limitAngleDown", table, bsData);
+            UIHelper::loadBinding(HEAD_INDEX_ROW, BINDING_COLUMN, varBind, "headIndex", table, bsData);
+            UIHelper::loadBinding(NECK_INDEX_ROW, BINDING_COLUMN, varBind, "neckIndex", table, bsData);
+            UIHelper::loadBinding(IS_ON_ROW, BINDING_COLUMN, varBind, "isOn", table, bsData);
+            UIHelper::loadBinding(INDIVIDUAL_LIMITS_ON_ROW, BINDING_COLUMN, varBind, "individualLimitsOn", table, bsData);
+            UIHelper::loadBinding(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN, varBind, "isTargetInsideLimitCone", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("LookAtModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("LookAtModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void LookAtModifierUI::setName(){
+void LookAtModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void LookAtModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("LookAtModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setTargetWS(){
-    if (bsData){
-        if (bsData->targetWS != targetWS->value()){
-            bsData->targetWS = targetWS->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::settargetWS(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetWS(targetWS->value()) : LogFile::writeToLog("LookAtModifierUI::setTargetWS(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setHeadForwardLS(){
-    if (bsData){
-        if (bsData->headForwardLS != headForwardLS->value()){
-            bsData->headForwardLS = headForwardLS->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setheadForwardLS(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setHeadForwardLS(headForwardLS->value()) : LogFile::writeToLog("LookAtModifierUI::setHeadForwardLS(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setNeckForwardLS(){
-    if (bsData){
-        if (bsData->neckForwardLS != neckForwardLS->value()){
-            bsData->neckForwardLS = neckForwardLS->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setneckForwardLS(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setNeckForwardLS(neckForwardLS->value()) : LogFile::writeToLog("LookAtModifierUI::setNeckForwardLS(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setNeckRightLS(){
-    if (bsData){
-        if (bsData->neckRightLS != neckRightLS->value()){
-            bsData->neckRightLS = neckRightLS->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setneckRightLS(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setNeckRightLS(neckRightLS->value()) : LogFile::writeToLog("LookAtModifierUI::setNeckRightLS(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setEyePositionHS(){
-    if (bsData){
-        if (bsData->eyePositionHS != eyePositionHS->value()){
-            bsData->eyePositionHS = eyePositionHS->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::seteyePositionHS(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEyePositionHS(eyePositionHS->value()) : LogFile::writeToLog("LookAtModifierUI::setEyePositionHS(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setNewTargetGain(){
-    if (bsData){
-        if (bsData->newTargetGain != newTargetGain->value()){
-            bsData->newTargetGain = newTargetGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setnewTargetGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setNewTargetGain(newTargetGain->value()) : LogFile::writeToLog("LookAtModifierUI::setNewTargetGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setOnGain(){
-    if (bsData){
-        if (bsData->onGain != onGain->value()){
-            bsData->onGain = onGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setonGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOnGain(onGain->value()) : LogFile::writeToLog("LookAtModifierUI::setOnGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setOffGain(){
-    if (bsData){
-        if (bsData->offGain != offGain->value()){
-            bsData->offGain = offGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setoffGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOffGain(offGain->value()) : LogFile::writeToLog("LookAtModifierUI::setOffGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setLimitAngleDegrees(){
-    if (bsData){
-        if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
-            bsData->limitAngleDegrees = limitAngleDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setLimitAngleDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleDegrees(limitAngleDegrees->value()) : LogFile::writeToLog("LookAtModifierUI::setLimitAngleDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setLimitAngleLeft(){
-    if (bsData){
-        if (bsData->limitAngleLeft != limitAngleLeft->value()){
-            bsData->limitAngleLeft = limitAngleLeft->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleLeft(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleLeft(limitAngleLeft->value()) : LogFile::writeToLog("LookAtModifierUI::setLimitAngleLeft(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setLimitAngleRight(){
-    if (bsData){
-        if (bsData->limitAngleRight != limitAngleRight->value()){
-            bsData->limitAngleRight = limitAngleRight->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleRight(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleRight(limitAngleRight->value()) : LogFile::writeToLog("LookAtModifierUI::setLimitAngleRight(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setLimitAngleUp(){
-    if (bsData){
-        if (bsData->limitAngleUp != limitAngleUp->value()){
-            bsData->limitAngleUp = limitAngleUp->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleUp(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleUp(limitAngleUp->value()) : LogFile::writeToLog("LookAtModifierUI::setLimitAngleUp(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setLimitAngleDown(){
-    if (bsData){
-        if (bsData->limitAngleDown != limitAngleDown->value()){
-            bsData->limitAngleDown = limitAngleDown->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleDown(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleDown(limitAngleDown->value()) : LogFile::writeToLog("LookAtModifierUI::setLimitAngleDown(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setHeadIndex(int index){
-    if (bsData){
-        bsData->headIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setheadIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setHeadIndex(index - 1) : LogFile::writeToLog("LookAtModifierUI::setHeadIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setNeckIndex(int index){
-    if (bsData){
-        bsData->neckIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setneckIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setNeckIndex(index - 1) : LogFile::writeToLog("LookAtModifierUI::setNeckIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setIsOn(){
-    if (bsData){
-        bsData->isOn = isOn->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setisOn(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setIsOn(isOn->isChecked()) : LogFile::writeToLog("LookAtModifierUI::setIsOn(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setIndividualLimitsOn(){
-    if (bsData){
-        bsData->individualLimitsOn = individualLimitsOn->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setindividualLimitsOn(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setIndividualLimitsOn(individualLimitsOn->isChecked()) : LogFile::writeToLog("LookAtModifierUI::setIndividualLimitsOn(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::setIsTargetInsideLimitCone(){
-    if (bsData){
-        bsData->isTargetInsideLimitCone = isTargetInsideLimitCone->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setisTargetInsideLimitCone(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setIsTargetInsideLimitCone(isTargetInsideLimitCone->isChecked()) : LogFile::writeToLog("LookAtModifierUI::setIsTargetInsideLimitCone(): The 'bsData' pointer is nullptr!!");
 }
 
 void LookAtModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case TARGET_WS_ROW:
-                if (table->item(TARGET_WS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetWS");
-                break;
+                checkisproperty(TARGET_WS_ROW, "targetWS"); break;
             case HEAD_FORWARD_LS_ROW:
-                if (table->item(HEAD_FORWARD_LS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "headForwardLS");
-                break;
+                checkisproperty(HEAD_FORWARD_LS_ROW, "headForwardLS"); break;
             case NECK_FORWARD_LS_ROW:
-                if (table->item(NECK_FORWARD_LS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "neckForwardLS");
-                break;
+                checkisproperty(NECK_FORWARD_LS_ROW, "neckForwardLS"); break;
             case NECK_RIGHT_LS_ROW:
-                if (table->item(NECK_RIGHT_LS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "neckRightLS");
-                break;
+                checkisproperty(NECK_RIGHT_LS_ROW, "neckRightLS"); break;
             case EYE_POSITION_HS_ROW:
-                if (table->item(EYE_POSITION_HS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "eyePositionHS");
-                break;
+                checkisproperty(EYE_POSITION_HS_ROW, "eyePositionHS"); break;
             case NEW_TARGET_GAIN_ROW:
-                if (table->item(NEW_TARGET_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "newTargetGain");
-                break;
+                checkisproperty(NEW_TARGET_GAIN_ROW, "newTargetGain"); break;
             case ON_GAIN_ROW:
-                if (table->item(ON_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "onGain");
-                break;
+                checkisproperty(ON_GAIN_ROW, "onGain"); break;
             case OFF_GAIN_ROW:
-                if (table->item(OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "offGain");
-                break;
+                checkisproperty(OFF_GAIN_ROW, "offGain"); break;
             case LIMIT_ANGLE_DEGREES_ROW:
-                if (table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitAngleDegrees");
-                break;
+                checkisproperty(LIMIT_ANGLE_DEGREES_ROW, "limitAngleDegrees"); break;
             case LIMIT_ANGLE_LEFT_ROW:
-                if (table->item(LIMIT_ANGLE_LEFT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitAngleLeft");
-                break;
+                checkisproperty(LIMIT_ANGLE_LEFT_ROW, "limitAngleLeft"); break;
             case LIMIT_ANGLE_RIGHT_ROW:
-                if (table->item(LIMIT_ANGLE_RIGHT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitAngleRight");
-                break;
+                checkisproperty(LIMIT_ANGLE_RIGHT_ROW, "limitAngleRight"); break;
             case LIMIT_ANGLE_UP_ROW:
-                if (table->item(LIMIT_ANGLE_UP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitAngleUp");
-                break;
+                checkisproperty(LIMIT_ANGLE_UP_ROW, "limitAngleUp"); break;
             case LIMIT_ANGLE_DOWN_ROW:
-                if (table->item(LIMIT_ANGLE_DOWN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitAngleDown");
-                break;
+                checkisproperty(LIMIT_ANGLE_DOWN_ROW, "limitAngleDown"); break;
             case HEAD_INDEX_ROW:
-                if (table->item(HEAD_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "headIndex");
-                break;
+                checkisproperty(HEAD_INDEX_ROW, "headIndex"); break;
             case NECK_INDEX_ROW:
-                if (table->item(NECK_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "neckIndex");
-                break;
+                checkisproperty(NECK_INDEX_ROW, "neckIndex"); break;
             case IS_ON_ROW:
-                if (table->item(IS_ON_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "isOn");
-                break;
+                checkisproperty(IS_ON_ROW, "isOn"); break;
             case INDIVIDUAL_LIMITS_ON_ROW:
-                if (table->item(INDIVIDUAL_LIMITS_ON_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "individualLimitsOn");
-                break;
+                checkisproperty(INDIVIDUAL_LIMITS_ON_ROW, "individualLimitsOn"); break;
             case IS_TARGET_INSIDE_LIMIT_CONE_ROW:
-                if (table->item(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "isTargetInsideLimitCone");
-                break;
-            default:
-                return;
+                checkisproperty(IS_TARGET_INSIDE_LIMIT_CONE_ROW, "isTargetInsideLimitCone"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -661,278 +439,93 @@ void LookAtModifierUI::selectTableToView(bool viewisProperty, const QString & pa
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void LookAtModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetWS");
-            if (bindIndex == index){
-                table->item(TARGET_WS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("headForwardLS");
-            if (bindIndex == index){
-                table->item(HEAD_FORWARD_LS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("neckForwardLS");
-            if (bindIndex == index){
-                table->item(NECK_FORWARD_LS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("neckRightLS");
-            if (bindIndex == index){
-                table->item(NECK_RIGHT_LS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("eyePositionHS");
-            if (bindIndex == index){
-                table->item(EYE_POSITION_HS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("newTargetGain");
-            if (bindIndex == index){
-                table->item(NEW_TARGET_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("onGain");
-            if (bindIndex == index){
-                table->item(ON_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("offGain");
-            if (bindIndex == index){
-                table->item(OFF_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleDegrees");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleLeft");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_LEFT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleRight");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_RIGHT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleUp");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_UP_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleDown");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_DOWN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("headIndex");
-            if (bindIndex == index){
-                table->item(HEAD_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("neckIndex");
-            if (bindIndex == index){
-                table->item(NECK_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("isOn");
-            if (bindIndex == index){
-                table->item(IS_ON_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("individualLimitsOn");
-            if (bindIndex == index){
-                table->item(INDIVIDUAL_LIMITS_ON_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("isTargetInsideLimitCone");
-            if (bindIndex == index){
-                table->item(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("targetWS", TARGET_WS_ROW);
+            setname("headForwardLS", HEAD_FORWARD_LS_ROW);
+            setname("neckForwardLS", NECK_FORWARD_LS_ROW);
+            setname("neckRightLS", NECK_RIGHT_LS_ROW);
+            setname("eyePositionHS", EYE_POSITION_HS_ROW);
+            setname("newTargetGain", NEW_TARGET_GAIN_ROW);
+            setname("onGain", ON_GAIN_ROW);
+            setname("offGain", OFF_GAIN_ROW);
+            setname("limitAngleDegrees", LIMIT_ANGLE_DEGREES_ROW);
+            setname("limitAngleLeft", LIMIT_ANGLE_LEFT_ROW);
+            setname("limitAngleRight", LIMIT_ANGLE_RIGHT_ROW);
+            setname("limitAngleUp", LIMIT_ANGLE_UP_ROW);
+            setname("limitAngleDown", LIMIT_ANGLE_DOWN_ROW);
+            setname("headIndex", HEAD_INDEX_ROW);
+            setname("neckIndex", NECK_INDEX_ROW);
+            setname("isOn", IS_ON_ROW);
+            setname("individualLimitsOn", INDIVIDUAL_LIMITS_ON_ROW);
+            setname("isTargetInsideLimitCone", IS_TARGET_INSIDE_LIMIT_CONE_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool LookAtModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void LookAtModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case TARGET_WS_ROW:
-            if (table->item(TARGET_WS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetWS", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_WS_ROW, "targetWS", VARIABLE_TYPE_VECTOR4); break;
         case HEAD_FORWARD_LS_ROW:
-            if (table->item(HEAD_FORWARD_LS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "headForwardLS", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(HEAD_FORWARD_LS_ROW, "headForwardLS", VARIABLE_TYPE_VECTOR4); break;
         case NECK_FORWARD_LS_ROW:
-            if (table->item(NECK_FORWARD_LS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "neckForwardLS", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(NECK_FORWARD_LS_ROW, "neckForwardLS", VARIABLE_TYPE_VECTOR4); break;
         case NECK_RIGHT_LS_ROW:
-            if (table->item(NECK_RIGHT_LS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "neckRightLS", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(NECK_RIGHT_LS_ROW, "neckRightLS", VARIABLE_TYPE_VECTOR4); break;
         case EYE_POSITION_HS_ROW:
-            if (table->item(EYE_POSITION_HS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "eyePositionHS", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(EYE_POSITION_HS_ROW, "eyePositionHS", VARIABLE_TYPE_VECTOR4); break;
         case NEW_TARGET_GAIN_ROW:
-            if (table->item(NEW_TARGET_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "newTargetGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(NEW_TARGET_GAIN_ROW, "newTargetGain", VARIABLE_TYPE_REAL); break;
         case ON_GAIN_ROW:
-            if (table->item(ON_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "onGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ON_GAIN_ROW, "onGain", VARIABLE_TYPE_REAL); break;
         case OFF_GAIN_ROW:
-            if (table->item(OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "offGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(OFF_GAIN_ROW, "offGain", VARIABLE_TYPE_REAL); break;
         case LIMIT_ANGLE_DEGREES_ROW:
-            if (table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_DEGREES_ROW, "limitAngleDegrees", VARIABLE_TYPE_REAL); break;
         case LIMIT_ANGLE_LEFT_ROW:
-            if (table->item(LIMIT_ANGLE_LEFT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleLeft", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_LEFT_ROW, "limitAngleLeft", VARIABLE_TYPE_REAL); break;
         case LIMIT_ANGLE_RIGHT_ROW:
-            if (table->item(LIMIT_ANGLE_RIGHT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleRight", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_RIGHT_ROW, "limitAngleRight", VARIABLE_TYPE_REAL); break;
         case LIMIT_ANGLE_UP_ROW:
-            if (table->item(LIMIT_ANGLE_UP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleUp", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_UP_ROW, "limitAngleUp", VARIABLE_TYPE_REAL); break;
         case LIMIT_ANGLE_DOWN_ROW:
-            if (table->item(LIMIT_ANGLE_DOWN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleDown", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_DOWN_ROW, "limitAngleDown", VARIABLE_TYPE_REAL); break;
         case HEAD_INDEX_ROW:
-            if (table->item(HEAD_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "headIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(HEAD_INDEX_ROW, "headIndex", VARIABLE_TYPE_INT32); break;
         case NECK_INDEX_ROW:
-            if (table->item(NECK_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "neckIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(NECK_INDEX_ROW, "neckIndex", VARIABLE_TYPE_INT32); break;
         case IS_ON_ROW:
-            if (table->item(IS_ON_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "isOn", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(IS_ON_ROW, "isOn", VARIABLE_TYPE_BOOL); break;
         case INDIVIDUAL_LIMITS_ON_ROW:
-            if (table->item(INDIVIDUAL_LIMITS_ON_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "individualLimitsOn", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(INDIVIDUAL_LIMITS_ON_ROW, "individualLimitsOn", VARIABLE_TYPE_BOOL); break;
         case IS_TARGET_INSIDE_LIMIT_CONE_ROW:
-            if (table->item(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "isTargetInsideLimitCone", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void LookAtModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("LookAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(IS_TARGET_INSIDE_LIMIT_CONE_ROW, "isTargetInsideLimitCone", VARIABLE_TYPE_BOOL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LookAtModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("LookAtModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

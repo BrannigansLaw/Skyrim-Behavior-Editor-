@@ -2,6 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSLookAtModifier::refCount = 0;
 
@@ -38,6 +39,26 @@ const QString BSLookAtModifier::getClassname(){
 QString BSLookAtModifier::getName() const{
     std::lock_guard <std::mutex> guard(mutex);
     return name;
+}
+
+void BSLookAtModifier::removeBone(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < bones.size()) ? bones.removeAt(index) : LogFile::writeToLog(getClassname()+": Unable to remove bone!");
+}
+
+void BSLookAtModifier::removeEyeBone(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < eyeBones.size()) ? eyeBones.removeAt(index) : LogFile::writeToLog(getClassname()+": Unable to remove eyeBone!");
+}
+
+void BSLookAtModifier::addBone(const BSLookAtModifier::BsBone &bone){
+    std::lock_guard <std::mutex> guard(mutex);
+    bones.append(bone);
+}
+
+void BSLookAtModifier::addEyeBone(const BSLookAtModifier::BsBone &bone){
+    std::lock_guard <std::mutex> guard(mutex);
+    eyeBones.append(bone);
 }
 
 bool BSLookAtModifier::readData(const HkxXmlReader &reader, long & index){
@@ -336,6 +357,181 @@ bool BSLookAtModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread s
     return false;
 }
 
+QVector<BSLookAtModifier::BsBone> &BSLookAtModifier::getEyeBones(){
+    std::lock_guard <std::mutex> guard(mutex);
+    return eyeBones;
+}
+
+QVector<BSLookAtModifier::BsBone> &BSLookAtModifier::getBones(){
+    std::lock_guard <std::mutex> guard(mutex);
+    return bones;
+}
+
+qreal BSLookAtModifier::getLookAtCameraZ() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return lookAtCameraZ;
+}
+
+void BSLookAtModifier::setLookAtCameraZ(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != lookAtCameraZ) ? lookAtCameraZ = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'lookAtCameraZ' was not set!");
+}
+
+qreal BSLookAtModifier::getLookAtCameraY() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return lookAtCameraY;
+}
+
+void BSLookAtModifier::setLookAtCameraY(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != lookAtCameraY) ? lookAtCameraY = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'lookAtCameraY' was not set!");
+}
+
+qreal BSLookAtModifier::getLookAtCameraX() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return lookAtCameraX;
+}
+
+void BSLookAtModifier::setLookAtCameraX(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != lookAtCameraX) ? lookAtCameraX = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'lookAtCameraX' was not set!");
+}
+
+bool BSLookAtModifier::getLookAtCamera() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return lookAtCamera;
+}
+
+void BSLookAtModifier::setLookAtCamera(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != lookAtCamera) ? lookAtCamera = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'lookAtCamera' was not set!");
+}
+
+hkbStringEventPayload * BSLookAtModifier::getPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(payload.data());
+}
+
+void BSLookAtModifier::setPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(payload.data())) ? payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'payload' was not set!");
+}
+
+int BSLookAtModifier::getId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return id;
+}
+
+void BSLookAtModifier::setId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != id && id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'id' was not set!");
+}
+
+bool BSLookAtModifier::getTargetOutsideLimits() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetOutsideLimits;
+}
+
+void BSLookAtModifier::setTargetOutsideLimits(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetOutsideLimits) ? targetOutsideLimits = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetOutsideLimits' was not set!");
+}
+
+hkQuadVariable BSLookAtModifier::getTargetLocation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetLocation;
+}
+
+void BSLookAtModifier::setTargetLocation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetLocation) ? targetLocation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetLocation' was not set!");
+}
+
+bool BSLookAtModifier::getUseBoneGains() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return useBoneGains;
+}
+
+void BSLookAtModifier::setUseBoneGains(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != useBoneGains) ? useBoneGains = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'useBoneGains' was not set!");
+}
+
+qreal BSLookAtModifier::getOffGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return offGain;
+}
+
+void BSLookAtModifier::setOffGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != offGain) ? offGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'offGain' was not set!");
+}
+
+qreal BSLookAtModifier::getOnGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return onGain;
+}
+
+void BSLookAtModifier::setOnGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != onGain) ? onGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'onGain' was not set!");
+}
+
+bool BSLookAtModifier::getContinueLookOutsideOfLimit() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return continueLookOutsideOfLimit;
+}
+
+void BSLookAtModifier::setContinueLookOutsideOfLimit(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != continueLookOutsideOfLimit) ? continueLookOutsideOfLimit = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'continueLookOutsideOfLimit' was not set!");
+}
+
+qreal BSLookAtModifier::getLimitAngleThresholdDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return limitAngleThresholdDegrees;
+}
+
+void BSLookAtModifier::setLimitAngleThresholdDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != limitAngleThresholdDegrees) ? limitAngleThresholdDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'limitAngleThresholdDegrees' was not set!");
+}
+
+qreal BSLookAtModifier::getLimitAngleDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return limitAngleDegrees;
+}
+
+void BSLookAtModifier::setLimitAngleDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != limitAngleDegrees) ? limitAngleDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'limitAngleDegrees' was not set!");
+}
+
+bool BSLookAtModifier::getLookAtTarget() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return lookAtTarget;
+}
+
+void BSLookAtModifier::setLookAtTarget(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != lookAtTarget) ? lookAtTarget = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'lookAtTarget' was not set!");
+}
+
+bool BSLookAtModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSLookAtModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSLookAtModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSLookAtModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -360,7 +556,7 @@ void BSLookAtModifier::unlink(){
 QString BSLookAtModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (bones.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": bones is empty!");

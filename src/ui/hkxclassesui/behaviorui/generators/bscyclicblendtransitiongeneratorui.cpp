@@ -133,7 +133,7 @@ void BSCyclicBlendTransitionGeneratorUI::loadData(HkxObject *data){
             name->setText(bsData->getName());
             (bsData->getEventToFreezeBlendValueId() > -1) ? eventToFreezeBlendValue->setChecked(true) : eventToFreezeBlendValue->setChecked(false);
             (bsData->getEventToCrossBlendId() > -1) ? eventToCrossBlend->setChecked(true) : eventToCrossBlend->setChecked(false);
-            (eBlendCurve->count() == 0) ? eBlendCurve->insertItems(0, bsData->BlendCurve) : NULL;
+            (!eBlendCurve->count()) ? eBlendCurve->insertItems(0, bsData->BlendCurve) : NULL;
             fTransitionDuration->setValue(bsData->getFTransitionDuration());
             eBlendCurve->setCurrentIndex(bsData->BlendCurve.indexOf(bsData->getEBlendCurve()));
             table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getBlenderGeneratorName());
@@ -227,9 +227,9 @@ void BSCyclicBlendTransitionGeneratorUI::selectTableToView(bool viewproperties, 
 
 void BSCyclicBlendTransitionGeneratorUI::viewSelectedChild(int row, int column){
     if (bsData){
-        auto properties = false;
         auto checkisproperty = [&](int row, const QString & fieldname){
-            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
             selectTableToView(properties, fieldname);
         };
         if (column == BINDING_COLUMN){
@@ -255,10 +255,10 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
 
 void BSCyclicBlendTransitionGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        auto isProperty = false;
         auto row = table->currentRow();
         auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
-            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
             UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
         };
         switch (row){

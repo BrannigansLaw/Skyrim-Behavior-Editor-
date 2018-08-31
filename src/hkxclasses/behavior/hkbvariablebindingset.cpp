@@ -65,7 +65,7 @@ bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBin
             indexOfBindingToEnable = bindings.size() - 1;
         }
     }
-    getParentFile()->setIsChanged(true);
+    setIsFileChanged(true);
     return true;
 }
 
@@ -317,7 +317,7 @@ bool hkbVariableBindingSet::link(){
 QString hkbVariableBindingSet::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (bindings.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": bindings is empty!");

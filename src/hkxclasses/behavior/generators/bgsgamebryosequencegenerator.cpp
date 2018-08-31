@@ -90,22 +90,22 @@ bool BGSGamebryoSequenceGenerator::link(){
 
 void BGSGamebryoSequenceGenerator::setFPercent(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fPercent) ? fPercent = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fPercent' was not set!");
+    (value != fPercent) ? fPercent = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fPercent' was not set!");
 }
 
 void BGSGamebryoSequenceGenerator::setEBlendModeFunction(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index >= 0 && index < BlendModeFunction.size() && eBlendModeFunction != BlendModeFunction.at(index)) ? eBlendModeFunction = BlendModeFunction.at(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'eBlendModeFunction' was not set!");
+    (index >= 0 && index < BlendModeFunction.size() && eBlendModeFunction != BlendModeFunction.at(index)) ? eBlendModeFunction = BlendModeFunction.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eBlendModeFunction' was not set!");
 }
 
 void BGSGamebryoSequenceGenerator::setPSequence(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != pSequence && value != "") ? pSequence = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'pSequence' was not set!");
+    (value != pSequence && value != "") ? pSequence = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'pSequence' was not set!");
 }
 
 void BGSGamebryoSequenceGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 qreal BGSGamebryoSequenceGenerator::getFPercent() const{

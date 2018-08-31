@@ -10,10 +10,9 @@ class QPushButton;
 class DoubleSpinBox;
 class TableWidget;
 
-class AnimationRotationUI: public QGroupBox
+class AnimationRotationUI final: public QGroupBox
 {
     Q_OBJECT
-    //friend class AnimationUI;
 public:
     AnimationRotationUI();
     void loadData(SkyrimAnimationRotation *quaternion, qreal maxtime);
@@ -26,12 +25,10 @@ private slots:
     void setZ(qreal zval);
     void setAngle(qreal wval);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    //SkyrimAnimData::Rotation convertAxisAngletoQuaternion(SkyrimAnimData::Rotation * axisAngleRot) const;
+    void toggleSignals(bool toggleconnections);
     SkyrimAnimationRotation convertQuaternionAxisAngle(SkyrimAnimationRotation * quaternion) const;
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     SkyrimAnimationRotation *bsData;
     QGridLayout *topLyt;
     QPushButton *returnPB;

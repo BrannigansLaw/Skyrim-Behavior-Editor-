@@ -17,13 +17,15 @@ class ComboBox;
 class QPushButton;
 class LineEdit;
 
-class HandIkDriverInfoHandUI: public QGroupBox
+class HandIkDriverInfoHandUI final: public QGroupBox
 {
     Q_OBJECT
-    //friend class HkDataUI;
 public:
     HandIkDriverInfoHandUI();
-    virtual ~HandIkDriverInfoHandUI(){}
+    HandIkDriverInfoHandUI& operator=(const HandIkDriverInfoHandUI&) = delete;
+    HandIkDriverInfoHandUI(const HandIkDriverInfoHandUI &) = delete;
+    ~HandIkDriverInfoHandUI() = default;
+public:
     void loadData(hkbHandIkDriverInfoHand *data, hkbHandIkDriverInfo *par);
     void loadBoneList(QStringList &bones);
 signals:
@@ -42,9 +44,9 @@ private slots:
     void setWristIndex(int index);
     void setEnforceEndPosition();
     void setEnforceEndRotation();
-    void setLocalFrameName();
+    void setLocalFrameName(int index);
 private:
-    static QStringList headerLabels1;
+    static const QStringList headerLabels1;
     hkbHandIkDriverInfo::hkbHandIkDriverInfoHand *bsData;
     hkbHandIkDriverInfo *parent;
     QVBoxLayout *lyt;
@@ -64,7 +66,7 @@ private:
     ComboBox *wristIndex;
     CheckBox *enforceEndPosition;
     CheckBox *enforceEndRotation;
-    LineEdit *localFrameName;
+    ComboBox *localFrameName;
 };
 
 #endif // HANDIKDRIVERINFOHANDUI_H

@@ -1,6 +1,7 @@
 #include "hkbrigidbodyragdollcontrolsmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbboneindexarray.h"
 
 uint hkbRigidBodyRagdollControlsModifier::refCount = 0;
 
@@ -195,6 +196,161 @@ bool hkbRigidBodyRagdollControlsModifier::merge(HkxObject *recessiveObject){ //T
     return false;
 }
 
+hkbBoneIndexArray * hkbRigidBodyRagdollControlsModifier::getBones() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbBoneIndexArray *>(bones.data());
+}
+
+void hkbRigidBodyRagdollControlsModifier::setBones(hkbBoneIndexArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    bones = HkxSharedPtr(value), setIsFileChanged(true);
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getDurationToBlend() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return durationToBlend;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setDurationToBlend(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != durationToBlend) ? durationToBlend = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'durationToBlend' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getSnapMaxAngularDistance() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return snapMaxAngularDistance;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setSnapMaxAngularDistance(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != snapMaxAngularDistance) ? snapMaxAngularDistance = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'snapMaxAngularDistance' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getSnapMaxLinearDistance() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return snapMaxLinearDistance;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setSnapMaxLinearDistance(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != snapMaxLinearDistance) ? snapMaxLinearDistance = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'snapMaxLinearDistance' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getSnapMaxAngularVelocity() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return snapMaxAngularVelocity;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setSnapMaxAngularVelocity(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != snapMaxAngularVelocity) ? snapMaxAngularVelocity = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'snapMaxAngularVelocity' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getSnapMaxLinearVelocity() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return snapMaxLinearVelocity;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setSnapMaxLinearVelocity(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != snapMaxLinearVelocity) ? snapMaxLinearVelocity = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'snapMaxLinearVelocity' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getSnapGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return snapGain;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setSnapGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != snapGain) ? snapGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'snapGain' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getPositionMaxAngularVelocity() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return positionMaxAngularVelocity;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setPositionMaxAngularVelocity(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != positionMaxAngularVelocity) ? positionMaxAngularVelocity = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'positionMaxAngularVelocity' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getPositionMaxLinearVelocity() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return positionMaxLinearVelocity;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setPositionMaxLinearVelocity(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != positionMaxLinearVelocity) ? positionMaxLinearVelocity = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'positionMaxLinearVelocity' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getPositionGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return positionGain;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setPositionGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != positionGain) ? positionGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'positionGain' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getVelocityGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return velocityGain;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setVelocityGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != velocityGain) ? velocityGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'velocityGain' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getAccelerationGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return accelerationGain;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setAccelerationGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != accelerationGain) ? accelerationGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'accelerationGain' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getVelocityDamping() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return velocityDamping;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setVelocityDamping(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != velocityDamping) ? velocityDamping = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'velocityDamping' was not set!");
+}
+
+qreal hkbRigidBodyRagdollControlsModifier::getHierarchyGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return hierarchyGain;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setHierarchyGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != hierarchyGain) ? hierarchyGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'hierarchyGain' was not set!");
+}
+
+bool hkbRigidBodyRagdollControlsModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbRigidBodyRagdollControlsModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbRigidBodyRagdollControlsModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbRigidBodyRagdollControlsModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -220,7 +376,7 @@ void hkbRigidBodyRagdollControlsModifier::unlink(){
 QString hkbRigidBodyRagdollControlsModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

@@ -15,15 +15,17 @@ class CheckBox;
 class TableWidget;
 class hkbClipGenerator;
 
-class ClipTriggerUI: public QGroupBox
+class ClipTriggerUI final: public QGroupBox
 {
     Q_OBJECT
     friend class ClipGeneratorUI;
 public:
     ClipTriggerUI();
+    ClipTriggerUI& operator=(const ClipTriggerUI&) = delete;
+    ClipTriggerUI(const ClipTriggerUI &) = delete;
+    ~ClipTriggerUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, hkbClipGenerator *parent, int index, hkbClipTriggerArray::HkTrigger *trigger);
-    //QSize sizeHint() const Q_DECL_OVERRIDE;
-    //QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 signals:
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
@@ -36,11 +38,10 @@ private slots:
     void setIsAnnotation();
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void eventRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbClipGenerator *parentClipGen;
     int indexOfTrigger;

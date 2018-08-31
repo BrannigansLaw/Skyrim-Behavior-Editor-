@@ -16,7 +16,7 @@ class TableWidget;
 class hkbVariableBindingSet;
 class ComboBox;
 
-class EventRangeDataUI: public QGroupBox
+class EventRangeDataUI final: public QGroupBox
 {
     Q_OBJECT
     friend class EventsFromRangeModifierUI;
@@ -25,8 +25,6 @@ public:
     void loadData(BehaviorFile *parentFile, hkbEventRangeDataArray::hkbEventRangeData *ranges, hkbEventRangeDataArray *par, int index);
 signals:
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
-    //void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
-    //void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setEventId(int index, const QString &name);
@@ -35,16 +33,10 @@ private slots:
     void setEventMode(int index);
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    //bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    //void setBindingVariable(int index, const QString & name);
-    //void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
-    //void selectTableToView(bool viewproperties, const QString & path);
+    void toggleSignals(bool toggleconnections);
     void eventRenamed(const QString & name, int index);
-    //void variableRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbEventRangeDataArray::hkbEventRangeData *bsData;
     hkbEventRangeDataArray *parent;

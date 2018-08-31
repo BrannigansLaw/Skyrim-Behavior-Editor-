@@ -87,7 +87,7 @@
 #include <QStackedLayout>
 #include <QCoreApplication>
 
-QStringList HkDataUI::generatorTypes = {
+const QStringList HkDataUI::generatorTypes = {
     "hkbStateMachine",
     "hkbManualSelectorGenerator",
     "hkbBlenderGenerator",
@@ -103,7 +103,7 @@ QStringList HkDataUI::generatorTypes = {
     "BGSGamebryoSequenceGenerator"
 };
 
-QStringList HkDataUI::modifierTypes = {
+const QStringList HkDataUI::modifierTypes = {
     "hkbModifierList",
     "hkbTwistModifier",
     "hkbEventDrivenModifier",
@@ -157,7 +157,7 @@ QStringList HkDataUI::modifierTypes = {
     "hkbHandIKControlsModifier"
 };
 
-QStringList HkDataUI::variableTypes = {
+const QStringList HkDataUI::variableTypes = {
     "hkBool",
     "hkInt32",
     "hkReal",
@@ -167,8 +167,7 @@ QStringList HkDataUI::variableTypes = {
 };
 
 HkDataUI::HkDataUI(const QString &title)
-    : //mainUI(mainui),
-      behaviorView(nullptr),
+    : behaviorView(nullptr),
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
       loadedData(nullptr),
@@ -317,9 +316,7 @@ HkDataUI::HkDataUI(const QString &title)
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    stateUI->returnPB->setVisible(false);
-
+    stateUI->setReturnPushButonVisability(false);
     connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
@@ -335,7 +332,6 @@ HkDataUI::HkDataUI(const QString &title)
     connect(syncClipGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(behaviorRefGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(gamebryoSequenceGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
-
     connect(limbIKModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(directAtModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(moveCharModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
@@ -383,28 +379,28 @@ HkDataUI::HkDataUI(const QString &title)
     connect(handIKControlsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(tweenerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(eventsFromRangeModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
-
     //connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     //connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
     //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
 }
 
 void HkDataUI::setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations){
-    if (!events || !variables || !animations){
-        return;
+    if (events && variables && animations){
+        eventsUI = events;
+        variablesUI = variables;
+        animationsUI = animations;
+        connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)), Qt::UniqueConnection);
+        connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)), Qt::UniqueConnection);
+        connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)), Qt::UniqueConnection);
+        connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString,QString)), Qt::UniqueConnection);
+        connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)), Qt::UniqueConnection);
+        connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)), Qt::UniqueConnection);
+        connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
+        //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
+        //connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
+    }else{
+        LogFile::writeToLog("HkDataUI::setEventsVariablesAnimationsUI(): One or more arguments are nullptr!!");
     }
-    eventsUI = events;
-    variablesUI = variables;
-    animationsUI = animations;
-    connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)), Qt::UniqueConnection);
-    connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)), Qt::UniqueConnection);
-    connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)), Qt::UniqueConnection);
-    connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString,QString)), Qt::UniqueConnection);
-    connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)), Qt::UniqueConnection);
-    connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)), Qt::UniqueConnection);
-    connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
-    //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
-    //connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
 }
 
 void HkDataUI::unloadDataWidget(){
@@ -420,70 +416,66 @@ void HkDataUI::unloadDataWidget(){
 }
 
 void HkDataUI::connectToGeneratorTable(){
-    if (generatorsTable && behaviorView){
+    if (behaviorView){
         unloadDataWidget();
         connect(generatorsTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnGeneratorIcon(int,QString)), Qt::UniqueConnection);
         generatorsTable->showTable(0);
+    }else{
+        LogFile::writeToLog("HkDataUI::connectToGeneratorTable(): behaviorView is nullptr!!");
     }
 }
 
 void HkDataUI::connectToModifierTable(){
-    if (modifiersTable && behaviorView){
+    if (behaviorView){
         unloadDataWidget();
         connect(modifiersTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnModifierIcon(int,QString)), Qt::UniqueConnection);
         modifiersTable->showTable(0);
+    }else{
+        LogFile::writeToLog("HkDataUI::connectToModifierTable(): behaviorView is nullptr!!");
     }
 }
 
 void HkDataUI::disconnectTables(){
-    disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnGeneratorIcon(int,QString)));
-    disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnModifierIcon(int,QString)));
+    if (behaviorView){
+        disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnGeneratorIcon(int,QString)));
+        disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnModifierIcon(int,QString)));
+    }else{
+        LogFile::writeToLog("HkDataUI::disconnectTables(): behaviorView is nullptr!!");
+    }
 }
 
 void HkDataUI::modifierAdded(const QString & name, const QString & type){
     modifiersTable->addItem(name, type);
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
-    index++;
-    modifiersTable->renameItem(index, newName);
+    modifiersTable->renameItem(++index, newName);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
-        modGenUI->modifierRenamed(newName, index);
-        break;
+        modGenUI->modifierRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MODIFIER_LIST:
-        modListUI->modifierRenamed(newName, index);
-        break;
+        modListUI->modifierRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
-        eventDrivenModUI->modifierRenamed(newName, index);
-        break;
+        eventDrivenModUI->modifierRenamed(newName, index); break;
     case DATA_TYPE_LOADED::DELAYED_MODIFIER:
-        delayedModUI->modifierRenamed(newName, index);
-        break;
+        delayedModUI->modifierRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER:
-        modifyOnceModUI->modifierRenamed(newName, index);
-        break;
+        modifyOnceModUI->modifierRenamed(newName, index); break;
     }
 }
 
 void HkDataUI::modifierRemoved(int index){
-    //index++;
     modifiersTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
-        modGenUI->modifierRenamed("NONE", index);
-        break;
+        modGenUI->modifierRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::MODIFIER_LIST:
-        //reload active widget table for multi-modifier child class...
-        break;
+        /*reload active widget table for multi-modifier child class...*/ break;
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
-        eventDrivenModUI->modifierRenamed("NONE", index);
-        break;
+        eventDrivenModUI->modifierRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::DELAYED_MODIFIER:
-        delayedModUI->modifierRenamed("NONE", index);
-        break;
+        delayedModUI->modifierRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER:
-        modifyOnceModUI->modifierRenamed("NONE", index);
-        break;
+        modifyOnceModUI->modifierRenamed("NONE", index); break;
     }
 }
 
@@ -492,179 +484,114 @@ void HkDataUI::generatorAdded(const QString & name, const QString & type){
 }
 
 void HkDataUI::generatorNameChanged(const QString & newName, int index){
-    index++;
-    generatorsTable->renameItem(index, newName);
+    generatorsTable->renameItem(++index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
-        blenderGeneratorUI->generatorRenamed(newName, index);
-        break;
+        blenderGeneratorUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD:
-        blenderGeneratorChildUI->generatorRenamed(newName, index);
-        break;
+        blenderGeneratorChildUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::STATE_MACHINE:
-        stateMachineUI->generatorRenamed(newName, index);
-        break;
+        stateMachineUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::STATE:
-        stateUI->generatorRenamed(newName, index);
-        break;
+        stateUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
-        manSelGenUI->generatorRenamed(newName, index);
-        break;
+        manSelGenUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
-        modGenUI->generatorRenamed(newName, index);
-        break;
+        modGenUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
-        iStateTagGenUI->generatorRenamed(newName, index);
-        break;
+        iStateTagGenUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
-        boneSwitchUI->generatorRenamed(newName, index);
-        break;
+        boneSwitchUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
-        boneSwitchChildUI->generatorRenamed(newName, index);
-        break;
+        boneSwitchChildUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
-        offsetAnimGenUI->generatorRenamed(newName, index);
-        break;
+        offsetAnimGenUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        cyclicBlendTransGenUI->generatorRenamed(newName, index);
-        break;
+        cyclicBlendTransGenUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
-        poseMatchGenUI->generatorRenamed(newName, index);
-        break;
+        poseMatchGenUI->generatorRenamed(newName, index); break;
     case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
-        syncClipGenUI->generatorRenamed(newName, index);
-        break;
+        syncClipGenUI->generatorRenamed(newName, index); break;
     }
 }
 
 void HkDataUI::generatorRemoved(int index){
-    //index++;
     generatorsTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
-        blenderGeneratorUI->loadData(loadedData);
-        //blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-        break;
+        blenderGeneratorUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD:
-        blenderGeneratorChildUI->loadData(loadedData, static_cast<hkbBlenderGeneratorChild *>(loadedData)->getThisIndex());
-        //blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-        break;
+        blenderGeneratorChildUI->loadData(loadedData, static_cast<hkbBlenderGeneratorChild *>(loadedData)->getThisIndex()); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
-        boneSwitchUI->loadData(loadedData);
-        //boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-        break;
+        boneSwitchUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
-        boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex());
-        //boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-        break;
+        boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex()); break;
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
-        modGenUI->loadData(loadedData);
-        //modGenUI->connectToTables(modifiersTable, generatorsTable);
-        break;
+        modGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
-        manSelGenUI->loadData(loadedData);
-        //manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-        break;
+        manSelGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::STATE_MACHINE:
-        stateMachineUI->loadData(loadedData);
-        //stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
-        break;
+        stateMachineUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::STATE:
-        stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId());
-        //stateUI->connectToTables(generatorsTable, eventsTable);
-        break;
+        stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId()); break;
     case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
-        iStateTagGenUI->loadData(loadedData);
-        //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-        break;
+        iStateTagGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
-        offsetAnimGenUI->loadData(loadedData);
-        //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-        break;
+        offsetAnimGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        cyclicBlendTransGenUI->loadData(loadedData);
-        //cyclicBlendTransGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
-        break;
+        cyclicBlendTransGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
-        poseMatchGenUI->loadData(loadedData);
-        //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-        break;
+        poseMatchGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->loadData(loadedData);
-        //clipGenUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable, animationsTables);
-        break;
+        clipGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
-        syncClipGenUI->loadData(loadedData);
-        //syncClipGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-        break;
+        syncClipGenUI->loadData(loadedData); break;
     case DATA_TYPE_LOADED::BEHAVIOR_GRAPH:
-        behaviorGraphUI->loadData(loadedData);
-        //behaviorGraphUI->connectToTables(generatorsTable);
-        break;
+        behaviorGraphUI->loadData(loadedData); break;
     }
 }
 
 void HkDataUI::eventNameChanged(const QString & newName, int index){
-    index++;
-    eventsTable->renameItem(index, newName);
+    eventsTable->renameItem(++index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::STATE_MACHINE:
-        stateMachineUI->eventRenamed(newName, index);
-        break;
+        stateMachineUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::STATE:
-        stateUI->eventRenamed(newName, index);
-        break;
+        stateUI->eventRenamed(newName, index); break;
     /*case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        cyclicBlendTransGenUI->eventRenamed(newName, index);
-        break;*/
+        cyclicBlendTransGenUI->eventRenamed(newName, index); break;*/
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
-        poseMatchGenUI->eventRenamed(newName, index);
-        break;
+        poseMatchGenUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->eventRenamed(newName, index);
-        break;
+        clipGenUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
-        evaluateExpModUI->eventRenamed(newName, index);
-        break;
+        evaluateExpModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
-        eventDrivenModUI->eventRenamed(newName, index);
-        break;
+        eventDrivenModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
-        senseHandleModUI->eventRenamed(newName, index);
-        break;
+        senseHandleModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
-        distTriggerModUI->eventRenamed(newName, index);
-        break;
+        distTriggerModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::TIMER_MODIFIER:
-        timerModUI->eventRenamed(newName, index);
-        break;
+        timerModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
-        bsTimerModUI->eventRenamed(newName, index);
-        break;
+        bsTimerModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
-        ragdollContactListenerModUI->eventRenamed(newName, index);
-        break;
+        ragdollContactListenerModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
-        eventOnDeactivateModUI->eventRenamed(newName, index);
-        break;
+        eventOnDeactivateModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
-        passByTargetTriggerModUI->eventRenamed(newName, index);
-        break;
+        passByTargetTriggerModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
-        bsLookAtModUI->eventRenamed(newName, index);
-        break;
+        bsLookAtModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
-        detectCloseToGroundModUI->eventRenamed(newName, index);
-        break;
+        detectCloseToGroundModUI->eventRenamed(newName, index);break;
     case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
-        eventEveryNEventsModUI->eventRenamed(newName, index);
-        break;
+        eventEveryNEventsModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
-        eventOnFalseToTrueModUI->eventRenamed(newName, index);
-        break;
+        eventOnFalseToTrueModUI->eventRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER:
-        eventsFromRangeModUI->eventRenamed(newName, index);
-        break;
+        eventsFromRangeModUI->eventRenamed(newName, index); break;
     }
 }
 
@@ -673,66 +600,46 @@ void HkDataUI::eventAdded(const QString & name){
 }
 
 void HkDataUI::eventRemoved(int index){
-    index++;
-    eventsTable->removeItem(index);
+    eventsTable->removeItem(++index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::STATE_MACHINE:
-        stateMachineUI->eventRenamed("NONE", index);
-        break;
+        stateMachineUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::STATE:
-        stateUI->eventRenamed("NONE", index);
-        break;
+        stateUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        cyclicBlendTransGenUI->eventRenamed("NONE", index);
-        break;
+        cyclicBlendTransGenUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
-        poseMatchGenUI->eventRenamed("NONE", index);
-        break;
+        poseMatchGenUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->eventRenamed("NONE", index);
-        break;
+        clipGenUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
-        evaluateExpModUI->eventRenamed("NONE", index);
-        break;
+        evaluateExpModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
-        eventDrivenModUI->eventRenamed("NONE", index);
-        break;
+        eventDrivenModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
-        senseHandleModUI->eventRenamed("NONE", index);
-        break;
+        senseHandleModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
-        distTriggerModUI->eventRenamed("NONE", index);
-        break;
+        distTriggerModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::TIMER_MODIFIER:
-        timerModUI->eventRenamed("NONE", index);
-        break;
+        timerModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
-        bsTimerModUI->eventRenamed("NONE", index);
-        break;
+        bsTimerModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
-        ragdollContactListenerModUI->eventRenamed("NONE", index);
-        break;
+        ragdollContactListenerModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
-        eventOnDeactivateModUI->eventRenamed("NONE", index);
-        break;
+        eventOnDeactivateModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
-        passByTargetTriggerModUI->eventRenamed("NONE", index);
-        break;
+        passByTargetTriggerModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
-        bsLookAtModUI->eventRenamed("NONE", index);
-        break;
+        bsLookAtModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
-        detectCloseToGroundModUI->eventRenamed("NONE", index);
-        break;
+        detectCloseToGroundModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
-        eventEveryNEventsModUI->eventRenamed("NONE", index);
-        break;
+        eventEveryNEventsModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
-        eventOnFalseToTrueModUI->eventRenamed("NONE", index);
-        break;
+        eventOnFalseToTrueModUI->eventRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER:
-        eventsFromRangeModUI->eventRenamed("NONE", index);
-        break;
+        eventsFromRangeModUI->eventRenamed("NONE", index); break;
     }
 }
 
@@ -761,186 +668,126 @@ void HkDataUI::animationAdded(const QString &name){
 }*/
 
 void HkDataUI::variableNameChanged(const QString & newName, int index){
-    index++;
-    variablesTable->renameItem(index, newName);
+    variablesTable->renameItem(++index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
-        blenderGeneratorUI->variableRenamed(newName, index);
-        break;
+        blenderGeneratorUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD:
-        blenderGeneratorChildUI->variableRenamed(newName, index);
-        break;
+        blenderGeneratorChildUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::STATE_MACHINE:
-        stateMachineUI->variableRenamed(newName, index);
-        break;
+        stateMachineUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
-        manSelGenUI->variableRenamed(newName, index);
-        break;
+        manSelGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
-        iStateTagGenUI->variableRenamed(newName, index);
-        break;
+        iStateTagGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_LIMB_IK_MOD:
-        limbIKModUI->variableRenamed(newName, index);
-        break;
+        limbIKModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
-        boneSwitchUI->variableRenamed(newName, index);
-        break;
+        boneSwitchUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
-        boneSwitchChildUI->variableRenamed(newName, index);
-        break;
+        boneSwitchChildUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
-        offsetAnimGenUI->variableRenamed(newName, index);
-        break;
+        offsetAnimGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        cyclicBlendTransGenUI->variableRenamed(newName, index);
-        break;
+        cyclicBlendTransGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
-        poseMatchGenUI->variableRenamed(newName, index);
-        break;
+        poseMatchGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->variableRenamed(newName, index);
-        break;
+        clipGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
-        syncClipGenUI->variableRenamed(newName, index);
-        break;
+        syncClipGenUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::DIRECT_AT_MODIFIER:
-        directAtModUI->variableRenamed(newName, index);
-        break;
+        directAtModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER:
-        moveCharModUI->variableRenamed(newName, index);
-        break;
+        moveCharModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER:
-        rotateCharModUI->variableRenamed(newName, index);
-        break;
+        rotateCharModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
-        evaluateExpModUI->variableRenamed(newName, index);
-        break;
+        evaluateExpModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MODIFIER_LIST:
-        modListUI->variableRenamed(newName, index);
-        break;
+        modListUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
-        eventDrivenModUI->variableRenamed(newName, index);
-        break;
+        eventDrivenModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER:
-        getHandleOnBoneUI->variableRenamed(newName, index);
-        break;
+        getHandleOnBoneUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER:
-        evaluateHandleModUI->variableRenamed(newName, index);
-        break;
+        evaluateHandleModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
-        senseHandleModUI->variableRenamed(newName, index);
-        break;
+        senseHandleModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER:
-        decomposeVectorModUI->variableRenamed(newName, index);
-        break;
+        decomposeVectorModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER:
-        isActiveModUI->variableRenamed(newName, index);
-        break;
+        isActiveModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER:
-        computeDirMod->variableRenamed(newName, index);
-        break;
+        computeDirMod->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
-        computeAddAnimUI->variableRenamed(newName, index);
-        break;
+        computeAddAnimUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
-        distTriggerModUI->variableRenamed(newName, index);
-        break;
+        distTriggerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER:
-        interpValueModUI->variableRenamed(newName, index);
-        break;
+        interpValueModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::GET_UP_MODIFIER:
-        getUpModUI->variableRenamed(newName, index);
-        break;
+        getUpModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER:
-        getWorldFromModelModUI->variableRenamed(newName, index);
-        break;
+        getWorldFromModelModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::TWIST_MODIFIER:
-        twistModUI->variableRenamed(newName, index);
-        break;
+        twistModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::TIMER_MODIFIER:
-        timerModUI->variableRenamed(newName, index);
-        break;
+        timerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::DAMPING_MODIFIER:
-        dampingModUI->variableRenamed(newName, index);
-        break;
+        dampingModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
-        rigidRagdollControlsModUI->variableRenamed(newName, index);
-        break;
+        rigidRagdollControlsModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER:
-        poweredRagdollControlsModUI->variableRenamed(newName, index);
-        break;
+        poweredRagdollControlsModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER:
-        combineTransModUI->variableRenamed(newName, index);
-        break;
+        combineTransModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
-        computeRotationAxisAngleModUI->variableRenamed(newName, index);
-        break;
+        computeRotationAxisAngleModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER:
-        computeRotationToTargetModUI->variableRenamed(newName, index);
-        break;
+        computeRotationToTargetModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER:
-        transformVectorModUI->variableRenamed(newName, index);
-        break;
+        transformVectorModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::LOOK_AT_MODIFIER:
-        lookAtModUI->variableRenamed(newName, index);
-        break;
+        lookAtModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER:
-        keyframeBonesModUI->variableRenamed(newName, index);
-        break;
+        keyframeBonesModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER:
-        footIKControlsModUI->variableRenamed(newName, index);
-        break;
+        footIKControlsModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::MIRROR_MODIFIER:
-        mirrorModUI->variableRenamed(newName, index);
-        break;
+        mirrorModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER:
-        extractRagdollPoseModUI->variableRenamed(newName, index);
-        break;
+        extractRagdollPoseModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
-        bsTimerModUI->variableRenamed(newName, index);
-        break;
+        bsTimerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER:
-        getTimeStepModUI->variableRenamed(newName, index);
-        break;
+        getTimeStepModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::DELAYED_MODIFIER:
-        delayedModUI->variableRenamed(newName, index);
-        break;
+        delayedModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
-        ragdollContactListenerModUI->variableRenamed(newName, index);
-        break;
+        ragdollContactListenerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
-        eventOnDeactivateModUI->variableRenamed(newName, index);
-        break;
+        eventOnDeactivateModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER:
-        speedSamplerModUI->variableRenamed(newName, index);
-        break;
+        speedSamplerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
-        passByTargetTriggerModUI->variableRenamed(newName, index);
-        break;
+        passByTargetTriggerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
-        bsLookAtModUI->variableRenamed(newName, index);
-        break;
+        bsLookAtModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
-        detectCloseToGroundModUI->variableRenamed(newName, index);
-        break;
+        detectCloseToGroundModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
-        eventEveryNEventsModUI->variableRenamed(newName, index);
-        break;
+        eventEveryNEventsModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
-        eventOnFalseToTrueModUI->variableRenamed(newName, index);
-        break;
+        eventOnFalseToTrueModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER:
-        modifyOnceModUI->variableRenamed(newName, index);
-        break;
+        modifyOnceModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::HAND_IK_CONTROLS_MODIFIER:
-        handIKControlsModUI->variableRenamed(newName, index);
-        break;
+        handIKControlsModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::BS_TWEENER_MODIFIER:
-        tweenerModUI->variableRenamed(newName, index);
-        break;
+        tweenerModUI->variableRenamed(newName, index); break;
     case DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER:
-        eventsFromRangeModUI->variableRenamed(newName, index);
-        break;
+        eventsFromRangeModUI->variableRenamed(newName, index); break;
     }
 }
 
@@ -949,647 +796,314 @@ void HkDataUI::variableAdded(const QString & name, const QString & type){
 }
 
 void HkDataUI::variableRemoved(int index){
-    index++;
-    variablesTable->removeItem(index);
+    variablesTable->removeItem(++index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
-        blenderGeneratorUI->variableRenamed("NONE", index);
-        break;
+        blenderGeneratorUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD:
-        blenderGeneratorChildUI->variableRenamed("NONE", index);
-        break;
+        blenderGeneratorChildUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
-        boneSwitchUI->variableRenamed("NONE", index);
-        break;
+        boneSwitchUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
-        boneSwitchChildUI->variableRenamed("NONE", index);
-        break;
+        boneSwitchChildUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::STATE_MACHINE:
-        stateMachineUI->variableRenamed("NONE", index);
-        break;
+        stateMachineUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
-        manSelGenUI->variableRenamed("NONE", index);
-        break;
+        manSelGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
-        iStateTagGenUI->variableRenamed("NONE", index);
-        break;
+        iStateTagGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_LIMB_IK_MOD:
-        limbIKModUI->variableRenamed("NONE", index);
-        break;
+        limbIKModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
-        offsetAnimGenUI->variableRenamed("NONE", index);
-        break;
+        offsetAnimGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        cyclicBlendTransGenUI->variableRenamed("NONE", index);
-        break;
+        cyclicBlendTransGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
-        poseMatchGenUI->variableRenamed("NONE", index);
-        break;
+        poseMatchGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->variableRenamed("NONE", index);
-        break;
+        clipGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
-        syncClipGenUI->variableRenamed("NONE", index);
-        break;
+        syncClipGenUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::DIRECT_AT_MODIFIER:
-        directAtModUI->variableRenamed("NONE", index);
-        break;
+        directAtModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER:
-        moveCharModUI->variableRenamed("NONE", index);
-        break;
+        moveCharModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER:
-        rotateCharModUI->variableRenamed("NONE", index);
-        break;
+        rotateCharModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
-        evaluateExpModUI->variableRenamed("NONE", index);
-        break;
+        evaluateExpModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::MODIFIER_LIST:
-        modListUI->variableRenamed("NONE", index);
-        break;
+        modListUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
-        eventDrivenModUI->variableRenamed("NONE", index);
-        break;
+        eventDrivenModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER:
-        getHandleOnBoneUI->variableRenamed("NONE", index);
-        break;
+        getHandleOnBoneUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER:
-        evaluateHandleModUI->variableRenamed("NONE", index);
-        break;
+        evaluateHandleModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
-        senseHandleModUI->variableRenamed("NONE", index);
-        break;
+        senseHandleModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER:
-        decomposeVectorModUI->variableRenamed("NONE", index);
-        break;
+        decomposeVectorModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER:
-        isActiveModUI->variableRenamed("NONE", index);
-        break;
+        isActiveModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER:
-        computeDirMod->variableRenamed("NONE", index);
-        break;
+        computeDirMod->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
-        computeAddAnimUI->variableRenamed("NONE", index);
-        break;
+        computeAddAnimUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
-        distTriggerModUI->variableRenamed("NONE", index);
-        break;
+        distTriggerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER:
-        interpValueModUI->variableRenamed("NONE", index);
-        break;
+        interpValueModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::GET_UP_MODIFIER:
-        getUpModUI->variableRenamed("NONE", index);
-        break;
+        getUpModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER:
-        getWorldFromModelModUI->variableRenamed("NONE", index);
-        break;
+        getWorldFromModelModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::TWIST_MODIFIER:
-        twistModUI->variableRenamed("NONE", index);
-        break;
+        twistModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::TIMER_MODIFIER:
-        timerModUI->variableRenamed("NONE", index);
-        break;
+        timerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::DAMPING_MODIFIER:
-        dampingModUI->variableRenamed("NONE", index);
-        break;
+        dampingModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
-        rigidRagdollControlsModUI->variableRenamed("NONE", index);
-        break;
+        rigidRagdollControlsModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER:
-        poweredRagdollControlsModUI->variableRenamed("NONE", index);
-        break;
+        poweredRagdollControlsModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER:
-        combineTransModUI->variableRenamed("NONE", index);
-        break;
+        combineTransModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
-        computeRotationAxisAngleModUI->variableRenamed("NONE", index);
-        break;
+        computeRotationAxisAngleModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER:
-        computeRotationToTargetModUI->variableRenamed("NONE", index);
-        break;
+        computeRotationToTargetModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER:
-        transformVectorModUI->variableRenamed("NONE", index);
-        break;
+        transformVectorModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::LOOK_AT_MODIFIER:
-        lookAtModUI->variableRenamed("NONE", index);
-        break;
+        lookAtModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER:
-        keyframeBonesModUI->variableRenamed("NONE", index);
-        break;
+        keyframeBonesModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER:
-        footIKControlsModUI->variableRenamed("NONE", index);
-        break;
+        footIKControlsModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::MIRROR_MODIFIER:
-        mirrorModUI->variableRenamed("NONE", index);
-        break;
+        mirrorModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER:
-        extractRagdollPoseModUI->variableRenamed("NONE", index);
-        break;
+        extractRagdollPoseModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
-        bsTimerModUI->variableRenamed("NONE", index);
-        break;
+        bsTimerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER:
-        getTimeStepModUI->variableRenamed("NONE", index);
-        break;
+        getTimeStepModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::DELAYED_MODIFIER:
-        delayedModUI->variableRenamed("NONE", index);
-        break;
+        delayedModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
-        ragdollContactListenerModUI->variableRenamed("NONE", index);
-        break;
+        ragdollContactListenerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
-        eventOnDeactivateModUI->variableRenamed("NONE", index);
-        break;
+        eventOnDeactivateModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER:
-        speedSamplerModUI->variableRenamed("NONE", index);
-        break;
+        speedSamplerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
-        passByTargetTriggerModUI->variableRenamed("NONE", index);
-        break;
+        passByTargetTriggerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
-        bsLookAtModUI->variableRenamed("NONE", index);
-        break;
+        bsLookAtModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
-        detectCloseToGroundModUI->variableRenamed("NONE", index);
-        break;
+        detectCloseToGroundModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
-        eventEveryNEventsModUI->variableRenamed("NONE", index);
-        break;
+        eventEveryNEventsModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
-        eventOnFalseToTrueModUI->variableRenamed("NONE", index);
-        break;
+        eventOnFalseToTrueModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER:
-        modifyOnceModUI->variableRenamed("NONE", index);
-        break;
+        modifyOnceModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::HAND_IK_CONTROLS_MODIFIER:
-        handIKControlsModUI->variableRenamed("NONE", index);
-        break;
+        handIKControlsModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::BS_TWEENER_MODIFIER:
-        tweenerModUI->variableRenamed("NONE", index);
-        break;
+        tweenerModUI->variableRenamed("NONE", index); break;
     case DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER:
-        eventsFromRangeModUI->variableRenamed("NONE", index);
-        break;
+        eventsFromRangeModUI->variableRenamed("NONE", index); break;
     }
     behaviorView->removeOtherData();
 }
 
+template<typename UIWidget>
+void HkDataUI::changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata, UIWidget *uiwidget, GenericTableWidget *table1, GenericTableWidget *table2){
+    (loadedData != olddata) ? uiwidget->loadData(loadedData) : NULL;
+    stack->setCurrentIndex(type);
+    uiwidget->connectToTables(table1, table2);
+}
+
+template<typename UIWidget>
+void HkDataUI::changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata, UIWidget *uiwidget, GenericTableWidget *table1, GenericTableWidget *table2, GenericTableWidget *table3){
+    (loadedData != olddata) ? uiwidget->loadData(loadedData) : NULL;
+    stack->setCurrentIndex(type);
+    uiwidget->connectToTables(table1, table2, table3);
+}
+
+template<typename UIWidget>
+void HkDataUI::changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata, UIWidget *uiwidget, GenericTableWidget *table1, GenericTableWidget *table2, GenericTableWidget *table3, GenericTableWidget *table4){
+    (loadedData != olddata) ? uiwidget->loadData(loadedData) : NULL;
+    stack->setCurrentIndex(type);
+    uiwidget->connectToTables(table1, table2, table3, table4);
+}
+
 void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
-    HkxSignature sig;
-    if (icon && (icon->itemData)){
-        HkxObject *oldData = loadedData;
-        if (oldData){
-            oldData->evaluateDataValidity();
-        }
-        sig = ((HkxObject *)((icon->itemData)))->getSignature();
-        loadedData = ((HkxObject *)((icon->itemData)));
-        switch (sig){
-        case HkxSignature::HKB_BLENDER_GENERATOR:
-            if (loadedData != oldData){
-                blenderGeneratorUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BLENDER_GENERATOR);
-            blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_BLENDER_GENERATOR_CHILD:
-            if (loadedData != oldData){
-                blenderGeneratorChildUI->loadData(loadedData, static_cast<hkbBlenderGeneratorChild *>(loadedData)->getThisIndex());
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD);
-            blenderGeneratorChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_BONE_SWITCH_GENERATOR:
-            if (loadedData != oldData){
-                boneSwitchUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR);
-            boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_BONE_SWITCH_GENERATOR_BONE_DATA:
-            if (loadedData != oldData){
-                boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex());
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD);
-            boneSwitchChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_MODIFIER_GENERATOR:
-            if (loadedData != oldData){
-                modGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::MODIFIER_GENERATOR);
-            modGenUI->connectToTables(modifiersTable, generatorsTable);
-            break;
-        case HkxSignature::BS_I_STATE_TAGGING_GENERATOR:
-            if (loadedData != oldData){
-                iStateTagGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN);
-            iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-            break;
-        case HkxSignature::BS_LIMB_IK_MODIFIER:
-            if (loadedData != oldData){
-                limbIKModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_LIMB_IK_MOD);
-            limbIKModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_MANUAL_SELECTOR_GENERATOR:
-            if (loadedData != oldData){
-                manSelGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR);
-            manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_OFFSET_ANIMATION_GENERATOR:
-            if (loadedData != oldData){
-                offsetAnimGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR);
-            offsetAnimGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_STATE_MACHINE:
-            if (loadedData != oldData){
-                stateMachineUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::STATE_MACHINE);
-            stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
-            break;
+    if (icon && icon->itemData){
+        auto oldData = loadedData;
+        (oldData) ? oldData->evaluateDataValidity() : NULL;
+        loadedData = icon->itemData;
+        switch (icon->itemData->getSignature()){
+        case HkxSignature::HKB_CLIP_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::CLIP_GENERATOR, oldData, clipGenUI, variablesTable, characterPropertiesTable, eventsTable, animationsTable); break;
         case HkxSignature::HKB_STATE_MACHINE_STATE_INFO:
-            if (loadedData != oldData){
-                stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId());
-            }
+        {
+            (loadedData != oldData) ? stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId()) : NULL;
             stack->setCurrentIndex(DATA_TYPE_LOADED::STATE);
             stateUI->connectToTables(generatorsTable, eventsTable);
             break;
-        case HkxSignature::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-            if (loadedData != oldData){
-                cyclicBlendTransGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR);
-            cyclicBlendTransGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+        }
+        case HkxSignature::HKB_STATE_MACHINE:
+            changeWidget(DATA_TYPE_LOADED::STATE_MACHINE, oldData, stateMachineUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_MANUAL_SELECTOR_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR, oldData, manSelGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_MODIFIER_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::MODIFIER_GENERATOR, oldData, modGenUI, modifiersTable, generatorsTable); break;
+        case HkxSignature::HKB_BLENDER_GENERATOR_CHILD:
+        {
+            (loadedData != oldData) ? blenderGeneratorChildUI->loadData(loadedData, static_cast<hkbBlenderGeneratorChild *>(loadedData)->getThisIndex()) : NULL;
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD);
+            blenderGeneratorChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
-        case HkxSignature::HKB_POSE_MATCHING_GENERATOR:
-            if (loadedData != oldData){
-                poseMatchGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR);
-            poseMatchGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+        }
+        case HkxSignature::HKB_BLENDER_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::BLENDER_GENERATOR, oldData, blenderGeneratorUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_BONE_SWITCH_GENERATOR_BONE_DATA:
+        {
+            (loadedData != oldData) ? boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex()) : NULL;
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD);
+            boneSwitchChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
-        case HkxSignature::HKB_CLIP_GENERATOR:
-            if (loadedData != oldData){
-                clipGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::CLIP_GENERATOR);
-            clipGenUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable, animationsTable);
-            break;
-        case HkxSignature::BS_SYNCHRONIZED_CLIP_GENERATOR:
-            if (loadedData != oldData){
-                syncClipGenUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR);
-            syncClipGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
+        }
+        case HkxSignature::BS_BONE_SWITCH_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR, oldData, boneSwitchUI, generatorsTable, variablesTable, characterPropertiesTable); break;
         case HkxSignature::HKB_BEHAVIOR_REFERENCE_GENERATOR:
-            if (loadedData != oldData){
-                behaviorRefGenUI->loadData(loadedData);
-            }
+        {
+            (loadedData != oldData) ? behaviorRefGenUI->loadData(loadedData) : NULL;
             stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_REFERENCE_GENERATOR);
             break;
-        case HkxSignature::HKB_BEHAVIOR_GRAPH:
-            if (loadedData != oldData){
-                behaviorGraphUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_GRAPH);
-            behaviorGraphUI->connectToTables(generatorsTable);
-            break;
-        case HkxSignature::BS_DIRECT_AT_MODIFIER:
-            if (loadedData != oldData){
-                directAtModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::DIRECT_AT_MODIFIER);
-            directAtModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_MOVE_CHARACTER_MODIFIER:
-            if (loadedData != oldData){
-                moveCharModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER);
-            moveCharModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_ROTATE_CHARACTER_MODIFIER:
-            if (loadedData != oldData){
-                rotateCharModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER);
-            rotateCharModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
+        }
         case HkxSignature::HKB_EVALUATE_EXPRESSION_MODIFIER:
-            if (loadedData != oldData){
-                evaluateExpModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER);
-            evaluateExpModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::HKB_MODIFIER_LIST:
-            if (loadedData != oldData){
-                modListUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::MODIFIER_LIST);
-            modListUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_EVENT_DRIVEN_MODIFIER:
-            if (loadedData != oldData){
-                eventDrivenModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER);
-            eventDrivenModUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::HKB_GET_HANDLE_ON_BONE_MODIFIER:
-            if (loadedData != oldData){
-                getHandleOnBoneUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER);
-            getHandleOnBoneUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_EVALUATE_HANDLE_MODIFIER:
-            if (loadedData != oldData){
-                evaluateHandleModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER);
-            evaluateHandleModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_SENSE_HANDLE_MODIFIER:
-            if (loadedData != oldData){
-                senseHandleModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER);
-            senseHandleModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::BS_DECOMPOSE_VECTOR_MODIFIER:
-            if (loadedData != oldData){
-                decomposeVectorModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER);
-            decomposeVectorModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
+            changeWidget(DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER, oldData, evaluateExpModUI, variablesTable, characterPropertiesTable, eventsTable); break;
         case HkxSignature::BS_IS_ACTIVE_MODIFIER:
-            if (loadedData != oldData){
-                isActiveModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER);
-            isActiveModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_COMPUTE_DIRECTION_MODIFIER:
-            if (loadedData != oldData){
-                computeDirMod->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER);
-            computeDirMod->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
-            if (loadedData != oldData){
-                computeAddAnimUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER);
-            computeAddAnimUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_DIST_TRIGGER_MODIFER:
-            if (loadedData != oldData){
-                distTriggerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER);
-            distTriggerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::BS_INTERP_VALUE_MODIFIER:
-            if (loadedData != oldData){
-                interpValueModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER);
-            interpValueModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_GET_UP_MODIFIER:
-            if (loadedData != oldData){
-                getUpModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::GET_UP_MODIFIER);
-            getUpModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_GET_WORLD_FROM_MODEL_MODIFIER:
-            if (loadedData != oldData){
-                getWorldFromModelModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER);
-            getWorldFromModelModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
+            changeWidget(DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER, oldData, isActiveModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_I_STATE_TAGGING_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN, oldData, iStateTagGenUI, variablesTable, characterPropertiesTable, generatorsTable); break;
+        case HkxSignature::BS_DIRECT_AT_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::DIRECT_AT_MODIFIER, oldData, directAtModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_SYNCHRONIZED_CLIP_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR, oldData, syncClipGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_MODIFIER_LIST:
+            changeWidget(DATA_TYPE_LOADED::MODIFIER_LIST, oldData, modListUI, modifiersTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR, oldData, cyclicBlendTransGenUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_EVENT_DRIVEN_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER, oldData, eventDrivenModUI, modifiersTable, variablesTable, characterPropertiesTable, eventsTable); break;
         case HkxSignature::HKB_TWIST_MODIFIER:
-            if (loadedData != oldData){
-                twistModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::TWIST_MODIFIER);
-            twistModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_TIMER_MODIFIER:
-            if (loadedData != oldData){
-                timerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::TIMER_MODIFIER);
-            timerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::HKB_DAMPING_MODIFIER:
-            if (loadedData != oldData){
-                dampingModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::DAMPING_MODIFIER);
-            dampingModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
-            if (loadedData != oldData){
-                rigidRagdollControlsModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER);
-            rigidRagdollControlsModUI->connectToTables(variablesTable, characterPropertiesTable, ragdollBonesTable);
-            break;
-        case HkxSignature::HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER:
-            if (loadedData != oldData){
-                poweredRagdollControlsModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER);
-            poweredRagdollControlsModUI->connectToTables(variablesTable, characterPropertiesTable, ragdollBonesTable);
-            break;
-        case HkxSignature::HKB_COMBINE_TRANSFORMS_MODIFIER:
-            if (loadedData != oldData){
-                combineTransModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER);
-            combineTransModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
-            if (loadedData != oldData){
-                computeRotationAxisAngleModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER);
-            computeRotationAxisAngleModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER:
-            if (loadedData != oldData){
-                computeRotationToTargetModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER);
-            computeRotationToTargetModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_TRANSFORM_VECTOR_MODIFIER:
-            if (loadedData != oldData){
-                transformVectorModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER);
-            transformVectorModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_LOOK_AT_MODIFIER:
-            if (loadedData != oldData){
-                lookAtModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::LOOK_AT_MODIFIER);
-            lookAtModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_KEY_FRAME_BONES_MODIFIER:
-            if (loadedData != oldData){
-                keyframeBonesModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER);
-            keyframeBonesModUI->connectToTables(variablesTable, characterPropertiesTable, ragdollBonesTable);
-            break;
-        case HkxSignature::HKB_FOOT_IK_CONTROLS_MODIFIER:
-            if (loadedData != oldData){
-                footIKControlsModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER);
-            footIKControlsModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::HKB_MIRROR_MODIFIER:
-            if (loadedData != oldData){
-                mirrorModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::MIRROR_MODIFIER);
-            mirrorModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_EXTRACT_RAGDOLL_POSE_MODIFIER:
-            if (loadedData != oldData){
-                extractRagdollPoseModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER);
-            extractRagdollPoseModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_TIMER_MODIFIER:
-            if (loadedData != oldData){
-                bsTimerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_TIMER_MODIFIER);
-            bsTimerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::BS_GET_TIME_STEP_MODIFIER:
-            if (loadedData != oldData){
-                getTimeStepModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER);
-            getTimeStepModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_DELAYED_MODIFIER:
-            if (loadedData != oldData){
-                delayedModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::DELAYED_MODIFIER);
-            delayedModUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
-            if (loadedData != oldData){
-                ragdollContactListenerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER);
-            ragdollContactListenerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable, ragdollBonesTable);
-            break;
-        case HkxSignature::BS_EVENT_ON_DEACTIVATE_MODIFIER:
-            if (loadedData != oldData){
-                eventOnDeactivateModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER);
-            eventOnDeactivateModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::BS_SPEED_SAMPLER_MODIFIER:
-            if (loadedData != oldData){
-                speedSamplerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER);
-            speedSamplerModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
-            if (loadedData != oldData){
-                passByTargetTriggerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER);
-            passByTargetTriggerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::BS_LOOK_AT_MODIFIER:
-            if (loadedData != oldData){
-                bsLookAtModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER);
-            bsLookAtModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
-        case HkxSignature::HKB_DETECT_CLOSE_TO_GROUND_MODIFIER:
-            if (loadedData != oldData){
-                detectCloseToGroundModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER);
-            detectCloseToGroundModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
+            changeWidget(DATA_TYPE_LOADED::TWIST_MODIFIER, oldData, twistModUI, variablesTable, characterPropertiesTable); break;
         case HkxSignature::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
-            if (loadedData != oldData){
-                eventEveryNEventsModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER);
-            eventEveryNEventsModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
+            changeWidget(DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER, oldData, eventEveryNEventsModUI, variablesTable, characterPropertiesTable, eventsTable); break;
         case HkxSignature::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
-            if (loadedData != oldData){
-                eventOnFalseToTrueModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER);
-            eventOnFalseToTrueModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
-            break;
+            changeWidget(DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER, oldData, eventOnFalseToTrueModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::BS_TIMER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_TIMER_MODIFIER, oldData, bsTimerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::BS_GET_TIME_STEP_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER, oldData, getTimeStepModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_DELAYED_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::DELAYED_MODIFIER, oldData, delayedModUI, modifiersTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER, oldData, ragdollContactListenerModUI, variablesTable, characterPropertiesTable, eventsTable, ragdollBonesTable); break;
+        case HkxSignature::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER, oldData, eventOnDeactivateModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER, oldData, passByTargetTriggerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_POSE_MATCHING_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR, oldData, poseMatchGenUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_DAMPING_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::DAMPING_MODIFIER, oldData, dampingModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_LIMB_IK_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_LIMB_IK_MOD, oldData, limbIKModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_MOVE_CHARACTER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER, oldData, moveCharModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_DECOMPOSE_VECTOR_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER, oldData, decomposeVectorModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_COMPUTE_DIRECTION_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER, oldData, computeDirMod, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER, oldData, computeAddAnimUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_DIST_TRIGGER_MODIFER:
+            changeWidget(DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER, oldData, distTriggerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::BS_INTERP_VALUE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER, oldData, interpValueModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_GET_UP_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::GET_UP_MODIFIER, oldData, getUpModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_GET_WORLD_FROM_MODEL_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER, oldData, getWorldFromModelModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_TIMER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::TIMER_MODIFIER, oldData, timerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
         case HkxSignature::BS_MODIFY_ONCE_MODIFIER:
-            if (loadedData != oldData){
-                modifyOnceModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER);
-            modifyOnceModUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::HKB_HAND_IK_CONTROLS_MODIFIER:
-            if (loadedData != oldData){
-                handIKControlsModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::HAND_IK_CONTROLS_MODIFIER);
-            handIKControlsModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        case HkxSignature::BS_TWEENER_MODIFIER:
-            if (loadedData != oldData){
-                tweenerModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_TWEENER_MODIFIER);
-            tweenerModUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
+            changeWidget(DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER, oldData, modifyOnceModUI, modifiersTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_COMBINE_TRANSFORMS_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER, oldData, combineTransModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER, oldData, computeRotationAxisAngleModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER, oldData, computeRotationToTargetModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_TRANSFORM_VECTOR_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER, oldData, transformVectorModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_EXTRACT_RAGDOLL_POSE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER, oldData, extractRagdollPoseModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_LOOK_AT_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::LOOK_AT_MODIFIER, oldData, lookAtModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_KEY_FRAME_BONES_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER, oldData, keyframeBonesModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
+        case HkxSignature::HKB_FOOT_IK_CONTROLS_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER, oldData, footIKControlsModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_MIRROR_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::MIRROR_MODIFIER, oldData, mirrorModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_DETECT_CLOSE_TO_GROUND_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER, oldData, detectCloseToGroundModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_ROTATE_CHARACTER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER, oldData, rotateCharModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_EVENTS_FROM_RANGE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER, oldData, eventsFromRangeModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_GET_HANDLE_ON_BONE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER, oldData, getHandleOnBoneUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_EVALUATE_HANDLE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER, oldData, evaluateHandleModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_SENSE_HANDLE_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER, oldData, senseHandleModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER, oldData, rigidRagdollControlsModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
+        case HkxSignature::HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER, oldData, poweredRagdollControlsModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
         case HkxSignature::BGS_GAMEBYRO_SEQUENCE_GENERATOR:
-            if (loadedData != oldData){
-                gamebryoSequenceGenUI->loadData(loadedData);
-            }
+        {
+            (loadedData != oldData) ? gamebryoSequenceGenUI->loadData(loadedData) : NULL;
             stack->setCurrentIndex(DATA_TYPE_LOADED::BGS_GAMEBYRO_SEQUENCE_GENERATOR);
             //gamebryoSequenceGenUI->connectToTables(variablesTable, characterPropertiesTable);
             break;
-        case HkxSignature::HKB_EVENTS_FROM_RANGE_MODIFIER:
-            if (loadedData != oldData){
-                eventsFromRangeModUI->loadData(loadedData);
-            }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER);
-            eventsFromRangeModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+        }
+        case HkxSignature::BS_TWEENER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_TWEENER_MODIFIER, oldData, tweenerModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_LOOK_AT_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER, oldData, bsLookAtModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+        case HkxSignature::BS_SPEED_SAMPLER_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER, oldData, speedSamplerModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::BS_OFFSET_ANIMATION_GENERATOR:
+            changeWidget(DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR, oldData, offsetAnimGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_HAND_IK_CONTROLS_MODIFIER:
+            changeWidget(DATA_TYPE_LOADED::HAND_IK_CONTROLS_MODIFIER, oldData, handIKControlsModUI, variablesTable, characterPropertiesTable); break;
+        case HkxSignature::HKB_BEHAVIOR_GRAPH:
+        {
+            (loadedData != oldData) ? behaviorGraphUI->loadData(loadedData) : NULL;
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_GRAPH);
+            behaviorGraphUI->connectToTables(generatorsTable);
             break;
+        }
         default:
             unloadDataWidget();
         }
@@ -1599,13 +1113,8 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
 }
 
 BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
-    BehaviorGraphView *oldView = behaviorView;
-    if (oldView){
-        //disconnect(oldView, 0, this, 0);
-    }
-    if (parentWidget()){
-        setMinimumSize(parentWidget()->size()*0.99);
-    }
+    auto oldView = behaviorView;
+    (parentWidget()) ? setMinimumSize(parentWidget()->size()*0.99) : NULL;
     behaviorView = view;
     iStateTagGenUI->setBehaviorView(view);
     modGenUI->setBehaviorView(view);

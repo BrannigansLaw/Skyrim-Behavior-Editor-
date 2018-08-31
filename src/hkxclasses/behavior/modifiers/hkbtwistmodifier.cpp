@@ -117,6 +117,91 @@ bool hkbTwistModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbTwistModifier::getIsAdditive() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return isAdditive;
+}
+
+void hkbTwistModifier::setIsAdditive(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != isAdditive) ? isAdditive = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'isAdditive' was not set!");
+}
+
+QString hkbTwistModifier::getRotationAxisCoordinates() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rotationAxisCoordinates;
+}
+
+void hkbTwistModifier::setRotationAxisCoordinates(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < RotationAxisCoordinates.size() && rotationAxisCoordinates != RotationAxisCoordinates.at(index)) ? rotationAxisCoordinates = RotationAxisCoordinates.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rotationAxisCoordinates' was not set!");
+}
+
+QString hkbTwistModifier::getSetAngleMethod() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return setAngleMethod;
+}
+
+void hkbTwistModifier::setSetAngleMethod(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < SetAngleMethod.size() && setAngleMethod != SetAngleMethod.at(index)) ? setAngleMethod = SetAngleMethod.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'setAngleMethod' was not set!");
+}
+
+int hkbTwistModifier::getEndBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return endBoneIndex;
+}
+
+void hkbTwistModifier::setEndBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != endBoneIndex && endBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? endBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'endBoneIndex' was not set!");
+}
+
+int hkbTwistModifier::getStartBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startBoneIndex;
+}
+
+void hkbTwistModifier::setStartBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startBoneIndex && startBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? startBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startBoneIndex' was not set!");
+}
+
+qreal hkbTwistModifier::getTwistAngle() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return twistAngle;
+}
+
+void hkbTwistModifier::setTwistAngle(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != twistAngle) ? twistAngle = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'twistAngle' was not set!");
+}
+
+hkQuadVariable hkbTwistModifier::getAxisOfRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return axisOfRotation;
+}
+
+void hkbTwistModifier::setAxisOfRotation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != axisOfRotation) ? axisOfRotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'axisOfRotation' was not set!");
+}
+
+bool hkbTwistModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbTwistModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbTwistModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbTwistModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -133,7 +218,7 @@ void hkbTwistModifier::unlink(){
 QString hkbTwistModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkbones = [&](int & boneindex, const QString & fieldname){
         if (boneindex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;

@@ -24,12 +24,9 @@
 #define BINDING_COLUMN 2
 #define VALUE_COLUMN 3
 
-//#define INDEX_OF_MODIFIER 0
-//#define INDEX_OF_GENERATOR 1 //See hkbModifierGenerator getIndexOfObj()
-
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList ModifierGeneratorUI::headerLabels = {
+const QStringList ModifierGeneratorUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -61,17 +58,17 @@ ModifierGeneratorUI::ModifierGeneratorUI()
     table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_GENERATORS_TABLE_TIP));
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ModifierGeneratorUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void ModifierGeneratorUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void ModifierGeneratorUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void ModifierGeneratorUI::connectToTables(GenericTableWidget *modifiers, GenericTableWidget *generators){
@@ -83,114 +80,43 @@ void ModifierGeneratorUI::connectToTables(GenericTableWidget *modifiers, Generic
         connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewModifiers(int,QString,QStringList)), modifiers, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("ModifierGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void ModifierGeneratorUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_MODIFIER_GENERATOR){
             bsData = static_cast<hkbModifierGenerator *>(data);
             name->setText(bsData->getName());
-            if (bsData->modifier.data()){
-                table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(static_cast<hkbModifier *>(bsData->modifier.data())->getName());
-            }else{
-                table->item(MODIFIER_ROW, VALUE_COLUMN)->setText("NONE");
-            }
-            if (bsData->generator.data()){
-                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
-            }else{
-                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
-            }
+            table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(bsData->getGeneratorName());
+            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getModifierName());
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("ModifierGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
+        LogFile::writeToLog("ModifierGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ModifierGeneratorUI::setName(){
+void ModifierGeneratorUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("ModifierGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
 void ModifierGeneratorUI::setModifier(int index, const QString &name){
-    DataIconManager *ptr = nullptr;
-    int indexOfModifier = -1;
-    if (bsData){
-        if (behaviorView){
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index - 1);
-            indexOfModifier = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->modifier.data()));
-            if (ptr){
-                if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                    return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifier.data()), 0, ptr, false)){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                    return;
-                }
-            }else{
-                if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->modifier.data())), indexOfModifier);
-                }else{
-                    CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setModifier(): The selected icon is nullptr!!");
-                    return;
-                }
-            }
-            behaviorView->removeModifierData();
-            table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setModifier(): The 'bsData' pointer is nullptr!!");
-    }
+    UIHelper::setModifier(index, name, bsData, static_cast<hkbModifier *>(bsData->modifier.data()), NULL_SIGNATURE, HkxObject::TYPE_MODIFIER, table, behaviorView, MODIFIER_ROW, VALUE_COLUMN);
 }
 
 void ModifierGeneratorUI::setGenerator(int index, const QString & name){
-    DataIconManager *ptr = nullptr;
-    int indexOfGenerator = -1;
-    if (bsData){
-        if (behaviorView){
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-            indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->generator.data()));
-            if (ptr){
-                if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                    return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), 1, ptr, false)){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                    return;
-                }
-            }else{
-                if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), indexOfGenerator);
-                }else{
-                    CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setGenerator(): The selected icon is nullptr!!");
-                    return;
-                }
-            }
-            behaviorView->removeGeneratorData();
-            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setGenerator(): The 'bsData' pointer is nullptr!!");
-    }
+    UIHelper::setGenerator(index, name, bsData, static_cast<hkbGenerator *>(bsData->generator.data()), NULL_SIGNATURE, HkxObject::TYPE_GENERATOR, table, behaviorView, GENERATOR_ROW, VALUE_COLUMN);
 }
 
 void ModifierGeneratorUI::viewSelected(int row, int column){
@@ -204,7 +130,7 @@ void ModifierGeneratorUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ModifierGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -215,7 +141,7 @@ void ModifierGeneratorUI::modifierRenamed(const QString & name, int index){
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::modifierRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ModifierGeneratorUI::modifierRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -226,7 +152,7 @@ void ModifierGeneratorUI::generatorRenamed(const QString & name, int index){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ModifierGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 

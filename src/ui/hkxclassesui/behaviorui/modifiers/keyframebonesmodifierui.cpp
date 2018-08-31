@@ -32,7 +32,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList KeyframeBonesModifierUI::headerLabels = {
+const QStringList KeyframeBonesModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -76,181 +76,88 @@ KeyframeBonesModifierUI::KeyframeBonesModifierUI()
     addWidget(groupBox);
     addWidget(keyframeInfoUI);
     addWidget(boneIndexUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void KeyframeBonesModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(keyframedBonesList, SIGNAL(pressed()), this, SLOT(viewKeyframedBonesList()), Qt::UniqueConnection);
-    connect(keyframedBonesList, SIGNAL(enabled(bool)), this, SLOT(toggleKeyframedBonesList(bool)), Qt::UniqueConnection);
-    connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(keyframeInfoUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(keyframeInfoUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-}
-
-void KeyframeBonesModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(keyframedBonesList, SIGNAL(pressed()), this, SLOT(viewKeyframedBonesList()));
-    disconnect(keyframedBonesList, SIGNAL(enabled(bool)), this, SLOT(toggleKeyframedBonesList(bool)));
-    disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(keyframeInfoUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(keyframeInfoUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+void KeyframeBonesModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(keyframedBonesList, SIGNAL(pressed()), this, SLOT(viewKeyframedBonesList()), Qt::UniqueConnection);
+        connect(keyframedBonesList, SIGNAL(enabled(bool)), this, SLOT(toggleKeyframedBonesList(bool)), Qt::UniqueConnection);
+        connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(keyframeInfoUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(keyframeInfoUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(keyframedBonesList, SIGNAL(pressed()), this, SLOT(viewKeyframedBonesList()));
+        disconnect(keyframedBonesList, SIGNAL(enabled(bool)), this, SLOT(toggleKeyframedBonesList(bool)));
+        disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(keyframeInfoUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(keyframeInfoUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    }
 }
 
 void KeyframeBonesModifierUI::addKeyframeInfo(){
-    if (bsData){
-        bsData->keyframeInfo.append(hkbKeyframeBonesModifier::hkKeyframeInfo());
-        bsData->setIsFileChanged(true);
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::addKeyframeInfo(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->addKeyframeInfo(), loadDynamicTableRows() : LogFile::writeToLog("KeyframeBonesModifierUI::addKeyframeInfo(): The data is nullptr!!");
 }
 
 void KeyframeBonesModifierUI::removeKeyframeInfo(int index){
-    if (bsData){
-        if (!bsData->keyframeInfo.isEmpty()){
-            if (index < bsData->keyframeInfo.size() && index >= 0){
-                bsData->keyframeInfo.removeAt(index);
-            }else{
-                WARNING_MESSAGE("KeyframeBonesModifierUI::removeKeyframeInfo(): Invalid row index selected!!");
-                return;
-            }
-            bsData->setIsFileChanged(true);
-            loadDynamicTableRows();
-        }else{
-            WARNING_MESSAGE("KeyframeBonesModifierUI::removeKeyframeInfo(): Ranges is empty!!");
-            return;
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::removeKeyframeInfo(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->removeKeyframeInfo(index), loadDynamicTableRows() : LogFile::writeToLog("KeyframeBonesModifierUI::removeKeyframeInfo(): The data is nullptr!!");
 }
 
 void KeyframeBonesModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
     if (data){
         if (data->getSignature() == HKB_KEY_FRAME_BONES_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbKeyframeBonesModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            if (bsData->keyframedBonesList.data()){
+            enable->setChecked(bsData->getEnable());
+            if (bsData->getKeyframedBonesList()){
                 keyframedBonesList->setChecked(true);
                 keyframedBonesList->setText("Edit");
             }else{
                 keyframedBonesList->setChecked(false);
                 keyframedBonesList->setText("nullptr");
             }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("KeyframeBonesModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("KeyframeBonesModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void KeyframeBonesModifierUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_KEYFRAME_INFO_ROW + bsData->getNumberOfKeyframeInfos() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
+        auto temp = ADD_KEYFRAME_INFO_ROW + bsData->getNumberOfKeyframeInfos() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
         for (auto i = ADD_KEYFRAME_INFO_ROW + 1, j = 0; j < bsData->getNumberOfKeyframeInfos(); i++, j++){
-            setRowItems(i, "KeyframeInfo "+QString::number(j), "hkKeyframeInfo", "Remove", "Edit", "Double click to remove this KeyframeInfo", "Double click to edit this KeyframeInfo");
+            UIHelper::setRowItems(i, "KeyframeInfo "+QString::number(j), "hkKeyframeInfo", "Remove", "Edit", "Double click to remove this KeyframeInfo", "Double click to edit this KeyframeInfo", table);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
-}
-
-void KeyframeBonesModifierUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
-    }
-}
-
-bool KeyframeBonesModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void KeyframeBonesModifierUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
-        switch (row){
-        case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
+        auto isProperty = false;
+        auto row = table->currentRow();
+        if (row == ENABLE_ROW){
+            (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, "enable", VARIABLE_TYPE_BOOL, isProperty, table, bsData);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -259,73 +166,56 @@ void KeyframeBonesModifierUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void KeyframeBonesModifierUI::setName(){
+void KeyframeBonesModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void KeyframeBonesModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("KeyframeBonesModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void KeyframeBonesModifierUI::toggleKeyframedBonesList(bool enable){
     if (bsData){
         if (!enable){
-            bsData->keyframedBonesList = HkxSharedPtr();
+            bsData->setKeyframedBonesList(nullptr);
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-        }else if (!bsData->keyframedBonesList.data()){
-            hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
-            //bsData->getParentFile()->addObjectToFile(indices, -1);
-            bsData->keyframedBonesList = HkxSharedPtr(indices);
-            //bones->setText(indices->getName());
+        }else if (!bsData->getKeyframedBonesList()){
+            bsData->setKeyframedBonesList(new hkbBoneIndexArray(bsData->getParentFile()));
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::toggleKeyframedBonesList(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::toggleKeyframedBonesList(): The data is nullptr!!");
     }
 }
 
 void KeyframeBonesModifierUI::viewKeyframedBonesList(){
     if (bsData){
-        boneIndexUI->loadData(bsData->keyframedBonesList.data());
+        boneIndexUI->loadData(bsData->getKeyframedBonesList());
         setCurrentIndex(BONE_INDEX_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::viewKeyframedBonesList(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::viewKeyframedBonesList(): The data is nullptr!!");
     }
 }
 
 void KeyframeBonesModifierUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
     if (bsData){
         if (row < ADD_KEYFRAME_INFO_ROW && row >= 0){
+            auto properties = false;
             if (column == BINDING_COLUMN){
-                switch (row){
-                case ENABLE_ROW:
-                    if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
+                if (row == ENABLE_ROW){
+                    (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
                     selectTableToView(properties, "enable");
-                    break;
                 }
             }
         }else if (row == ADD_KEYFRAME_INFO_ROW && column == NAME_COLUMN){
             addKeyframeInfo();
         }else if (row > ADD_KEYFRAME_INFO_ROW && row < ADD_KEYFRAME_INFO_ROW + bsData->getNumberOfKeyframeInfos() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfKeyframeInfos() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     keyframeInfoUI->loadData(((BehaviorFile *)(bsData->getParentFile())), &bsData->keyframeInfo[result], bsData, result);
@@ -336,22 +226,20 @@ void KeyframeBonesModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::viewSelectedChild(): Invalid index of range to view!!");
+                LogFile::writeToLog("KeyframeBonesModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void KeyframeBonesModifierUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     case KEYFRAME_WIDGET:
-        keyframeInfoUI->setBindingVariable(index, name);
-        break;
+        keyframeInfoUI->setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("KeyframeBonesModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -369,32 +257,7 @@ void KeyframeBonesModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::connectToTables(): One or more arguments are nullptr!!");
-    }
-}
-
-void KeyframeBonesModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -414,31 +277,24 @@ void KeyframeBonesModifierUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void KeyframeBonesModifierUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("KeyframeBonesModifierUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            bind = bsData->getVariableBindingSetData();
+            auto bind = bsData->getVariableBindingSetData();
             if (bind){
-                bindIndex = bind->getVariableIndexOfBinding("enable");
-                if (bindIndex == index){
-                    table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-                }
+                auto bindIndex = bind->getVariableIndexOfBinding("enable");
+                (bindIndex == index) ? table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name) : NULL;
             }
         }else{
             keyframeInfoUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("KeyframeBonesModifierUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("KeyframeBonesModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

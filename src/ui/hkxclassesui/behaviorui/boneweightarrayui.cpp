@@ -7,7 +7,7 @@
 #define NAME_COLUMN 0
 #define VALUE_COLUMN 1
 
-QStringList BoneWeightArrayUI::headerLabels = {
+const QStringList BoneWeightArrayUI::headerLabels = {
     "Bone Name",
     "Weight"
 };
@@ -47,109 +47,79 @@ BoneWeightArrayUI::BoneWeightArrayUI()
 void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
     blockSignals(true);
     if (data && data->getSignature() == HKB_BONE_WEIGHT_ARRAY){
-        bsData = static_cast<hkbBoneWeightArray *>(data);
         HkxFile *file = dynamic_cast<BehaviorFile *>(bsData->getParentFile());
-        int rowCount = 0;
         QStringList boneNames;
+        bsData = static_cast<hkbBoneWeightArray *>(data);
         if (file){
-            if (isRagdoll){
-                boneNames = static_cast<BehaviorFile *>(file)->getRagdollBoneNames();
-            }else{
-                boneNames = static_cast<BehaviorFile *>(file)->getRigBoneNames();
-            }
+            (isRagdoll) ? boneNames = static_cast<BehaviorFile *>(file)->getRagdollBoneNames() : boneNames = static_cast<BehaviorFile *>(file)->getRigBoneNames();
         }else{
             file = dynamic_cast<CharacterFile *>(bsData->getParentFile());
             if (file){
-                if (isRagdoll){
-                    boneNames = static_cast<CharacterFile *>(file)->getRagdollBoneNames();
-                }else{
-                    boneNames = static_cast<CharacterFile *>(file)->getRigBoneNames();
-                }
+                (isRagdoll) ? boneNames = static_cast<CharacterFile *>(file)->getRagdollBoneNames() : boneNames = static_cast<BehaviorFile *>(file)->getRigBoneNames();
             }else{
-                CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!");
+                LogFile::writeToLog("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!");
             }
         }
-        for (auto i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
-            rowCount = bones->rowCount();
+        for (auto i = 0; i < bsData->getBoneWeightsSize() && i < boneNames.size(); i++){
+            auto rowCount = bones->rowCount();
             if (rowCount > i){
+                auto itemname = bones->item(i, NAME_COLUMN);
+                auto itemvalue = bones->item(i, VALUE_COLUMN);
                 bones->setRowHidden(i, false);
-                if (bones->item(i, NAME_COLUMN)){
-                    bones->item(i, NAME_COLUMN)->setText(boneNames.at(i));
-                }else{
-                    bones->setItem(i, NAME_COLUMN, new TableWidgetItem(boneNames.at(i), Qt::AlignCenter, QColor(Qt::white)));
-                }
-                if (bones->item(i, VALUE_COLUMN)){
-                    bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i), char('f'), 6));
-                }else{
-                    bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
-                }
+                (itemname) ? itemname->setText(boneNames.at(i)) : bones->setItem(i, NAME_COLUMN, new TableWidgetItem(boneNames.at(i), Qt::AlignCenter, QColor(Qt::white)));
+                (itemvalue) ? itemvalue->setText(QString::number(bsData->getBoneWeightAt(i), char('f'), 6)) : bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->getBoneWeightAt(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }else{
                 bones->setRowCount(rowCount + 1);
                 bones->setItem(rowCount, NAME_COLUMN, new TableWidgetItem(boneNames.at(i), Qt::AlignCenter, QColor(Qt::white)));
-                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
+                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->getBoneWeightAt(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }
         }
-        for (auto j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
+        for (auto j = bsData->getBoneWeightsSize(); j < bones->rowCount(); j++){
             bones->setRowHidden(j, true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::loadData(): The data passed to the UI is nullptr!!!");
+        LogFile::writeToLog("BoneWeightArrayUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     blockSignals(false);
 }
 
 void BoneWeightArrayUI::setBoneWeight(){
-    int row = bones->currentRow();
     if (bsData){
-        if (bsData->boneWeights.size() > row && row >= 0){
+        auto row = bones->currentRow();
+        auto numbones = bsData->getBoneWeightsSize();
+        if (numbones > row && row >= 0){
             if (setAllCB->isChecked()){
-                for (auto i = 0; i < bsData->boneWeights.size(); i++){
-                    bsData->boneWeights[i] = selectedBone->value();
-                    if (bones->item(i, VALUE_COLUMN)){
-                        bones->item(i, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
-                    }else{
-                        bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
-                    }
+                for (auto i = 0; i < numbones; i++){
+                    bsData->setBoneWeightAt(i, selectedBone->value());
+                    auto item = bones->item(i, VALUE_COLUMN);
+                    (item) ? item->setText(QString::number(selectedBone->value(), char('f'), 6)) : bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
                 }
             }else{
-                bsData->boneWeights[row] = selectedBone->value();
-                if (bones->item(row, VALUE_COLUMN)){
-                    bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
-                }else{
-                    bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
-                }
+                bsData->setBoneWeightAt(row, selectedBone->value());
+                auto item = bones->item(row, VALUE_COLUMN);
+                (item) ? item->setText(QString::number(selectedBone->value(), char('f'), 6)) : bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }
-            bsData->setIsFileChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
     }
 }
 
 void BoneWeightArrayUI::loadBoneWeight(int row, int){
-    if (bsData){
-        if (bsData->boneWeights.size() > row && row >= 0){
-            selectedBone->setValue(bsData->boneWeights.at(row));
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
-    }
+    (bsData) ? selectedBone->setValue(bsData->getBoneWeightAt(row)) : LogFile::writeToLog("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
 }
 
 void BoneWeightArrayUI::invert(){
     if (bsData){
-        for (auto i = 0; i < bsData->boneWeights.size(); i++){
-            bsData->boneWeights[i] = 1 - bsData->boneWeights.at(i);
+        auto numbones = bsData->getBoneWeightsSize();
+        for (auto i = 0; i < numbones; i++){
+            bsData->setBoneWeightAt(i, 1 - bsData->getBoneWeightAt(i));
         }
-        for (auto i = 0; i < bones->rowCount() && i < bsData->boneWeights.size(); i++){
-            if (bones->item(i, VALUE_COLUMN)){
-                bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i), char('f'), 6));
-            }else{
-                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
-            }
+        for (auto i = 0; i < bones->rowCount() && i < numbones; i++){
+            auto item = bones->item(i, VALUE_COLUMN);
+            (item) ? item->setText(QString::number(bsData->boneWeights.at(i), char('f'), 6)) : bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::invert(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BoneWeightArrayUI::invert(): The 'bsData' pointer is nullptr!!");
     }
 }

@@ -3,6 +3,8 @@
 
 #include "hkbmodifier.h"
 
+class hkbEventRangeDataArray;
+
 class hkbEventsFromRangeModifier final: public hkbModifier
 {
     friend class EventsFromRangeModifierUI;
@@ -15,6 +17,15 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    qreal getInputValue() const;
+    void setInputValue(const qreal &value);
+    qreal getLowerBound() const;
+    void setLowerBound(const qreal &value);
+    hkbEventRangeDataArray * getEventRanges() const;
+    void setEventRanges(hkbEventRangeDataArray *value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

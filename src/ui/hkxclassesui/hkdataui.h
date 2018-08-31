@@ -93,12 +93,15 @@ class MainWindow;
  * add it to the set behavior view function if necessary.
  */
 
-class HkDataUI: public QGroupBox
+class HkDataUI final: public QGroupBox
 {
     Q_OBJECT
 public:
-    HkDataUI(/*MainWindow *mainui, */const QString & title);
-    virtual ~HkDataUI(){}
+    HkDataUI(const QString & title);
+    HkDataUI& operator=(const HkDataUI&) = delete;
+    HkDataUI(const HkDataUI &) = delete;
+    ~HkDataUI() = default;
+public:
     BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
     void unloadDataWidget();
@@ -122,9 +125,6 @@ public slots:
     void variableNameChanged(const QString & newName, int index);
     void variableAdded(const QString & name, const QString & type);
     void variableRemoved(int index);
-private:
-    HkDataUI& operator=(const HkDataUI&);
-    HkDataUI(const HkDataUI &);
 private:
     enum DATA_TYPE_LOADED{
         NO_DATA_SELECTED,
@@ -193,10 +193,17 @@ private:
         BGS_GAMEBYRO_SEQUENCE_GENERATOR,
         EVENTS_FROM_RANGE_MODIFIER
     };
-    static QStringList generatorTypes;
-    static QStringList modifierTypes;
-    static QStringList variableTypes;
-    //MainWindow *mainUI;
+private:
+    template<typename UIWidget>
+    void changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata, UIWidget *uiwidget, GenericTableWidget *table1, GenericTableWidget *table2);
+    template<typename UIWidget>
+    void changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata, UIWidget *uiwidget, GenericTableWidget *table1, GenericTableWidget *table2, GenericTableWidget *table3);
+    template<typename UIWidget>
+    void changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata, UIWidget *uiwidget, GenericTableWidget *table1, GenericTableWidget *table2, GenericTableWidget *table3, GenericTableWidget *table4);
+private:
+    static const QStringList generatorTypes;
+    static const QStringList modifierTypes;
+    static const QStringList variableTypes;
     EventsUI *eventsUI;
     BehaviorVariablesUI *variablesUI;
     AnimationsUI *animationsUI;

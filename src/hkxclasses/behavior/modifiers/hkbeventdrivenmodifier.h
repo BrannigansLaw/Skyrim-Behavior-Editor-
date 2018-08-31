@@ -15,6 +15,16 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkbModifier * getModifier() const;
+    int getActivateEventId() const;
+    void setActivateEventId(int value);
+    int getDeactivateEventId() const;
+    void setDeactivateEventId(int value);
+    bool getActiveByDefault() const;
+    void setActiveByDefault(bool value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

@@ -35,58 +35,46 @@ CacheVariableWidget::CacheVariableWidget()
     nameLyt->addRow("Variable Name: ", name);
     minValueLyt->addRow("Minimum Value: ", minValue);
     maxValueLyt->addRow("Maximum Value: ", maxValue);
-    connectSignals();
+    toggleSignals(true);
+}
+
+void CacheVariableWidget::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textChanged(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(minValue, SIGNAL(valueChanged(int)), this, SLOT(setMinimumValue(int)), Qt::UniqueConnection);
+        connect(maxValue, SIGNAL(valueChanged(int)), this, SLOT(setMaximumValue(int)), Qt::UniqueConnection);
+        connect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textChanged(QString)), this, SLOT(setName(QString)));
+        disconnect(minValue, SIGNAL(valueChanged(int)), this, SLOT(setMinimumValue(int)));
+        disconnect(maxValue, SIGNAL(valueChanged(int)), this, SLOT(setMaximumValue(int)));
+        disconnect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()));
+    }
 }
 
 void CacheVariableWidget::loadData(AnimCacheVariable *data){
+    toggleSignals(false);
     if (data){
         bsData = data;
-        disconnectSignals();
         name->setText(bsData->getName());
         minValue->setValue(bsData->minValue);
         maxValue->setValue(bsData->maxValue);
-        connectSignals();
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("CacheVariableWidget::loadData(): The data is nullptr!!");
     }
+    toggleSignals(true);
 }
 
 void CacheVariableWidget::setName(const QString & newname){
-    if (bsData){
-        bsData->getName() = newname;
-    }else{
-        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setName(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->name = newname : LogFile::writeToLog("CacheVariableWidget::setName(): The data is nullptr!!");
 }
 
 void CacheVariableWidget::setMinimumValue(int newvalue){
-    if (bsData){
-        bsData->minValue = newvalue;
-    }else{
-        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setMinimumValue(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->minValue = newvalue : LogFile::writeToLog("CacheVariableWidget::setMinimumValue(): The data is nullptr!!");
 }
 
 void CacheVariableWidget::setMaximumValue(int newvalue){
-    if (bsData){
-        bsData->maxValue = newvalue;
-    }else{
-        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setMaximumValue(): The data is nullptr!!");
-    }
-}
-
-void CacheVariableWidget::connectSignals(){
-    connect(name, SIGNAL(textChanged(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
-    connect(minValue, SIGNAL(valueChanged(int)), this, SLOT(setMinimumValue(int)), Qt::UniqueConnection);
-    connect(maxValue, SIGNAL(valueChanged(int)), this, SLOT(setMaximumValue(int)), Qt::UniqueConnection);
-    connect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()), Qt::UniqueConnection);
-}
-
-void CacheVariableWidget::disconnectSignals(){
-    disconnect(name, SIGNAL(textChanged(QString)), this, SLOT(setName(QString)));
-    disconnect(minValue, SIGNAL(valueChanged(int)), this, SLOT(setMinimumValue(int)));
-    disconnect(maxValue, SIGNAL(valueChanged(int)), this, SLOT(setMaximumValue(int)));
-    disconnect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()));
+    (bsData) ? bsData->maxValue = newvalue : LogFile::writeToLog("CacheVariableWidget::setMaximumValue(): The data is nullptr!!");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,87 +111,73 @@ CacheClipWidget::CacheClipWidget()
     unknownLyt->addRow("Unknown Variable: ", unknown);
     buttonLyt->addWidget(addClipButton);
     buttonLyt->addWidget(removeClipButton);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void CacheClipWidget::connectSignals(){
-    connect(eventName, SIGNAL(textChanged(QString)), this, SLOT(setEventName(QString)), Qt::UniqueConnection);
-    connect(unknown, SIGNAL(valueChanged(int)), this, SLOT(setUnknown(int)), Qt::UniqueConnection);
-    connect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()), Qt::UniqueConnection);
-    connect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()), Qt::UniqueConnection);
-    connect(clipGenerators, SIGNAL(cellChanged(int,int)), this, SLOT(setClipGeneratorAt(int,int)), Qt::UniqueConnection);
-    connect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()), Qt::UniqueConnection);
-}
-
-void CacheClipWidget::disconnectSignals(){
-    disconnect(eventName, SIGNAL(textChanged(QString)), this, SLOT(setEventName(QString)));
-    disconnect(unknown, SIGNAL(valueChanged(int)), this, SLOT(setUnknown(int)));
-    disconnect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()));
-    disconnect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()));
-    disconnect(clipGenerators, SIGNAL(cellChanged(int,int)), this, SLOT(setClipGeneratorAt(int,int)));
-    disconnect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()));
+void CacheClipWidget::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(eventName, SIGNAL(textChanged(QString)), this, SLOT(setEventName(QString)), Qt::UniqueConnection);
+        connect(unknown, SIGNAL(valueChanged(int)), this, SLOT(setUnknown(int)), Qt::UniqueConnection);
+        connect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()), Qt::UniqueConnection);
+        connect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()), Qt::UniqueConnection);
+        connect(clipGenerators, SIGNAL(cellChanged(int,int)), this, SLOT(setClipGeneratorAt(int,int)), Qt::UniqueConnection);
+        connect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(eventName, SIGNAL(textChanged(QString)), this, SLOT(setEventName(QString)));
+        disconnect(unknown, SIGNAL(valueChanged(int)), this, SLOT(setUnknown(int)));
+        disconnect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()));
+        disconnect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()));
+        disconnect(clipGenerators, SIGNAL(cellChanged(int,int)), this, SLOT(setClipGeneratorAt(int,int)));
+        disconnect(returnButton, SIGNAL(released()), this, SIGNAL(returnToWidget()));
+    }
 }
 
 void CacheClipWidget::loadData(AnimCacheClipInfo *data){
+    toggleSignals(false);
     if (data){
         bsData = data;
-        disconnectSignals();
         eventName->setText(bsData->eventName);
         unknown->setValue(bsData->unknown);
         clipGenerators->setRowCount(bsData->clipGenerators.size());
         for (auto i = 0; i < bsData->clipGenerators.size(); i++){
-            if (clipGenerators->item(i, 0)){
-                clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i));
-            }else{
-                clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i)));
-            }
+            auto item = clipGenerators->item(i, 0);
+            (item) ? item->setText(bsData->clipGenerators.at(i)) : clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i)));
         }
-        connectSignals();
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheClipWidget::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("CacheClipWidget::loadData(): The data is nullptr!!");
     }
+    toggleSignals(true);
 }
 
 void CacheClipWidget::setEventName(const QString & name){
-    if (bsData){
-        bsData->eventName = name;
-    }else{
-        CRITICAL_ERROR_MESSAGE("CacheClipWidget::setEventName(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->eventName = name : LogFile::writeToLog("CacheClipWidget::setEventName(): The data is nullptr!!");
 }
 
 void CacheClipWidget::setUnknown(int newvalue){
-    if (bsData){
-        bsData->unknown = newvalue;
-    }else{
-        CRITICAL_ERROR_MESSAGE("CacheClipWidget::setUnknown(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->unknown = newvalue : LogFile::writeToLog("CacheClipWidget::setUnknown(): The data is nullptr!!");
 }
 
 void CacheClipWidget::addClipGenerator(){
     if (bsData){
-        int index = clipGenerators->rowCount();
+        auto index = clipGenerators->rowCount();
         bsData->clipGenerators.append("NEWCLIP");
         clipGenerators->setRowCount(index + 1);
-        if (clipGenerators->item(index, 0)){
-            clipGenerators->item(index, 0)->setText("NEWCLIP");
-        }else{
-            clipGenerators->setItem(index, 0, new TableWidgetItem("NEWCLIP"));
-        }
+        auto item = clipGenerators->item(index, 0);
+        (item) ? item->setText("NEWCLIP") : clipGenerators->setItem(index, 0, new TableWidgetItem("NEWCLIP"));
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheClipWidget::addClipGenerator(): The data is nullptr!!");
+        LogFile::writeToLog("CacheClipWidget::addClipGenerator(): The data is nullptr!!");
     }
 }
 
 void CacheClipWidget::removeClipGenerator(){
     if (bsData){
-        int index = clipGenerators->currentRow();
+        auto index = clipGenerators->currentRow();
         if (index > -1 && index < bsData->clipGenerators.size()){
             bsData->clipGenerators.removeAt(index);
             clipGenerators->removeRow(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheClipWidget::removeClipGenerator(): The data is nullptr!!");
+        LogFile::writeToLog("CacheClipWidget::removeClipGenerator(): The data is nullptr!!");
     }
 }
 
@@ -212,10 +186,10 @@ void CacheClipWidget::setClipGeneratorAt(int row, int column){
         if (row > -1 && row < bsData->clipGenerators.size()){
             bsData->clipGenerators[row] = clipGenerators->item(row, column)->text();
         }else{
-            CRITICAL_ERROR_MESSAGE("CacheClipWidget::setClipGeneratorAt(): Mismatch between data and UI!!");
+            LogFile::writeToLog("CacheClipWidget::setClipGeneratorAt(): Mismatch between data and UI!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheClipWidget::setClipGeneratorAt(): The data is nullptr!!");
+        LogFile::writeToLog("CacheClipWidget::setClipGeneratorAt(): The data is nullptr!!");
     }
 }
 
@@ -247,7 +221,7 @@ CacheWidget::CacheWidget()
       returnButton(new QPushButton("Return"))
 {
     //setTitle("Cache Data");
-    QWidget *wid = new QWidget();
+    auto wid = new QWidget();
     wid->setLayout(lyt);
     lyt->addWidget(returnButton);
     lyt->addLayout(eventButtonLyt);
@@ -291,160 +265,137 @@ CacheWidget::CacheWidget()
     addWidget(wid);
     addWidget(variableUI);
     addWidget(clipUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void CacheWidget::connectSignals(){
-    connect(cacheEvents, SIGNAL(cellChanged(int,int)), this, SLOT(setCacheEventNameAt(int,int)), Qt::UniqueConnection);
-    connect(addEventButton, SIGNAL(released()), this, SLOT(addCacheEvent()), Qt::UniqueConnection);
-    connect(removeEventButton, SIGNAL(released()), this, SLOT(removeCacheEvent()), Qt::UniqueConnection);
-    connect(addVariableButton, SIGNAL(released()), this, SLOT(addBehaviorVariable()), Qt::UniqueConnection);
-    connect(removeVariableButton, SIGNAL(released()), this, SLOT(removeBehaviorVariable()), Qt::UniqueConnection);
-    connect(behaviorVariables, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewBehaviorVariable(int,int)), Qt::UniqueConnection);
-    connect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()), Qt::UniqueConnection);
-    connect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()), Qt::UniqueConnection);
-    connect(clipGenerators, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewClipGenerator(int,int)), Qt::UniqueConnection);
-    connect(addAnimationButton, SIGNAL(released()), this, SLOT(addAnimation()), Qt::UniqueConnection);
-    connect(removeAnimationButton, SIGNAL(released()), this, SLOT(removeAnimation()), Qt::UniqueConnection);
-    connect(animations, SIGNAL(cellChanged(int,int)), this, SLOT(setAnimationNameAt(int,int)), Qt::UniqueConnection);
-    connect(variableUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(clipUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(returnButton, SIGNAL(released()), this, SIGNAL(returnToMainWidget()), Qt::UniqueConnection);
-}
-
-void CacheWidget::disconnectSignals(){
-    disconnect(cacheEvents, SIGNAL(cellChanged(int,int)), this, SLOT(setCacheEventNameAt(int,int)));
-    disconnect(addEventButton, SIGNAL(released()), this, SLOT(addCacheEvent()));
-    disconnect(removeEventButton, SIGNAL(released()), this, SLOT(removeCacheEvent()));
-    disconnect(addVariableButton, SIGNAL(released()), this, SLOT(addBehaviorVariable()));
-    disconnect(removeVariableButton, SIGNAL(released()), this, SLOT(removeBehaviorVariable()));
-    disconnect(behaviorVariables, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewBehaviorVariable(int,int)));
-    disconnect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()));
-    disconnect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()));
-    disconnect(clipGenerators, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewClipGenerator(int,int)));
-    disconnect(addAnimationButton, SIGNAL(released()), this, SLOT(addAnimation()));
-    disconnect(removeAnimationButton, SIGNAL(released()), this, SLOT(removeAnimation()));
-    disconnect(animations, SIGNAL(cellChanged(int,int)), this, SLOT(setAnimationNameAt(int,int)));
-    disconnect(variableUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()));
-    disconnect(clipUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()));
-    disconnect(returnButton, SIGNAL(released()), this, SIGNAL(returnToMainWidget()));
+void CacheWidget::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(cacheEvents, SIGNAL(cellChanged(int,int)), this, SLOT(setCacheEventNameAt(int,int)), Qt::UniqueConnection);
+        connect(addEventButton, SIGNAL(released()), this, SLOT(addCacheEvent()), Qt::UniqueConnection);
+        connect(removeEventButton, SIGNAL(released()), this, SLOT(removeCacheEvent()), Qt::UniqueConnection);
+        connect(addVariableButton, SIGNAL(released()), this, SLOT(addBehaviorVariable()), Qt::UniqueConnection);
+        connect(removeVariableButton, SIGNAL(released()), this, SLOT(removeBehaviorVariable()), Qt::UniqueConnection);
+        connect(behaviorVariables, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewBehaviorVariable(int,int)), Qt::UniqueConnection);
+        connect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()), Qt::UniqueConnection);
+        connect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()), Qt::UniqueConnection);
+        connect(clipGenerators, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewClipGenerator(int,int)), Qt::UniqueConnection);
+        connect(addAnimationButton, SIGNAL(released()), this, SLOT(addAnimation()), Qt::UniqueConnection);
+        connect(removeAnimationButton, SIGNAL(released()), this, SLOT(removeAnimation()), Qt::UniqueConnection);
+        connect(animations, SIGNAL(cellChanged(int,int)), this, SLOT(setAnimationNameAt(int,int)), Qt::UniqueConnection);
+        connect(variableUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(clipUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(returnButton, SIGNAL(released()), this, SIGNAL(returnToMainWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(cacheEvents, SIGNAL(cellChanged(int,int)), this, SLOT(setCacheEventNameAt(int,int)));
+        disconnect(addEventButton, SIGNAL(released()), this, SLOT(addCacheEvent()));
+        disconnect(removeEventButton, SIGNAL(released()), this, SLOT(removeCacheEvent()));
+        disconnect(addVariableButton, SIGNAL(released()), this, SLOT(addBehaviorVariable()));
+        disconnect(removeVariableButton, SIGNAL(released()), this, SLOT(removeBehaviorVariable()));
+        disconnect(behaviorVariables, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewBehaviorVariable(int,int)));
+        disconnect(addClipButton, SIGNAL(released()), this, SLOT(addClipGenerator()));
+        disconnect(removeClipButton, SIGNAL(released()), this, SLOT(removeClipGenerator()));
+        disconnect(clipGenerators, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewClipGenerator(int,int)));
+        disconnect(addAnimationButton, SIGNAL(released()), this, SLOT(addAnimation()));
+        disconnect(removeAnimationButton, SIGNAL(released()), this, SLOT(removeAnimation()));
+        disconnect(animations, SIGNAL(cellChanged(int,int)), this, SLOT(setAnimationNameAt(int,int)));
+        disconnect(variableUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()));
+        disconnect(clipUI, SIGNAL(returnToWidget()), this, SLOT(returnToWidget()));
+        disconnect(returnButton, SIGNAL(released()), this, SIGNAL(returnToMainWidget()));
+    }
 }
 
 void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
+    toggleSignals(false);
     if (data && project){
         bsData = data;
         projectData = project;
-        disconnectSignals();
         cacheEvents->setRowCount(bsData->cacheEvents.size());
+        auto setrowitem = [&](TableWidget *table, const QString & itemname, int row, const QString & message){
+            (table->item(row, 0)) ? table->item(row, 0)->setText(itemname) : table->setItem(row, 0, new TableWidgetItem(itemname)), table->setItem(row, 1, new TableWidgetItem(message));
+        };
         for (auto i = 0; i < bsData->cacheEvents.size(); i++){
-            if (cacheEvents->item(i, 0)){
-                cacheEvents->item(i, 0)->setText(bsData->cacheEvents.at(i));
-            }else{
-                cacheEvents->setItem(i, 0, new TableWidgetItem(bsData->cacheEvents.at(i)));
-            }
+            setrowitem(cacheEvents, bsData->cacheEvents.at(i), i, "");
         }
         behaviorVariables->setRowCount(bsData->behaviorVariables.size());
         for (auto i = 0; i < bsData->behaviorVariables.size(); i++){
-            if (behaviorVariables->item(i, 0)){
-                behaviorVariables->item(i, 0)->setText(bsData->behaviorVariables.at(i)->getName());
-            }else{
-                behaviorVariables->setItem(i, 0, new TableWidgetItem(bsData->behaviorVariables.at(i)->getName()));
-                behaviorVariables->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
-            }
+            setrowitem(behaviorVariables, bsData->behaviorVariables.at(i)->getName(), i, "Double Click To Edit");
         }
         clipGenerators->setRowCount(bsData->clipGenerators.size());
         for (auto i = 0; i < bsData->clipGenerators.size(); i++){
-            if (clipGenerators->item(i, 0)){
-                clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i)->getEventName());
-            }else{
-                clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i)->getEventName()));
-                clipGenerators->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
-            }
+            setrowitem(clipGenerators, bsData->clipGenerators.at(i)->getEventName(), i, "Double Click To Edit");
         }
         animations->setRowCount(bsData->animations.size());
         for (auto i = 0; i < bsData->animations.size(); i++){
-            if (animations->item(i, 0)){
-                animations->item(i, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i)->crcAnimationName));
-            }else{
-                animations->setItem(i, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i)->crcAnimationName)));
-            }
+            setrowitem(animations, projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i)->crcAnimationName), i, "");
         }
-        connectSignals();
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::loadData(): The data or project is nullptr!!");
     }
+    toggleSignals(true);
 }
 
 void CacheWidget::setCacheEventNameAt(int row, int column){
     if (bsData){
-        if (row > -1 && row < bsData->cacheEvents.size()){
-            bsData->cacheEvents[row] = cacheEvents->item(row, column)->text();
-        }else{
-            CRITICAL_ERROR_MESSAGE("CacheWidget::setEventNameAt(): Mismatch between data and UI!!");
-        }
+        (row > -1 && row < bsData->cacheEvents.size()) ? bsData->cacheEvents[row] = cacheEvents->item(row, column)->text() : LogFile::writeToLog("CacheWidget::setEventNameAt(): Mismatch between data and UI!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::setEventNameAt(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::setEventNameAt(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addCacheEvent(){
     if (bsData){
-        int index = cacheEvents->rowCount();
-        bsData->cacheEvents.append("NEWEVENT");
+        auto index = cacheEvents->rowCount();
+        bsData->cacheEvents.append("NEW_EVENT");
         cacheEvents->setRowCount(index + 1);
-        if (cacheEvents->item(index, 0)){
-            cacheEvents->item(index, 0)->setText("NEWEVENT");
-        }else{
-            cacheEvents->setItem(index, 0, new TableWidgetItem("NEWEVENT"));
-        }
+        (cacheEvents->item(index, 0)) ? cacheEvents->item(index, 0)->setText("NEW_EVENT") : cacheEvents->setItem(index, 0, new TableWidgetItem("NEW_EVENT"));
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::addCacheEvent(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::addCacheEvent(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::removeCacheEvent(){
     if (bsData){
-        int index = cacheEvents->currentRow();
+        auto index = cacheEvents->currentRow();
         if (index > -1 && index < bsData->cacheEvents.size()){
             bsData->cacheEvents.removeAt(index);
             cacheEvents->removeRow(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::removeCacheEvent(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::removeCacheEvent(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addBehaviorVariable(){
     if (bsData){
-        int index = behaviorVariables->rowCount();
-        bsData->behaviorVariables.append(new AnimCacheVariable("NEWVARIABLE"));
+        auto index = behaviorVariables->rowCount();
+        bsData->behaviorVariables.append(new AnimCacheVariable("NEW_VARIABLE"));
         behaviorVariables->setRowCount(index + 1);
         if (behaviorVariables->item(index, 0)){
-            behaviorVariables->item(index, 0)->setText("NEWVARIABLE");
+            behaviorVariables->item(index, 0)->setText("NEW_VARIABLE");
         }else{
-            behaviorVariables->setItem(index, 0, new TableWidgetItem("NEWVARIABLE"));
+            behaviorVariables->setItem(index, 0, new TableWidgetItem("NEW_VARIABLE"));
             behaviorVariables->setItem(index, 1, new TableWidgetItem("Double Click To Edit"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::addBehaviorVariable(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::addBehaviorVariable(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::removeBehaviorVariable(){
     if (bsData){
-        int index = behaviorVariables->currentRow();
+        auto index = behaviorVariables->currentRow();
         if (index > -1 && index < bsData->behaviorVariables.size()){
             bsData->behaviorVariables.removeAt(index);
             behaviorVariables->removeRow(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::removeBehaviorVariable(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::removeBehaviorVariable(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addClipGenerator(){
     if (bsData){
-        int index = clipGenerators->rowCount();
+        auto index = clipGenerators->rowCount();
         bsData->clipGenerators.append(new AnimCacheClipInfo("NEWCLIPGENERATOR"));
         clipGenerators->setRowCount(index + 1);
         if (clipGenerators->item(index, 0)){
@@ -454,101 +405,101 @@ void CacheWidget::addClipGenerator(){
             clipGenerators->setItem(index, 1, new TableWidgetItem("Double Click To Edit"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::addClipGenerator(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::addClipGenerator(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::removeClipGenerator(){
     if (bsData){
-        int index = clipGenerators->currentRow();
+        auto index = clipGenerators->currentRow();
         if (index > -1 && index < bsData->clipGenerators.size()){
             bsData->clipGenerators.removeAt(index);
             clipGenerators->removeRow(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::removeClipGenerator(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::removeClipGenerator(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::setAnimationNameAt(int row, int column){
     if (bsData && projectData){
         if (row > -1 && row < bsData->animations.size()){
-            QString name = animations->item(row, column)->text();
+            auto name = animations->item(row, column)->text();
             if (name.count("\\") > 0){
                 name = animations->item(row, column)->text().section("\\", -1, -1);
-                QString pathextension = animations->item(row, column)->text().remove("\\"+name);
+                auto pathextension = animations->item(row, column)->text().remove("\\"+name);
                 bsData->animations[row]->setAnimationData(projectData->getProjectAnimationsPath()+"/"+pathextension, name, true);
             }else{
                 bsData->animations[row]->setAnimationData(projectData->getProjectAnimationsPath(), name, true);
             }
         }else{
-            CRITICAL_ERROR_MESSAGE("CacheWidget::setAnimationNameAt(): Mismatch between data and UI!!");
+            LogFile::writeToLog("CacheWidget::setAnimationNameAt(): Mismatch between data and UI!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::setAnimationNameAt(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::setAnimationNameAt(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addAnimation(){
-    QString filename = QFileDialog::getOpenFileName(this, tr("Select an animation file to add to the current animation cache..."), projectData->fileName().section("/", 0, -2), tr("hkx Files (*.hkx)"));
-    if (filename != ""){
-        if (bsData && projectData){
-            int index = animations->rowCount();
-            QString path = filename.section("/animations/", -1, -1).section("/", 0, -2);
-            QString name = filename.section("/", -1, -1).remove(".hkx");
-            if (path != ""){
-                path = "/"+path;
-            }
-            bsData->animations.append(new AnimCacheAnimationInfo(projectData->getProjectAnimationsPath()+path, name, true));
-            animations->setRowCount(index + 1);
-            if (animations->item(index, 0)){
-                animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName));
+    if (projectData){
+        auto filename = QFileDialog::getOpenFileName(this, tr("Select an animation file to add to the current animation cache..."), projectData->fileName().section("/", 0, -2), tr("hkx Files (*.hkx)"));
+        if (filename != ""){
+            if (bsData && projectData){
+                auto index = animations->rowCount();
+                auto path = filename.section("/animations/", -1, -1).section("/", 0, -2);
+                auto name = filename.section("/", -1, -1).remove(".hkx");
+                (path != "") ? path = "/"+path : NULL;
+                bsData->animations.append(new AnimCacheAnimationInfo(projectData->getProjectAnimationsPath()+path, name, true));
+                animations->setRowCount(index + 1);
+                if (animations->item(index, 0)){
+                    animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName));
+                }else{
+                    animations->setItem(index, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName)));
+                }
             }else{
-                animations->setItem(index, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName)));
+                LogFile::writeToLog("CacheWidget::addCacheEvent(): The data is nullptr!!");
             }
-        }else{
-            CRITICAL_ERROR_MESSAGE("CacheWidget::addCacheEvent(): The data is nullptr!!");
         }
+    }else{
+        LogFile::writeToLog("CacheWidget::addCacheEvent(): The projectData is nullptr!!");
     }
 }
 
 void CacheWidget::removeAnimation(){
     if (bsData){
-        int index = animations->currentRow();
+        auto index = animations->currentRow();
         if (index > -1 && index < bsData->animations.size()){
             bsData->animations.removeAt(index);
             animations->removeRow(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::removeCacheEvent(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::removeCacheEvent(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::viewBehaviorVariable(int row, int column){
     if (bsData){
         if (column == 1){
-            //int index = behaviorVariables->currentRow();
             if (row > -1 && row < bsData->behaviorVariables.size()){
                 variableUI->loadData(bsData->behaviorVariables[row]);
                 setCurrentIndex(VARIABLE_WIDGET);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::viewClipGenerator(int row, int column){
     if (bsData){
         if (column == 1){
-            //int index = clipGenerators->currentRow();
             if (row > -1 && row < bsData->clipGenerators.size()){
                 clipUI->loadData(bsData->clipGenerators[row]);
                 setCurrentIndex(CLIP_WIDGET);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
+        LogFile::writeToLog("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
     }
 }
 
@@ -585,28 +536,28 @@ AnimationCacheUI::AnimationCacheUI()
     cacheButtonLyt->setSpacing(2);
     addWidget(groupBox);
     addWidget(cacheUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void AnimationCacheUI::connectSignals(){
-    connect(cacheUI, SIGNAL(returnToMainWidget()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(addCacheButton, SIGNAL(released()), this, SLOT(addCacheFile()), Qt::UniqueConnection);
-    connect(removeCacheButton, SIGNAL(released()), this, SLOT(removeCacheFile()), Qt::UniqueConnection);
-    connect(cacheFiles, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedFile(int,int)), Qt::UniqueConnection);
-}
-
-void AnimationCacheUI::disconnectSignals(){
-    disconnect(cacheUI, SIGNAL(returnToMainWidget()), this, SLOT(returnToWidget()));
-    disconnect(addCacheButton, SIGNAL(released()), this, SLOT(addCacheFile()));
-    disconnect(removeCacheButton, SIGNAL(released()), this, SLOT(removeCacheFile()));
-    disconnect(cacheFiles, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedFile(int,int)));
+void AnimationCacheUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(cacheUI, SIGNAL(returnToMainWidget()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(addCacheButton, SIGNAL(released()), this, SLOT(addCacheFile()), Qt::UniqueConnection);
+        connect(removeCacheButton, SIGNAL(released()), this, SLOT(removeCacheFile()), Qt::UniqueConnection);
+        connect(cacheFiles, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedFile(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(cacheUI, SIGNAL(returnToMainWidget()), this, SLOT(returnToWidget()));
+        disconnect(addCacheButton, SIGNAL(released()), this, SLOT(addCacheFile()));
+        disconnect(removeCacheButton, SIGNAL(released()), this, SLOT(removeCacheFile()));
+        disconnect(cacheFiles, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedFile(int,int)));
+    }
 }
 
 void AnimationCacheUI::loadData(ProjectFile *project){
+    toggleSignals(false);
     if (project){
         projectData = project;
         bsData = projectData->getProjectCacheData();
-        disconnectSignals();
         cacheFiles->setRowCount(bsData->fileNames.size());
         for (auto i = 0; i < bsData->fileNames.size(); i++){
             if (cacheFiles->item(i, 0)){
@@ -616,29 +567,28 @@ void AnimationCacheUI::loadData(ProjectFile *project){
                 cacheFiles->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
             }
         }
-        connectSignals();
     }else{
-        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("AnimationCacheUI::loadData(): The data is nullptr!!");
     }
+    toggleSignals(true);
 }
 
 void AnimationCacheUI::viewSelectedFile(int row, int column){
     if (bsData){
         if (column == 1){
-            //int index = behaviorVariables->currentRow();
             if (row > -1 && row < bsData->animSetData.size()){
                 cacheUI->loadData(bsData->animSetData[row], projectData);
                 setCurrentIndex(CACHE_WIDGET);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::viewSelectedFile(): The data is nullptr!!");
+        LogFile::writeToLog("AnimationCacheUI::viewSelectedFile(): The data is nullptr!!");
     }
 }
 
 void AnimationCacheUI::addCacheFile(){
     if (bsData){
-        int index = cacheFiles->rowCount();
+        auto index = cacheFiles->rowCount();
         bsData->animSetData.append(new AnimCacheAnimSetData(QStringList("FullBody.txt")));
         bsData->fileNames.append(projectData->getProjectName()+"ProjectData\\"+projectData->getProjectName()+".txt");
         cacheFiles->setRowCount(index + 1);
@@ -649,19 +599,19 @@ void AnimationCacheUI::addCacheFile(){
             cacheFiles->setItem(index, 0, new TableWidgetItem("Double Click To Edit"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::addCacheFile(): The data is nullptr!!");
+        LogFile::writeToLog("AnimationCacheUI::addCacheFile(): The data is nullptr!!");
     }
 }
 
 void AnimationCacheUI::removeCacheFile(){
     if (bsData){
-        int index = cacheFiles->currentRow();
+        auto index = cacheFiles->currentRow();
         if (index > -1 && index < bsData->animSetData.size()){
             bsData->animSetData.removeAt(index);
             cacheFiles->removeRow(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::removeCacheFile(): The data is nullptr!!");
+        LogFile::writeToLog("AnimationCacheUI::removeCacheFile(): The data is nullptr!!");
     }
 }
 

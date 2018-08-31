@@ -31,6 +31,16 @@ QString hkbHandIkControlsModifier::getName() const{
     return name;
 }
 
+void hkbHandIkControlsModifier::addHand(hkbHandIkControlsModifier::hkHand hand){
+    std::lock_guard <std::mutex> guard(mutex);
+    hands.append(hand), setIsFileChanged(true);
+}
+
+void hkbHandIkControlsModifier::removeHand(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < hands.size()) ? hands.removeAt(index), setIsFileChanged(true) : NULL;
+}
+
 bool hkbHandIkControlsModifier::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     int numhands;
@@ -179,6 +189,21 @@ int hkbHandIkControlsModifier::getNumberOfHands() const{
     return hands.size();
 }
 
+bool hkbHandIkControlsModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbHandIkControlsModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbHandIkControlsModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbHandIkControlsModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -195,7 +220,7 @@ void hkbHandIkControlsModifier::unlink(){
 QString hkbHandIkControlsModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (hands.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": hands is empty!");

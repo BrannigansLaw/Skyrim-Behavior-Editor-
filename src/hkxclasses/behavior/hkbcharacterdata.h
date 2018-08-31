@@ -14,6 +14,7 @@ class hkbHandIkDriverInfo;
 class hkbCharacterData final: public HkxObject
 {
     friend class CharacterFile;
+    friend class CharacterPropertiesUI;
 public:
     hkbCharacterData(HkxFile *parent, long ref = 0, hkbCharacterStringData *strings = nullptr, hkbVariableValueSet *values = nullptr, hkbMirroredSkeletonInfo *mirrorskelinfo = nullptr);
     hkbCharacterData& operator=(const hkbCharacterData&) = delete;
@@ -38,6 +39,7 @@ public:
     void setWordVariableValueAt(int index, int value);
     void setQuadVariableValueAt(int index, hkQuadVariable value);
 private:
+    void setVariableNameAt(int index, const QString & name);
     void setHandIkDriverInfo(hkbHandIkDriverInfo *value);
     void setFootIkDriverInfo(hkbFootIkDriverInfo *fooik);
     QString evaluateDataValidity();

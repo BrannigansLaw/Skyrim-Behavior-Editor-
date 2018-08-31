@@ -42,14 +42,14 @@ hkbStateMachine *hkbBehaviorGraph::getRootGenerator() const{
 
 void hkbBehaviorGraph::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 QString hkbBehaviorGraph::getRootGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString rootname("NONE");
     hkbStateMachine *rootgen = static_cast<hkbStateMachine *>(rootGenerator.data());
-    (rootgen) ? rootname = rootgen->getName() : NULL;
+    (rootgen) ? rootname = rootgen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return rootname;
 }
 
@@ -69,7 +69,7 @@ bool hkbBehaviorGraph::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbBehaviorGraph::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         rootGenerator = HkxSharedPtr();
         return true;
     }
@@ -78,7 +78,7 @@ bool hkbBehaviorGraph::removeObjectAt(int index){
 
 void hkbBehaviorGraph::setVariableMode(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != variableMode && VariableMode.contains(value)) ? variableMode = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'variableMode' was not set!");
+    (value != variableMode && VariableMode.contains(value)) ? variableMode = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'variableMode' was not set!");
 }
 
 QString hkbBehaviorGraph::getVariableMode() const{
@@ -216,7 +216,7 @@ QString hkbBehaviorGraph::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool temp;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
         QString sigstring;
         if (sig != NULL_SIGNATURE)

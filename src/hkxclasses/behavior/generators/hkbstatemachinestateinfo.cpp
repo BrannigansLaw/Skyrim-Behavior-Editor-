@@ -260,7 +260,7 @@ hkbStateMachine *hkbStateMachineStateInfo::getNestedStateMachine() const{
     std::lock_guard <std::mutex> guard(mutex);
     HkxSignature sig;
     QString behaviorname;
-    hkbGenerator *gen = static_cast<hkbGenerator *>(generator.data());
+    auto gen = static_cast<hkbGenerator *>(generator.data());
     while (gen){
         sig = gen->getSignature();
         switch (sig){
@@ -307,11 +307,44 @@ bool hkbStateMachineStateInfo::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbStateMachineStateInfo::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         generator = HkxSharedPtr();
         return true;
     }
     return false;
+}
+
+QString hkbStateMachineStateInfo::getGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    auto gen = static_cast<hkbGenerator *>(generator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
+    return genname;
+}
+
+bool hkbStateMachineStateInfo::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbStateMachineStateInfo::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+qreal hkbStateMachineStateInfo::getProbability() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return probability;
+}
+
+void hkbStateMachineStateInfo::setProbability(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != probability && value <= 1 && value >= 0) ? probability = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'probability' was not set!");
+}
+
+void hkbStateMachineStateInfo::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 HkxObject *hkbStateMachineStateInfo::getEnterNotifyEventsData() const{
@@ -470,7 +503,7 @@ void hkbStateMachineStateInfo::unlink(){
 QString hkbStateMachineStateInfo::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     QString temp;
     auto checknfix = [&](HkxSharedPtr & shdptr, const QString & datafield, HkxSignature sig){
         if (shdptr.data()){

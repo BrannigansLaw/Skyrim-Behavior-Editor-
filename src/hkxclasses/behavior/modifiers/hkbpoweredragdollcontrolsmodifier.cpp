@@ -1,6 +1,8 @@
 #include "hkbpoweredragdollcontrolsmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbboneindexarray.h"
+#include "src/hkxclasses/behavior/hkbboneweightarray.h"
 
 uint hkbPoweredRagdollControlsModifier::refCount = 0;
 
@@ -191,14 +193,129 @@ bool hkbPoweredRagdollControlsModifier::merge(HkxObject *recessiveObject){ //TO 
     return false;
 }
 
-HkxSharedPtr hkbPoweredRagdollControlsModifier::getBoneWeights() const{
+QString hkbPoweredRagdollControlsModifier::getMode() const{
     std::lock_guard <std::mutex> guard(mutex);
-    return boneWeights;
+    return mode;
 }
 
-HkxSharedPtr hkbPoweredRagdollControlsModifier::getBones() const{
+void hkbPoweredRagdollControlsModifier::setMode(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    return bones;
+    (index >= 0 && index < Mode.size() && mode != Mode.at(index)) ? mode = Mode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'mode' was not set!");
+}
+
+int hkbPoweredRagdollControlsModifier::getPoseMatchingBone2() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return poseMatchingBone2;
+}
+
+void hkbPoweredRagdollControlsModifier::setPoseMatchingBone2(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != poseMatchingBone2 && poseMatchingBone2 < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)) ? poseMatchingBone2 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'poseMatchingBone2' was not set!");
+}
+
+int hkbPoweredRagdollControlsModifier::getPoseMatchingBone1() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return poseMatchingBone1;
+}
+
+void hkbPoweredRagdollControlsModifier::setPoseMatchingBone1(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != poseMatchingBone1 && poseMatchingBone1 < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)) ? poseMatchingBone1 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'poseMatchingBone1' was not set!");
+}
+
+int hkbPoweredRagdollControlsModifier::getPoseMatchingBone0() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return poseMatchingBone0;
+}
+
+void hkbPoweredRagdollControlsModifier::setPoseMatchingBone0(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != poseMatchingBone0 && poseMatchingBone0 < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)) ? poseMatchingBone0 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'poseMatchingBone0' was not set!");
+}
+
+qreal hkbPoweredRagdollControlsModifier::getConstantRecoveryVelocity() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return constantRecoveryVelocity;
+}
+
+void hkbPoweredRagdollControlsModifier::setConstantRecoveryVelocity(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != constantRecoveryVelocity) ? constantRecoveryVelocity = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'constantRecoveryVelocity' was not set!");
+}
+
+qreal hkbPoweredRagdollControlsModifier::getProportionalRecoveryVelocity() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return proportionalRecoveryVelocity;
+}
+
+void hkbPoweredRagdollControlsModifier::setProportionalRecoveryVelocity(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != proportionalRecoveryVelocity) ? proportionalRecoveryVelocity = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'proportionalRecoveryVelocity' was not set!");
+}
+
+qreal hkbPoweredRagdollControlsModifier::getDamping() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return damping;
+}
+
+void hkbPoweredRagdollControlsModifier::setDamping(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != damping) ? damping = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'damping' was not set!");
+}
+
+qreal hkbPoweredRagdollControlsModifier::getTau() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return tau;
+}
+
+void hkbPoweredRagdollControlsModifier::setTau(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != tau) ? tau = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'tau' was not set!");
+}
+
+qreal hkbPoweredRagdollControlsModifier::getMaxForce() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return maxForce;
+}
+
+void hkbPoweredRagdollControlsModifier::setMaxForce(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != maxForce) ? maxForce = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'maxForce' was not set!");
+}
+
+bool hkbPoweredRagdollControlsModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbPoweredRagdollControlsModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbPoweredRagdollControlsModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+hkbBoneWeightArray * hkbPoweredRagdollControlsModifier::getBoneWeights() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbBoneWeightArray *>(boneWeights.data());
+}
+
+hkbBoneIndexArray * hkbPoweredRagdollControlsModifier::getBones() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbBoneIndexArray *>(bones.data());
+}
+
+void hkbPoweredRagdollControlsModifier::setBoneWeights(hkbBoneWeightArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    boneWeights = HkxSharedPtr(value), setIsFileChanged(true);
+}
+
+void hkbPoweredRagdollControlsModifier::setBones(hkbBoneIndexArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    bones = HkxSharedPtr(value), setIsFileChanged(true);
 }
 
 bool hkbPoweredRagdollControlsModifier::link(){
@@ -233,7 +350,7 @@ void hkbPoweredRagdollControlsModifier::unlink(){
 QString hkbPoweredRagdollControlsModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkbones = [&](int & boneindex, const QString & fieldname){
         if (boneindex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;

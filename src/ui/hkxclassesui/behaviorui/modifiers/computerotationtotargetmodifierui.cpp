@@ -28,7 +28,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList ComputeRotationToTargetModifierUI::headerLabels = {
+const QStringList ComputeRotationToTargetModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -91,32 +91,33 @@ ComputeRotationToTargetModifierUI::ComputeRotationToTargetModifierUI()
     table->setCellWidget(RESULT_IS_DELTA_ROW, VALUE_COLUMN, resultIsDelta);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void ComputeRotationToTargetModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(rotationOut, SIGNAL(editingFinished()), this, SLOT(setRotationOut()), Qt::UniqueConnection);
-    connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
-    connect(currentPosition, SIGNAL(editingFinished()), this, SLOT(setCurrentPosition()), Qt::UniqueConnection);
-    connect(currentRotation, SIGNAL(editingFinished()), this, SLOT(setCurrentRotation()), Qt::UniqueConnection);
-    connect(localAxisOfRotation, SIGNAL(editingFinished()), this, SLOT(setLocalAxisOfRotation()), Qt::UniqueConnection);
-    connect(localFacingDirection, SIGNAL(editingFinished()), this, SLOT(setLocalFacingDirection()), Qt::UniqueConnection);
-    connect(resultIsDelta, SIGNAL(released()), this, SLOT(setResultIsDelta()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void ComputeRotationToTargetModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(rotationOut, SIGNAL(editingFinished()), this, SLOT(setRotationOut()));
-    disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
-    disconnect(currentPosition, SIGNAL(editingFinished()), this, SLOT(setCurrentPosition()));
-    disconnect(currentRotation, SIGNAL(editingFinished()), this, SLOT(setCurrentRotation()));
-    disconnect(localAxisOfRotation, SIGNAL(editingFinished()), this, SLOT(setLocalAxisOfRotation()));
-    disconnect(localFacingDirection, SIGNAL(editingFinished()), this, SLOT(setLocalFacingDirection()));
-    disconnect(resultIsDelta, SIGNAL(released()), this, SLOT(setResultIsDelta()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void ComputeRotationToTargetModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(rotationOut, SIGNAL(editingFinished()), this, SLOT(setRotationOut()), Qt::UniqueConnection);
+        connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
+        connect(currentPosition, SIGNAL(editingFinished()), this, SLOT(setCurrentPosition()), Qt::UniqueConnection);
+        connect(currentRotation, SIGNAL(editingFinished()), this, SLOT(setCurrentRotation()), Qt::UniqueConnection);
+        connect(localAxisOfRotation, SIGNAL(editingFinished()), this, SLOT(setLocalAxisOfRotation()), Qt::UniqueConnection);
+        connect(localFacingDirection, SIGNAL(editingFinished()), this, SLOT(setLocalFacingDirection()), Qt::UniqueConnection);
+        connect(resultIsDelta, SIGNAL(released()), this, SLOT(setResultIsDelta()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(rotationOut, SIGNAL(editingFinished()), this, SLOT(setRotationOut()));
+        disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
+        disconnect(currentPosition, SIGNAL(editingFinished()), this, SLOT(setCurrentPosition()));
+        disconnect(currentRotation, SIGNAL(editingFinished()), this, SLOT(setCurrentRotation()));
+        disconnect(localAxisOfRotation, SIGNAL(editingFinished()), this, SLOT(setLocalAxisOfRotation()));
+        disconnect(localFacingDirection, SIGNAL(editingFinished()), this, SLOT(setLocalFacingDirection()));
+        disconnect(resultIsDelta, SIGNAL(released()), this, SLOT(setResultIsDelta()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void ComputeRotationToTargetModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -128,210 +129,113 @@ void ComputeRotationToTargetModifierUI::connectToTables(GenericTableWidget *vari
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void ComputeRotationToTargetModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbComputeRotationToTargetModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            rotationOut->setValue(bsData->rotationOut);
-            targetPosition->setValue(bsData->targetPosition);
-            currentPosition->setValue(bsData->currentPosition);
-            currentRotation->setValue(bsData->currentRotation);
-            localAxisOfRotation->setValue(bsData->localAxisOfRotation);
-            localFacingDirection->setValue(bsData->localFacingDirection);
-            resultIsDelta->setChecked(bsData->resultIsDelta);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(ROTATION_OUT_ROW, BINDING_COLUMN, varBind, "rotationOut");
-                loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition");
-                loadBinding(CURRENT_POSITION_ROW, BINDING_COLUMN, varBind, "currentPosition");
-                loadBinding(CURRENT_ROTATION_ROW, BINDING_COLUMN, varBind, "currentRotation");
-                loadBinding(LOCAL_AXIS_OF_ROTATION_ROW, BINDING_COLUMN, varBind, "localAxisOfRotation");
-                loadBinding(LOCAL_FACING_DIRECTION_ROW, BINDING_COLUMN, varBind, "localFacingDirection");
-                loadBinding(RESULT_IS_DELTA_ROW, BINDING_COLUMN, varBind, "resultIsDelta");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CURRENT_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CURRENT_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LOCAL_AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LOCAL_FACING_DIRECTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(RESULT_IS_DELTA_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            rotationOut->setValue(bsData->getRotationOut());
+            targetPosition->setValue(bsData->getTargetPosition());
+            currentPosition->setValue(bsData->getCurrentPosition());
+            currentRotation->setValue(bsData->getCurrentRotation());
+            localAxisOfRotation->setValue(bsData->getLocalAxisOfRotation());
+            localFacingDirection->setValue(bsData->getLocalFacingDirection());
+            resultIsDelta->setChecked(bsData->getResultIsDelta());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(ROTATION_OUT_ROW, BINDING_COLUMN, varBind, "rotationOut", table, bsData);
+            UIHelper::loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition", table, bsData);
+            UIHelper::loadBinding(CURRENT_POSITION_ROW, BINDING_COLUMN, varBind, "currentPosition", table, bsData);
+            UIHelper::loadBinding(CURRENT_ROTATION_ROW, BINDING_COLUMN, varBind, "currentRotation", table, bsData);
+            UIHelper::loadBinding(LOCAL_AXIS_OF_ROTATION_ROW, BINDING_COLUMN, varBind, "localAxisOfRotation", table, bsData);
+            UIHelper::loadBinding(LOCAL_FACING_DIRECTION_ROW, BINDING_COLUMN, varBind, "localFacingDirection", table, bsData);
+            UIHelper::loadBinding(RESULT_IS_DELTA_ROW, BINDING_COLUMN, varBind, "resultIsDelta", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("ComputeRotationToTargetModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ComputeRotationToTargetModifierUI::setName(){
+void ComputeRotationToTargetModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void ComputeRotationToTargetModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setRotationOut(){
-    if (bsData){
-        if (bsData->rotationOut != rotationOut->value()){
-            bsData->rotationOut = rotationOut->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setrotationOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRotationOut(rotationOut->value()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setRotationOut(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setTargetPosition(){
-    if (bsData){
-        if (bsData->targetPosition != targetPosition->value()){
-            bsData->targetPosition = targetPosition->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::settargetPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetPosition(targetPosition->value()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setTargetPosition(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setCurrentPosition(){
-    if (bsData){
-        if (bsData->currentPosition != currentPosition->value()){
-            bsData->currentPosition = currentPosition->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setcurrentPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCurrentPosition(targetPosition->value()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setCurrentPosition(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setCurrentRotation(){
-    if (bsData){
-        if (bsData->currentRotation != currentRotation->value()){
-            bsData->currentRotation = currentRotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setcurrentRotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCurrentRotation(currentRotation->value()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setCurrentRotation(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setLocalAxisOfRotation(){
-    if (bsData){
-        if (bsData->localAxisOfRotation != localAxisOfRotation->value()){
-            bsData->localAxisOfRotation = localAxisOfRotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setlocalAxisOfRotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLocalAxisOfRotation(localAxisOfRotation->value()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setLocalAxisOfRotation(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
-    if (bsData){
-        if (bsData->localFacingDirection != localFacingDirection->value()){
-            bsData->localFacingDirection = localFacingDirection->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setlocalFacingDirection(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLocalFacingDirection(localFacingDirection->value()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setLocalFacingDirection(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::setResultIsDelta(){
-    if (bsData){
-        bsData->resultIsDelta = resultIsDelta->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setresultIsDelta(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setResultIsDelta(resultIsDelta->isChecked()) : LogFile::writeToLog("ComputeRotationToTargetModifierUI::setResultIsDelta(): The data is nullptr!!");
 }
 
 void ComputeRotationToTargetModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case ROTATION_OUT_ROW:
-                if (table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "rotationOut");
-                break;
+                checkisproperty(ROTATION_OUT_ROW, "rotationOut"); break;
             case TARGET_POSITION_ROW:
-                if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetPosition");
-                break;
+                checkisproperty(TARGET_POSITION_ROW, "targetPosition"); break;
             case CURRENT_POSITION_ROW:
-                if (table->item(CURRENT_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "currentPosition");
-                break;
+                checkisproperty(CURRENT_POSITION_ROW, "currentPosition"); break;
             case CURRENT_ROTATION_ROW:
-                if (table->item(CURRENT_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "currentRotation");
-                break;
+                checkisproperty(CURRENT_ROTATION_ROW, "currentRotation"); break;
             case LOCAL_AXIS_OF_ROTATION_ROW:
-                if (table->item(LOCAL_AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "localAxisOfRotation");
-                break;
+                checkisproperty(LOCAL_AXIS_OF_ROTATION_ROW, "localAxisOfRotation"); break;
             case LOCAL_FACING_DIRECTION_ROW:
-                if (table->item(LOCAL_FACING_DIRECTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "localFacingDirection");
-                break;
+                checkisproperty(LOCAL_FACING_DIRECTION_ROW, "localFacingDirection"); break;
             case RESULT_IS_DELTA_ROW:
-                if (table->item(RESULT_IS_DELTA_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "resultIsDelta");
-                break;
-            default:
-                return;
+                checkisproperty(RESULT_IS_DELTA_ROW, "resultIsDelta"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -351,168 +255,60 @@ void ComputeRotationToTargetModifierUI::selectTableToView(bool viewisProperty, c
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void ComputeRotationToTargetModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("rotationOut");
-            if (bindIndex == index){
-                table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetPosition");
-            if (bindIndex == index){
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("currentPosition");
-            if (bindIndex == index){
-                table->item(CURRENT_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("currentRotation");
-            if (bindIndex == index){
-                table->item(CURRENT_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("localAxisOfRotation");
-            if (bindIndex == index){
-                table->item(LOCAL_AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("localFacingDirection");
-            if (bindIndex == index){
-                table->item(LOCAL_FACING_DIRECTION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("resultIsDelta");
-            if (bindIndex == index){
-                table->item(RESULT_IS_DELTA_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("rotationOut", ROTATION_OUT_ROW);
+            setname("targetPosition", TARGET_POSITION_ROW);
+            setname("currentPosition", CURRENT_POSITION_ROW);
+            setname("currentRotation", CURRENT_ROTATION_ROW);
+            setname("localAxisOfRotation", LOCAL_AXIS_OF_ROTATION_ROW);
+            setname("localFacingDirection", LOCAL_FACING_DIRECTION_ROW);
+            setname("resultIsDelta", RESULT_IS_DELTA_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool ComputeRotationToTargetModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void ComputeRotationToTargetModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case ROTATION_OUT_ROW:
-            if (table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "rotationOut", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(ROTATION_OUT_ROW, "rotationOut", VARIABLE_TYPE_VECTOR4); break;
         case TARGET_POSITION_ROW:
-            if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_POSITION_ROW, "targetPosition", VARIABLE_TYPE_VECTOR4); break;
         case CURRENT_POSITION_ROW:
-            if (table->item(CURRENT_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "currentPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(CURRENT_POSITION_ROW, "currentPosition", VARIABLE_TYPE_VECTOR4); break;
         case CURRENT_ROTATION_ROW:
-            if (table->item(CURRENT_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "currentRotation", VARIABLE_TYPE_QUATERNION, isProperty);
-            break;
+            checkisproperty(CURRENT_ROTATION_ROW, "currentRotation", VARIABLE_TYPE_QUATERNION); break;
         case LOCAL_AXIS_OF_ROTATION_ROW:
-            if (table->item(LOCAL_AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "localAxisOfRotation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(LOCAL_AXIS_OF_ROTATION_ROW, "localAxisOfRotation", VARIABLE_TYPE_VECTOR4); break;
         case LOCAL_FACING_DIRECTION_ROW:
-            if (table->item(LOCAL_FACING_DIRECTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "localFacingDirection", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(LOCAL_FACING_DIRECTION_ROW, "localFacingDirection", VARIABLE_TYPE_VECTOR4); break;
         case RESULT_IS_DELTA_ROW:
-            if (table->item(RESULT_IS_DELTA_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "resultIsDelta", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void ComputeRotationToTargetModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(RESULT_IS_DELTA_ROW, "resultIsDelta", VARIABLE_TYPE_BOOL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeRotationToTargetModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

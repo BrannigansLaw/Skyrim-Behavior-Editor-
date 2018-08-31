@@ -167,7 +167,7 @@ int SkyrimAnimData::getProjectIndex(const QString &projectname) const{
         name.append(".txt");
     }
     for (auto i = 0; i < projectNames.size(); i++){
-        if (name.compare(projectNames.at(i), Qt::CaseInsensitive) == 0){
+        if (!name.compare(projectNames.at(i), Qt::CaseInsensitive)){
             return i;
         }
     }

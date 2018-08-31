@@ -10,7 +10,7 @@ class QLineEdit;
 class BehaviorFile;
 struct hkEventPayload;
 
-class EventUI: public QGroupBox
+class EventUI final: public QGroupBox
 {
     Q_OBJECT
     friend class StateMachineUI;
@@ -18,6 +18,10 @@ class EventUI: public QGroupBox
     friend class BSCyclicBlendTransitionGeneratorUI;
 public:
     EventUI();
+    EventUI& operator=(const EventUI&) = delete;
+    EventUI(const EventUI &) = delete;
+    ~EventUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, hkEventPayload *event);
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -29,8 +33,7 @@ private slots:
     void setEventPayload();
     void emitViewEvent();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void eventRenamed(const QString & name, int index);
 private:
     BehaviorFile *file;

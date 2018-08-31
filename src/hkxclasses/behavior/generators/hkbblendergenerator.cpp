@@ -45,7 +45,7 @@ bool hkbBlenderGenerator::insertObjectAt(int index, DataIconManager *obj){
         if (obj->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
             if (index >= children.size() || index == -1){
                 children.append(HkxSharedPtr(obj));
-            }else if (index == 0 || !children.isEmpty()){
+            }else if (!index || !children.isEmpty()){
                 children.replace(index, HkxSharedPtr(obj));
             }
             return true;
@@ -72,7 +72,7 @@ bool hkbBlenderGenerator::removeObjectAt(int index){
 
 void hkbBlenderGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 QString hkbBlenderGenerator::getFlags() const{
@@ -82,7 +82,7 @@ QString hkbBlenderGenerator::getFlags() const{
 
 void hkbBlenderGenerator::setFlags(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != flags) ? flags = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
+    (value != flags) ? flags = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
 }
 
 void hkbBlenderGenerator::setSubtractLastChild(bool value){
@@ -102,7 +102,7 @@ int hkbBlenderGenerator::getIndexOfSyncMasterChild() const{
 
 void hkbBlenderGenerator::setIndexOfSyncMasterChild(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != indexOfSyncMasterChild) ? indexOfSyncMasterChild = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'indexOfSyncMasterChild' was not set!");
+    (value != indexOfSyncMasterChild) ? indexOfSyncMasterChild = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'indexOfSyncMasterChild' was not set!");
 }
 
 qreal hkbBlenderGenerator::getMaxCyclicBlendParameter() const{
@@ -112,7 +112,7 @@ qreal hkbBlenderGenerator::getMaxCyclicBlendParameter() const{
 
 void hkbBlenderGenerator::setMaxCyclicBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != maxCyclicBlendParameter) ? maxCyclicBlendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'maxCyclicBlendParameter' was not set!");
+    (value != maxCyclicBlendParameter) ? maxCyclicBlendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'maxCyclicBlendParameter' was not set!");
 }
 
 qreal hkbBlenderGenerator::getMinCyclicBlendParameter() const{
@@ -122,7 +122,7 @@ qreal hkbBlenderGenerator::getMinCyclicBlendParameter() const{
 
 void hkbBlenderGenerator::setMinCyclicBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != minCyclicBlendParameter) ? minCyclicBlendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'minCyclicBlendParameter' was not set!");
+    (value != minCyclicBlendParameter) ? minCyclicBlendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'minCyclicBlendParameter' was not set!");
 }
 
 qreal hkbBlenderGenerator::getBlendParameter() const{
@@ -132,7 +132,7 @@ qreal hkbBlenderGenerator::getBlendParameter() const{
 
 void hkbBlenderGenerator::setBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != blendParameter) ? blendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'blendParameter' was not set!");
+    (value != blendParameter) ? blendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'blendParameter' was not set!");
 }
 
 qreal hkbBlenderGenerator::getReferencePoseWeightThreshold() const{
@@ -142,7 +142,7 @@ qreal hkbBlenderGenerator::getReferencePoseWeightThreshold() const{
 
 void hkbBlenderGenerator::setReferencePoseWeightThreshold(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != referencePoseWeightThreshold) ? referencePoseWeightThreshold = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'referencePoseWeightThreshold' was not set!");
+    (value != referencePoseWeightThreshold) ? referencePoseWeightThreshold = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'referencePoseWeightThreshold' was not set!");
 }
 
 bool hkbBlenderGenerator::hasChildren() const{
@@ -184,18 +184,16 @@ bool hkbBlenderGenerator::isParametricBlend() const{
 }
 
 bool hkbBlenderGenerator::swapChildren(int index1, int index2){
-    HkxObject *gen1;
-    HkxObject *gen2;
+    std::lock_guard <std::mutex> guard(mutex);
     if (children.size() > index1 && children.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
-        gen1 = children.at(index1).data();
-        gen2 = children.at(index2).data();
+        auto gen1 = children.at(index1).data();
+        auto gen2 = children.at(index2).data();
         children[index1] = HkxSharedPtr(gen2);
         children[index2] = HkxSharedPtr(gen1);
-        getParentFile()->setIsChanged(true);
-    }else{
-        return false;
+        setIsFileChanged(true);
+        return true;
     }
-    return true;
+    return false;
 }
 
 hkbBlenderGeneratorChild *hkbBlenderGenerator::getChildDataAt(int index) const{
@@ -334,11 +332,7 @@ bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < children.size(); i++, j++){
             refString.append(children.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refString.append("\n");
-            }else{
-                refString.append(" ");
-            }
+            (!(j % 16)) ? refString.append("\n") : refString.append(" ");
         }
         if (children.size() > 0){
             if (refString.endsWith(" \0")){

@@ -100,6 +100,61 @@ bool BSSpeedSamplerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal BSSpeedSamplerModifier::getSpeedOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return speedOut;
+}
+
+void BSSpeedSamplerModifier::setSpeedOut(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != speedOut) ? speedOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'speedOut' was not set!");
+}
+
+qreal BSSpeedSamplerModifier::getGoalSpeed() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return goalSpeed;
+}
+
+void BSSpeedSamplerModifier::setGoalSpeed(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != goalSpeed) ? goalSpeed = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'goalSpeed' was not set!");
+}
+
+qreal BSSpeedSamplerModifier::getDirection() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return direction;
+}
+
+void BSSpeedSamplerModifier::setDirection(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != direction) ? direction = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'direction' was not set!");
+}
+
+int BSSpeedSamplerModifier::getState() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return state;
+}
+
+void BSSpeedSamplerModifier::setState(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != state) ? state = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'state' was not set!");
+}
+
+bool BSSpeedSamplerModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSSpeedSamplerModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSSpeedSamplerModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSSpeedSamplerModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -116,7 +171,7 @@ void BSSpeedSamplerModifier::unlink(){
 QString BSSpeedSamplerModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

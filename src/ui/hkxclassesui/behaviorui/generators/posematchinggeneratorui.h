@@ -5,6 +5,8 @@
 
 #include "src/utility.h"
 
+#include "src/hkxclasses/behavior/generators/hkbposematchinggenerator.h"
+
 class TableWidget;
 class hkbPoseMatchingGenerator;
 class QGridLayout;
@@ -22,14 +24,21 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class QuadVariableWidget;
 
-class PoseMatchingGeneratorUI: public QStackedWidget
+class PoseMatchingGeneratorUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     PoseMatchingGeneratorUI();
-    virtual ~PoseMatchingGeneratorUI(){}
+    PoseMatchingGeneratorUI& operator=(const PoseMatchingGeneratorUI&) = delete;
+    PoseMatchingGeneratorUI(const PoseMatchingGeneratorUI &) = delete;
+    ~PoseMatchingGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void eventRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -37,7 +46,7 @@ signals:
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setReferencePoseWeightThreshold();
     void setBlendParameter();
     void setMinCyclicBlendParameter();
@@ -69,26 +78,17 @@ private slots:
     void generatorTableElementSelected(int index, const QString &name);
     void swapGeneratorIndices(int index1, int index2);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void eventRenamed(const QString & name, int index);
+    void toggleSignals(bool toggleconnections);
     void addChildWithGenerator();
     void removeChild(int index);
     void selectTableToView(bool viewproperties, const QString & path);
-    void loadTableValue(int row, const QString &value);
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
+    void setFlag(CheckBox *flagcheckbox, hkbPoseMatchingGenerator::BlenderFlag flagtoset);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        MAIN_WIDGET,
+        CHILD_WIDGET
     };
     enum Generator_Type {
         STATE_MACHINE,
@@ -105,8 +105,9 @@ private:
         BEHAVIOR_REFERENCE_GENERATOR,
         GAMEBYRO_SEQUENCE_GENERATOR
     };
-    static QStringList types;
-    static QStringList headerLabels;
+private:
+    static const QStringList types;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbPoseMatchingGenerator *bsData;
     QGroupBox *groupBox;

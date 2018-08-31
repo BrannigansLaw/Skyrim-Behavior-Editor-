@@ -23,7 +23,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList AnimationRotationUI::headerLabels = {
+const QStringList AnimationRotationUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -63,50 +63,36 @@ AnimationRotationUI::AnimationRotationUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void AnimationRotationUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()), Qt::UniqueConnection);
-    connect(x, SIGNAL(valueChanged(double)), this, SLOT(setX(double)), Qt::UniqueConnection);
-    connect(y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)), Qt::UniqueConnection);
-    connect(z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)), Qt::UniqueConnection);
-    connect(angle, SIGNAL(valueChanged(double)), this, SLOT(setAngle(double)), Qt::UniqueConnection);
-}
-
-void AnimationRotationUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()));
-    disconnect(x, SIGNAL(valueChanged(double)), this, SLOT(setX(double)));
-    disconnect(y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)));
-    disconnect(z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)));
-    disconnect(angle, SIGNAL(valueChanged(double)), this, SLOT(setAngle(double)));
+void AnimationRotationUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()), Qt::UniqueConnection);
+        connect(x, SIGNAL(valueChanged(double)), this, SLOT(setX(double)), Qt::UniqueConnection);
+        connect(y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)), Qt::UniqueConnection);
+        connect(z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)), Qt::UniqueConnection);
+        connect(angle, SIGNAL(valueChanged(double)), this, SLOT(setAngle(double)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()));
+        disconnect(x, SIGNAL(valueChanged(double)), this, SLOT(setX(double)));
+        disconnect(y, SIGNAL(valueChanged(double)), this, SLOT(setY(double)));
+        disconnect(z, SIGNAL(valueChanged(double)), this, SLOT(setZ(double)));
+        disconnect(angle, SIGNAL(valueChanged(double)), this, SLOT(setAngle(double)));
+    }
 }
 
 SkyrimAnimationRotation AnimationRotationUI::convertQuaternionAxisAngle(SkyrimAnimationRotation *quaternion) const{
     SkyrimAnimationRotation axisAngleRot;
     QQuaternion quat(quaternion->w, quaternion->x, quaternion->y, quaternion->z);
-    /*qreal angle = acos(quaternion->w)/2;
-    axisAngleRot.w = angle;
-    axisAngleRot.x = quaternion->x/sin(angle/2);
-    axisAngleRot.y = quaternion->y/sin(angle/2);
-    axisAngleRot.z = quaternion->z/sin(angle/2);*/
     quat.getAxisAndAngle(&axisAngleRot.x, &axisAngleRot.y, &axisAngleRot.z, &axisAngleRot.w);
     return axisAngleRot;
 }
 
-/*SkyrimAnimData::Rotation AnimationRotationUI::convertAxisAngletoQuaternion(SkyrimAnimData::Rotation * axisAngleRot) const{
-    SkyrimAnimData::Rotation rot;
-    rot.w = cos(axisAngleRot->w/2);
-    rot.x = axisAngleRot->x*sin(axisAngleRot->w/2);
-    rot.y = axisAngleRot->y*sin(axisAngleRot->w/2);
-    rot.z = axisAngleRot->z*sin(axisAngleRot->w/2);
-    return rot;
-}*/
-
 void AnimationRotationUI::loadData(SkyrimAnimationRotation *quaternion, qreal maxtime){
-    disconnectSignals();
+    toggleSignals(false);
     if (quaternion){
         localTime->setMaximum(maxtime);
         bsData = quaternion;
@@ -117,54 +103,27 @@ void AnimationRotationUI::loadData(SkyrimAnimationRotation *quaternion, qreal ma
         z->setValue(axisAngleRot.z);
         angle->setValue(axisAngleRot.w);
     }else{
-        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::loadData(): Data is null!!!");
+        LogFile::writeToLog("AnimationRotationUI::loadData(): Data is null!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void AnimationRotationUI::setLocalTime(){
-    if (bsData){
-        if (bsData->localTime != localTime->value()){
-            bsData->localTime = localTime->value();
-            //file->toggleChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setlocalTime(): Data is null!!!");
-    }
+    (bsData) ? bsData->localTime = localTime->value() : LogFile::writeToLog("AnimationRotationUI::setlocalTime(): Data is null!!!");
 }
 
 void AnimationRotationUI::setX(qreal xval){
-    if (bsData){
-        bsData->x = xval*sin(angle->value()/2);
-        //file->toggleChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setx(): Data is null!!!");
-    }
+    (bsData) ? bsData->x = xval*sin(angle->value()/2) : LogFile::writeToLog("AnimationRotationUI::setx(): Data is null!!!");
 }
 
 void AnimationRotationUI::setY(qreal yval){
-    if (bsData){
-        bsData->y = yval*sin(angle->value()/2);
-        //file->toggleChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::sety(): Data is null!!!");
-    }
+    (bsData) ? bsData->y = yval*sin(angle->value()/2) : LogFile::writeToLog("AnimationRotationUI::sety(): Data is null!!!");
 }
 
 void AnimationRotationUI::setZ(qreal zval){
-    if (bsData){
-        bsData->z = zval*sin(angle->value()/2);
-        //file->toggleChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setz(): Data is null!!!");
-    }
+    (bsData) ? bsData->z = zval*sin(angle->value()/2) : LogFile::writeToLog("AnimationRotationUI::setz(): Data is null!!!");
 }
 
 void AnimationRotationUI::setAngle(qreal wval){
-    if (bsData){
-        bsData->w = cos(wval/2);
-        //file->toggleChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setz(): Data is null!!!");
-    }
+    (bsData) ? bsData->w = cos(wval/2) : LogFile::writeToLog("AnimationRotationUI::setz(): Data is null!!!");
 }

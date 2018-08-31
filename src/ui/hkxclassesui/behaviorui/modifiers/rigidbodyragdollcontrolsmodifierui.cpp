@@ -37,7 +37,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList RigidBodyRagdollControlsModifierUI::headerLabels = {
+const QStringList RigidBodyRagdollControlsModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -139,50 +139,51 @@ RigidBodyRagdollControlsModifierUI::RigidBodyRagdollControlsModifierUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(boneIndexUI);
+    toggleSignals(true);
 }
 
-void RigidBodyRagdollControlsModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(hierarchyGain, SIGNAL(editingFinished()), this, SLOT(setHierarchyGain()), Qt::UniqueConnection);
-    connect(velocityDamping, SIGNAL(editingFinished()), this, SLOT(setVelocityDamping()), Qt::UniqueConnection);
-    connect(accelerationGain, SIGNAL(editingFinished()), this, SLOT(setAccelerationGain()), Qt::UniqueConnection);
-    connect(velocityGain, SIGNAL(editingFinished()), this, SLOT(setVelocityGain()), Qt::UniqueConnection);
-    connect(positionGain, SIGNAL(editingFinished()), this, SLOT(setPositionGain()), Qt::UniqueConnection);
-    connect(positionMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxLinearVelocity()), Qt::UniqueConnection);
-    connect(positionMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxAngularVelocity()), Qt::UniqueConnection);
-    connect(snapGain, SIGNAL(editingFinished()), this, SLOT(setSnapGain()), Qt::UniqueConnection);
-    connect(snapMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearVelocity()), Qt::UniqueConnection);
-    connect(snapMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularVelocity()), Qt::UniqueConnection);
-    connect(snapMaxLinearDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearDistance()), Qt::UniqueConnection);
-    connect(snapMaxAngularDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularDistance()), Qt::UniqueConnection);
-    connect(durationToBlend, SIGNAL(editingFinished()), this, SLOT(setDurationToBlend()), Qt::UniqueConnection);
-    connect(bones, SIGNAL(pressed()), this, SLOT(viewBones()), Qt::UniqueConnection);
-    connect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)), Qt::UniqueConnection);
-    connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void RigidBodyRagdollControlsModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(hierarchyGain, SIGNAL(editingFinished()), this, SLOT(setHierarchyGain()));
-    disconnect(velocityDamping, SIGNAL(editingFinished()), this, SLOT(setVelocityDamping()));
-    disconnect(accelerationGain, SIGNAL(editingFinished()), this, SLOT(setAccelerationGain()));
-    disconnect(velocityGain, SIGNAL(editingFinished()), this, SLOT(setVelocityGain()));
-    disconnect(positionGain, SIGNAL(editingFinished()), this, SLOT(setPositionGain()));
-    disconnect(positionMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxLinearVelocity()));
-    disconnect(positionMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxAngularVelocity()));
-    disconnect(snapGain, SIGNAL(editingFinished()), this, SLOT(setSnapGain()));
-    disconnect(snapMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearVelocity()));
-    disconnect(snapMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularVelocity()));
-    disconnect(snapMaxLinearDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearDistance()));
-    disconnect(snapMaxAngularDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularDistance()));
-    disconnect(durationToBlend, SIGNAL(editingFinished()), this, SLOT(setDurationToBlend()));
-    disconnect(bones, SIGNAL(pressed()), this, SLOT(viewBones()));
-    disconnect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)));
-    disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void RigidBodyRagdollControlsModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(hierarchyGain, SIGNAL(editingFinished()), this, SLOT(setHierarchyGain()), Qt::UniqueConnection);
+        connect(velocityDamping, SIGNAL(editingFinished()), this, SLOT(setVelocityDamping()), Qt::UniqueConnection);
+        connect(accelerationGain, SIGNAL(editingFinished()), this, SLOT(setAccelerationGain()), Qt::UniqueConnection);
+        connect(velocityGain, SIGNAL(editingFinished()), this, SLOT(setVelocityGain()), Qt::UniqueConnection);
+        connect(positionGain, SIGNAL(editingFinished()), this, SLOT(setPositionGain()), Qt::UniqueConnection);
+        connect(positionMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxLinearVelocity()), Qt::UniqueConnection);
+        connect(positionMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxAngularVelocity()), Qt::UniqueConnection);
+        connect(snapGain, SIGNAL(editingFinished()), this, SLOT(setSnapGain()), Qt::UniqueConnection);
+        connect(snapMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearVelocity()), Qt::UniqueConnection);
+        connect(snapMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularVelocity()), Qt::UniqueConnection);
+        connect(snapMaxLinearDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearDistance()), Qt::UniqueConnection);
+        connect(snapMaxAngularDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularDistance()), Qt::UniqueConnection);
+        connect(durationToBlend, SIGNAL(editingFinished()), this, SLOT(setDurationToBlend()), Qt::UniqueConnection);
+        connect(bones, SIGNAL(pressed()), this, SLOT(viewBones()), Qt::UniqueConnection);
+        connect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)), Qt::UniqueConnection);
+        connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(hierarchyGain, SIGNAL(editingFinished()), this, SLOT(setHierarchyGain()));
+        disconnect(velocityDamping, SIGNAL(editingFinished()), this, SLOT(setVelocityDamping()));
+        disconnect(accelerationGain, SIGNAL(editingFinished()), this, SLOT(setAccelerationGain()));
+        disconnect(velocityGain, SIGNAL(editingFinished()), this, SLOT(setVelocityGain()));
+        disconnect(positionGain, SIGNAL(editingFinished()), this, SLOT(setPositionGain()));
+        disconnect(positionMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxLinearVelocity()));
+        disconnect(positionMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setPositionMaxAngularVelocity()));
+        disconnect(snapGain, SIGNAL(editingFinished()), this, SLOT(setSnapGain()));
+        disconnect(snapMaxLinearVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearVelocity()));
+        disconnect(snapMaxAngularVelocity, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularVelocity()));
+        disconnect(snapMaxLinearDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxLinearDistance()));
+        disconnect(snapMaxAngularDistance, SIGNAL(editingFinished()), this, SLOT(setSnapMaxAngularDistance()));
+        disconnect(durationToBlend, SIGNAL(editingFinished()), this, SLOT(setDurationToBlend()));
+        disconnect(bones, SIGNAL(pressed()), this, SLOT(viewBones()));
+        disconnect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)));
+        disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void RigidBodyRagdollControlsModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *ragdollBones){
@@ -197,32 +198,31 @@ void RigidBodyRagdollControlsModifierUI::connectToTables(GenericTableWidget *var
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void RigidBodyRagdollControlsModifierUI::loadData(HkxObject *data){
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
-    disconnectSignals();
     if (data){
         if (data->getSignature() == HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbRigidBodyRagdollControlsModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            hierarchyGain->setValue(bsData->hierarchyGain);
-            velocityDamping->setValue(bsData->velocityDamping);
-            accelerationGain->setValue(bsData->accelerationGain);
-            velocityGain->setValue(bsData->velocityGain);
-            positionGain->setValue(bsData->positionGain);
-            positionMaxLinearVelocity->setValue(bsData->positionMaxLinearVelocity);
-            positionMaxAngularVelocity->setValue(bsData->positionMaxAngularVelocity);
-            snapGain->setValue(bsData->snapGain);
-            snapMaxLinearVelocity->setValue(bsData->snapMaxLinearVelocity);
-            snapMaxAngularVelocity->setValue(bsData->snapMaxAngularVelocity);
-            snapMaxLinearDistance->setValue(bsData->snapMaxLinearDistance);
-            snapMaxAngularDistance->setValue(bsData->snapMaxAngularDistance);
-            durationToBlend->setValue(bsData->durationToBlend);
+            enable->setChecked(bsData->getEnable());
+            hierarchyGain->setValue(bsData->getHierarchyGain());
+            velocityDamping->setValue(bsData->getVelocityDamping());
+            accelerationGain->setValue(bsData->getAccelerationGain());
+            velocityGain->setValue(bsData->getVelocityGain());
+            positionGain->setValue(bsData->getPositionGain());
+            positionMaxLinearVelocity->setValue(bsData->getPositionMaxLinearVelocity());
+            positionMaxAngularVelocity->setValue(bsData->getPositionMaxAngularVelocity());
+            snapGain->setValue(bsData->getSnapGain());
+            snapMaxLinearVelocity->setValue(bsData->getSnapMaxLinearVelocity());
+            snapMaxAngularVelocity->setValue(bsData->getSnapMaxAngularVelocity());
+            snapMaxLinearDistance->setValue(bsData->getSnapMaxLinearDistance());
+            snapMaxAngularDistance->setValue(bsData->getSnapMaxAngularDistance());
+            durationToBlend->setValue(bsData->getDurationToBlend());
             if (bsData->bones.data()){
                 bones->setChecked(true);
                 bones->setText("Edit");
@@ -230,333 +230,161 @@ void RigidBodyRagdollControlsModifierUI::loadData(HkxObject *data){
                 bones->setChecked(false);
                 bones->setText("nullptr");
             }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(HIERARCHY_ROW, BINDING_COLUMN, varBind, "hierarchyGain");
-                loadBinding(VELOCITY_DAMPING_ROW, BINDING_COLUMN, varBind, "velocityDamping");
-                loadBinding(ACCELERATION_GAIN_ROW, BINDING_COLUMN, varBind, "accelerationGain");
-                loadBinding(VELOCITY_GAIN_ROW, BINDING_COLUMN, varBind, "velocityGain");
-                loadBinding(POSITION_GAIN_ROW, BINDING_COLUMN, varBind, "positionGain");
-                loadBinding(POSITION_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "positionMaxLinearVelocity");
-                loadBinding(POSITION_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "positionMaxAngularVelocity");
-                loadBinding(SNAP_GAIN_ROW, BINDING_COLUMN, varBind, "snapGain");
-                loadBinding(SNAP_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "snapMaxLinearVelocity");
-                loadBinding(SNAP_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "snapMaxAngularVelocity");
-                loadBinding(SNAP_MAX_LINEAR_DISTANCE_ROW, BINDING_COLUMN, varBind, "snapMaxLinearDistance");
-                loadBinding(SNAP_MAX_ANGULAR_DISTANCE_ROW, BINDING_COLUMN, varBind, "snapMaxAngularDistance");
-                loadBinding(DURATION_TO_BLEND_ROW, BINDING_COLUMN, varBind, "durationToBlend");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(HIERARCHY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VELOCITY_DAMPING_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ACCELERATION_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VELOCITY_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POSITION_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POSITION_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POSITION_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SNAP_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SNAP_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SNAP_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SNAP_MAX_LINEAR_DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SNAP_MAX_ANGULAR_DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DURATION_TO_BLEND_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(HIERARCHY_ROW, BINDING_COLUMN, varBind, "hierarchyGain", table, bsData);
+            UIHelper::loadBinding(VELOCITY_DAMPING_ROW, BINDING_COLUMN, varBind, "velocityDamping", table, bsData);
+            UIHelper::loadBinding(ACCELERATION_GAIN_ROW, BINDING_COLUMN, varBind, "accelerationGain", table, bsData);
+            UIHelper::loadBinding(VELOCITY_GAIN_ROW, BINDING_COLUMN, varBind, "velocityGain", table, bsData);
+            UIHelper::loadBinding(POSITION_GAIN_ROW, BINDING_COLUMN, varBind, "positionGain", table, bsData);
+            UIHelper::loadBinding(POSITION_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "positionMaxLinearVelocity", table, bsData);
+            UIHelper::loadBinding(POSITION_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "positionMaxAngularVelocity", table, bsData);
+            UIHelper::loadBinding(SNAP_GAIN_ROW, BINDING_COLUMN, varBind, "snapGain", table, bsData);
+            UIHelper::loadBinding(SNAP_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "snapMaxLinearVelocity", table, bsData);
+            UIHelper::loadBinding(SNAP_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN, varBind, "snapMaxAngularVelocity", table, bsData);
+            UIHelper::loadBinding(SNAP_MAX_LINEAR_DISTANCE_ROW, BINDING_COLUMN, varBind, "snapMaxLinearDistance", table, bsData);
+            UIHelper::loadBinding(SNAP_MAX_ANGULAR_DISTANCE_ROW, BINDING_COLUMN, varBind, "snapMaxAngularDistance", table, bsData);
+            UIHelper::loadBinding(DURATION_TO_BLEND_ROW, BINDING_COLUMN, varBind, "durationToBlend", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void RigidBodyRagdollControlsModifierUI::setName(){
+void RigidBodyRagdollControlsModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void RigidBodyRagdollControlsModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setHierarchyGain(){
-    if (bsData){
-        if (bsData->hierarchyGain != hierarchyGain->value()){
-            bsData->hierarchyGain = hierarchyGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::sethierarchyGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setHierarchyGain(hierarchyGain->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setHierarchyGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setVelocityDamping(){
-    if (bsData){
-        if (bsData->velocityDamping != velocityDamping->value()){
-            bsData->velocityDamping = velocityDamping->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setvelocityDamping(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVelocityDamping(velocityDamping->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setVelocityDamping(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setAccelerationGain(){
-    if (bsData){
-        if (bsData->accelerationGain != accelerationGain->value()){
-            bsData->accelerationGain = accelerationGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setaccelerationGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setAccelerationGain(accelerationGain->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setAccelerationGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setVelocityGain(){
-    if (bsData){
-        if (bsData->velocityGain != velocityGain->value()){
-            bsData->velocityGain = velocityGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setvelocityGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVelocityGain(velocityGain->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setVelocityGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setPositionGain(){
-    if (bsData){
-        if (bsData->positionGain != positionGain->value()){
-            bsData->positionGain = positionGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setpositionGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPositionGain(positionGain->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setPositionGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setPositionMaxLinearVelocity(){
-    if (bsData){
-        if (bsData->positionMaxLinearVelocity != positionMaxLinearVelocity->value()){
-            bsData->positionMaxLinearVelocity = positionMaxLinearVelocity->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setpositionMaxLinearVelocity(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPositionMaxLinearVelocity(positionMaxLinearVelocity->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setPositionMaxLinearVelocity(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setPositionMaxAngularVelocity(){
-    if (bsData){
-        if (bsData->positionMaxAngularVelocity != positionMaxAngularVelocity->value()){
-            bsData->positionMaxAngularVelocity = positionMaxAngularVelocity->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setpositionMaxAngularVelocity(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPositionMaxAngularVelocity(positionMaxAngularVelocity->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setPositionMaxAngularVelocity(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setSnapGain(){
-    if (bsData){
-        if (bsData->snapGain != snapGain->value()){
-            bsData->snapGain = snapGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setsnapGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSnapGain(snapGain->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setSnapGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setSnapMaxLinearVelocity(){
-    if (bsData){
-        if (bsData->snapMaxLinearVelocity != snapMaxLinearVelocity->value()){
-            bsData->snapMaxLinearVelocity = snapMaxLinearVelocity->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setsnapMaxLinearVelocity(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSnapMaxLinearVelocity(snapMaxLinearVelocity->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setSnapMaxLinearVelocity(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setSnapMaxAngularVelocity(){
-    if (bsData){
-        if (bsData->snapMaxAngularVelocity != snapMaxAngularVelocity->value()){
-            bsData->snapMaxAngularVelocity = snapMaxAngularVelocity->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setsnapMaxAngularVelocity(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSnapMaxAngularVelocity(snapMaxAngularVelocity->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setSnapMaxAngularVelocity(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setSnapMaxLinearDistance(){
-    if (bsData){
-        if (bsData->snapMaxLinearDistance != snapMaxLinearDistance->value()){
-            bsData->snapMaxLinearDistance = snapMaxLinearDistance->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setsnapMaxLinearDistance(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSnapMaxLinearDistance(snapMaxLinearDistance->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setSnapMaxLinearDistance(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setSnapMaxAngularDistance(){
-    if (bsData){
-        if (bsData->snapMaxAngularDistance != snapMaxAngularDistance->value()){
-            bsData->snapMaxAngularDistance = snapMaxAngularDistance->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setsnapMaxAngularDistance(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSnapMaxAngularDistance(snapMaxAngularDistance->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setSnapMaxAngularDistance(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::setDurationToBlend(){
-    if (bsData){
-        if (bsData->durationToBlend != durationToBlend->value()){
-            bsData->durationToBlend = durationToBlend->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setdurationToBlend(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDurationToBlend(durationToBlend->value()) : LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setDurationToBlend(): The 'bsData' pointer is nullptr!!");
 }
 
 void RigidBodyRagdollControlsModifierUI::toggleBones(bool enable){
     if (bsData){
         if (!enable){
-            bsData->bones = HkxSharedPtr();
+            bsData->setBones(nullptr);
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-        }else if (!bsData->bones.data()){
-            hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
-            //bsData->getParentFile()->addObjectToFile(indices, -1);
-            bsData->bones = HkxSharedPtr(indices);
+        }else if (!bsData->getBones()){
+            bsData->setBones(new hkbBoneIndexArray(bsData->getParentFile()));
             bones->setText("Edit");
         }
         bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::toggleBones(): The data is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::toggleBones(): The data is nullptr!!");
     }
 }
 
 void RigidBodyRagdollControlsModifierUI::viewBones(){
     if (bsData){
-        boneIndexUI->loadData(bsData->bones.data());
+        boneIndexUI->loadData(bsData->getBones());
         setCurrentIndex(CHILD_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::viewBones(): The data is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::viewBones(): The data is nullptr!!");
     }
 }
 
 void RigidBodyRagdollControlsModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case HIERARCHY_ROW:
-                if (table->item(HIERARCHY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "hierarchyGain");
-                break;
+                checkisproperty(HIERARCHY_ROW, "hierarchyGain"); break;
             case VELOCITY_DAMPING_ROW:
-                if (table->item(VELOCITY_DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "velocityDamping");
-                break;
+                checkisproperty(VELOCITY_DAMPING_ROW, "velocityDamping"); break;
             case ACCELERATION_GAIN_ROW:
-                if (table->item(ACCELERATION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "accelerationGain");
-                break;
+                checkisproperty(ACCELERATION_GAIN_ROW, "accelerationGain"); break;
             case VELOCITY_GAIN_ROW:
-                if (table->item(VELOCITY_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "velocityGain");
-                break;
+                checkisproperty(VELOCITY_GAIN_ROW, "velocityGain"); break;
             case POSITION_GAIN_ROW:
-                if (table->item(POSITION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "positionGain");
-                break;
+                checkisproperty(POSITION_GAIN_ROW, "positionGain"); break;
             case POSITION_MAX_LINEAR_VELOCITY_ROW:
-                if (table->item(POSITION_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "positionMaxLinearVelocity");
-                break;
+                checkisproperty(POSITION_MAX_LINEAR_VELOCITY_ROW, "positionMaxLinearVelocity"); break;
             case POSITION_MAX_ANGULAR_VELOCITY_ROW:
-                if (table->item(POSITION_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "positionMaxAngularVelocity");
-                break;
+                checkisproperty(POSITION_MAX_ANGULAR_VELOCITY_ROW, "positionMaxAngularVelocity"); break;
             case SNAP_GAIN_ROW:
-                if (table->item(SNAP_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "snapGain");
-                break;
+                checkisproperty(SNAP_GAIN_ROW, "snapGain"); break;
             case SNAP_MAX_LINEAR_VELOCITY_ROW:
-                if (table->item(SNAP_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "snapMaxLinearVelocity");
-                break;
+                checkisproperty(SNAP_MAX_LINEAR_VELOCITY_ROW, "snapMaxLinearVelocity"); break;
             case SNAP_MAX_ANGULAR_VELOCITY_ROW:
-                if (table->item(SNAP_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "snapMaxAngularVelocity");
-                break;
+                checkisproperty(SNAP_MAX_ANGULAR_VELOCITY_ROW, "snapMaxAngularVelocity"); break;
             case SNAP_MAX_LINEAR_DISTANCE_ROW:
-                if (table->item(SNAP_MAX_LINEAR_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "snapMaxLinearDistance");
-                break;
+                checkisproperty(SNAP_MAX_LINEAR_DISTANCE_ROW, "snapMaxLinearDistance"); break;
             case SNAP_MAX_ANGULAR_DISTANCE_ROW:
-                if (table->item(SNAP_MAX_ANGULAR_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "snapMaxAngularDistance");
-                break;
+                checkisproperty(SNAP_MAX_ANGULAR_DISTANCE_ROW, "snapMaxAngularDistance"); break;
             case DURATION_TO_BLEND_ROW:
-                if (table->item(DURATION_TO_BLEND_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "durationToBlend");
-                break;
-            default:
-                return;
+                checkisproperty(DURATION_TO_BLEND_ROW, "durationToBlend"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -576,232 +404,82 @@ void RigidBodyRagdollControlsModifierUI::selectTableToView(bool viewisProperty, 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void RigidBodyRagdollControlsModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hierarchyGain");
-            if (bindIndex == index){
-                table->item(HIERARCHY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("velocityDamping");
-            if (bindIndex == index){
-                table->item(VELOCITY_DAMPING_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("accelerationGain");
-            if (bindIndex == index){
-                table->item(ACCELERATION_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("velocityGain");
-            if (bindIndex == index){
-                table->item(VELOCITY_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("positionGain");
-            if (bindIndex == index){
-                table->item(POSITION_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("positionMaxLinearVelocity");
-            if (bindIndex == index){
-                table->item(POSITION_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("positionMaxAngularVelocity");
-            if (bindIndex == index){
-                table->item(POSITION_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("snapGain");
-            if (bindIndex == index){
-                table->item(SNAP_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("snapMaxLinearVelocity");
-            if (bindIndex == index){
-                table->item(SNAP_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("snapMaxAngularVelocity");
-            if (bindIndex == index){
-                table->item(SNAP_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("snapMaxLinearDistance");
-            if (bindIndex == index){
-                table->item(SNAP_MAX_LINEAR_DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("snapMaxAngularDistance");
-            if (bindIndex == index){
-                table->item(SNAP_MAX_ANGULAR_DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("durationToBlend");
-            if (bindIndex == index){
-                table->item(DURATION_TO_BLEND_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("hierarchyGain", HIERARCHY_ROW);
+            setname("velocityDamping", VELOCITY_DAMPING_ROW);
+            setname("accelerationGain", ACCELERATION_GAIN_ROW);
+            setname("velocityGain", VELOCITY_GAIN_ROW);
+            setname("positionGain", POSITION_GAIN_ROW);
+            setname("positionMaxLinearVelocity", POSITION_MAX_LINEAR_VELOCITY_ROW);
+            setname("positionMaxAngularVelocity", POSITION_MAX_ANGULAR_VELOCITY_ROW);
+            setname("snapGain", SNAP_GAIN_ROW);
+            setname("snapMaxLinearVelocity", SNAP_MAX_LINEAR_VELOCITY_ROW);
+            setname("snapMaxAngularVelocity", SNAP_MAX_ANGULAR_VELOCITY_ROW);
+            setname("snapMaxLinearDistance", SNAP_MAX_LINEAR_DISTANCE_ROW);
+            setname("snapMaxAngularDistance", SNAP_MAX_ANGULAR_DISTANCE_ROW);
+            setname("durationToBlend", DURATION_TO_BLEND_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool RigidBodyRagdollControlsModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void RigidBodyRagdollControlsModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case HIERARCHY_ROW:
-            if (table->item(HIERARCHY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hierarchyGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(HIERARCHY_ROW, "hierarchyGain", VARIABLE_TYPE_REAL); break;
         case VELOCITY_DAMPING_ROW:
-            if (table->item(VELOCITY_DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "velocityDamping", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(VELOCITY_DAMPING_ROW, "velocityDamping", VARIABLE_TYPE_REAL); break;
         case ACCELERATION_GAIN_ROW:
-            if (table->item(ACCELERATION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "accelerationGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ACCELERATION_GAIN_ROW, "accelerationGain", VARIABLE_TYPE_REAL); break;
         case VELOCITY_GAIN_ROW:
-            if (table->item(VELOCITY_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "velocityGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(VELOCITY_GAIN_ROW, "velocityGain", VARIABLE_TYPE_REAL); break;
         case POSITION_GAIN_ROW:
-            if (table->item(POSITION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "positionGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(POSITION_GAIN_ROW, "positionGain", VARIABLE_TYPE_REAL); break;
         case POSITION_MAX_LINEAR_VELOCITY_ROW:
-            if (table->item(POSITION_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "positionMaxLinearVelocity", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(POSITION_MAX_LINEAR_VELOCITY_ROW, "positionMaxLinearVelocity", VARIABLE_TYPE_REAL); break;
         case POSITION_MAX_ANGULAR_VELOCITY_ROW:
-            if (table->item(POSITION_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "positionMaxAngularVelocity", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(POSITION_MAX_ANGULAR_VELOCITY_ROW, "positionMaxAngularVelocity", VARIABLE_TYPE_REAL); break;
         case SNAP_GAIN_ROW:
-            if (table->item(SNAP_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "snapGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(SNAP_GAIN_ROW, "snapGain", VARIABLE_TYPE_REAL); break;
         case SNAP_MAX_LINEAR_VELOCITY_ROW:
-            if (table->item(SNAP_MAX_LINEAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "snapMaxLinearVelocity", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(SNAP_MAX_LINEAR_VELOCITY_ROW, "snapMaxLinearVelocity", VARIABLE_TYPE_REAL); break;
         case SNAP_MAX_ANGULAR_VELOCITY_ROW:
-            if (table->item(SNAP_MAX_ANGULAR_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "snapMaxAngularVelocity", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(SNAP_MAX_ANGULAR_VELOCITY_ROW, "snapMaxAngularVelocity", VARIABLE_TYPE_REAL); break;
         case SNAP_MAX_LINEAR_DISTANCE_ROW:
-            if (table->item(SNAP_MAX_LINEAR_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "snapMaxLinearDistance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(SNAP_MAX_LINEAR_DISTANCE_ROW, "snapMaxLinearDistance", VARIABLE_TYPE_REAL); break;
         case SNAP_MAX_ANGULAR_DISTANCE_ROW:
-            if (table->item(SNAP_MAX_ANGULAR_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "snapMaxAngularDistance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(SNAP_MAX_ANGULAR_DISTANCE_ROW, "snapMaxAngularDistance", VARIABLE_TYPE_REAL); break;
         case DURATION_TO_BLEND_ROW:
-            if (table->item(DURATION_TO_BLEND_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "durationToBlend", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(DURATION_TO_BLEND_ROW, "durationToBlend", VARIABLE_TYPE_REAL); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("RigidBodyRagdollControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
 void RigidBodyRagdollControlsModifierUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
-}
-
-void RigidBodyRagdollControlsModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RigidBodyRagdollControlsModifierUI::loadBinding(): The data is nullptr!!");
-    }
 }

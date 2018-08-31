@@ -36,8 +36,8 @@ const QString hkbBehaviorGraphData::getClassname(){
 
 int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     auto index = -1;
     auto varAdded = false;
     if (strData && varData){
@@ -70,8 +70,8 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
 
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     hkVariableInfo varInfo;
     varInfo.type = Type.at(type);
     if (strData && varData){
@@ -85,8 +85,8 @@ void hkbBehaviorGraphData::addVariable(hkVariableType type){
 
 void hkbBehaviorGraphData::removeVariable(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     auto count = -1;
     if (strData && varData){
         if (index < variableInfos.size() && index > -1){
@@ -112,7 +112,7 @@ void hkbBehaviorGraphData::removeVariable(int index){
 
 void hkbBehaviorGraphData::addEvent(const QString &name){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     auto wasadded = false;
     if (strData){
         strData->addEventName(name, &wasadded);
@@ -124,7 +124,7 @@ void hkbBehaviorGraphData::addEvent(const QString &name){
 
 void hkbBehaviorGraphData::addEvent(){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         strData->generateAppendEventName();
         eventInfos.append("0");
@@ -135,7 +135,7 @@ void hkbBehaviorGraphData::addEvent(){
 
 void hkbBehaviorGraphData::removeEvent(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         if (index < eventInfos.size() && index > -1){
             (strData->removeEventNameAt(index)) ? eventInfos.removeAt(index) : NULL;
@@ -147,7 +147,7 @@ void hkbBehaviorGraphData::removeEvent(int index){
 
 void hkbBehaviorGraphData::setEventNameAt(int index, const QString & name){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         strData->setEventNameAt(index, name);
     }else{
@@ -174,7 +174,7 @@ hkVariableType hkbBehaviorGraphData::getVariableTypeAt(int index) const{
 
 QString hkbBehaviorGraphData::getVariableNameAt(int index) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         return strData->getVariableNameAt(index);
     }else{
@@ -185,7 +185,7 @@ QString hkbBehaviorGraphData::getVariableNameAt(int index) const{
 
 QString hkbBehaviorGraphData::getEventNameAt(int index) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         return strData->getEventNameAt(index);
     }else{
@@ -194,9 +194,27 @@ QString hkbBehaviorGraphData::getEventNameAt(int index) const{
     return "";
 }
 
+QString hkbBehaviorGraphData::getEventInfoAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    if (eventInfos.size() > index && index > -1){
+        return eventInfos.at(index);
+    }
+    return "";
+}
+
+int hkbBehaviorGraphData::getWordVariableValueAt(int index) const{
+    auto varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    if (varData){
+        return varData->getWordVariableAt(index);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!");
+    }
+    return -1;
+}
+
 void hkbBehaviorGraphData::setVariableNameAt(int index, const QString & name){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         strData->setVariableNameAt(index, name);
     }else{
@@ -206,7 +224,7 @@ void hkbBehaviorGraphData::setVariableNameAt(int index, const QString & name){
 
 void hkbBehaviorGraphData::setWordVariableValueAt(int index, int value){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     if (varData){
         varData->setWordVariableAt(index, value);
     }else{
@@ -216,7 +234,7 @@ void hkbBehaviorGraphData::setWordVariableValueAt(int index, int value){
 
 void hkbBehaviorGraphData::setQuadVariableValueAt(int index, hkQuadVariable value){
     std::lock_guard <std::mutex> guard(mutex);
-    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     auto count = -1;
     if (varData){
         if (index < variableInfos.size() && index >= 0){
@@ -234,9 +252,9 @@ void hkbBehaviorGraphData::setQuadVariableValueAt(int index, hkQuadVariable valu
     }
 }
 
-hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok) const{
+hkQuadVariable hkbBehaviorGraphData::getQuadVariableValueAt(int index, bool *ok) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     if (variableValues){
         if (variableInfos.size() > index){
             auto count = -1;
@@ -256,7 +274,7 @@ hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok) const{
 
 HkxObject * hkbBehaviorGraphData::getVariantVariable(int index) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    auto variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     if (variableValues){
         if (variableInfos.size() > index){
             auto count = -1;
@@ -287,7 +305,7 @@ hkVariableType hkbBehaviorGraphData::getCharacterPropertyTypeAt(int index) const
 
 QString hkbBehaviorGraphData::getCharacterPropertyNameAt(int index) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strdata){
         return strdata->getCharacterPropertyNameAt(index);
     }else{
@@ -299,7 +317,7 @@ QString hkbBehaviorGraphData::getCharacterPropertyNameAt(int index) const{
 bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long & index){  //TO DO: tidy up...
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    int numElems = 0;
+    auto numElems = 0;
     auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
@@ -547,7 +565,7 @@ QStringList hkbBehaviorGraphData::getVariableTypeNames() const{
 
 int hkbBehaviorGraphData::getIndexOfVariable(const QString & name) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         return strData->getIndexOfVariableName(name);
     }else{
@@ -558,7 +576,7 @@ int hkbBehaviorGraphData::getIndexOfVariable(const QString & name) const{
 
 int hkbBehaviorGraphData::getIndexOfEvent(const QString &name) const{
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData){
         return strData->getIndexOfEventName(name);
     }else{
@@ -569,20 +587,14 @@ int hkbBehaviorGraphData::getIndexOfEvent(const QString &name) const{
 
 bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){  //TO DO: not thread safe...
     std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphData *otherdata;
-    hkbBehaviorGraphStringData *otherstrings;
-    hkbVariableValueSet *othervalues;
-    hkbBehaviorGraphStringData *strings;
-    hkbVariableValueSet *values;
     bool found;
-    int size;
     if (recessiveobj && recessiveobj->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
-        otherdata = static_cast<hkbBehaviorGraphData *>(recessiveobj);
-        strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-        values = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
-        otherstrings = static_cast<hkbBehaviorGraphStringData *>(otherdata->stringData.data());
-        othervalues = static_cast<hkbVariableValueSet *>(otherdata->variableInitialValues.data());
-        size = strings->eventNames.size();
+        auto otherdata = static_cast<hkbBehaviorGraphData *>(recessiveobj);
+        auto strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+        //auto values = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+        auto otherstrings = static_cast<hkbBehaviorGraphStringData *>(otherdata->stringData.data());
+        //auto othervalues = static_cast<hkbVariableValueSet *>(otherdata->variableInitialValues.data());
+        auto size = strings->eventNames.size();
         for (auto i = 0; i < otherstrings->eventNames.size(); i++){
             found = false;
             for (auto j = 0; j < size; j++){

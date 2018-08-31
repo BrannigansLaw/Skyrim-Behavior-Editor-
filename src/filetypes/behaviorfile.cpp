@@ -1154,8 +1154,8 @@ bool BehaviorFile::link(){
         linkobjs(modifiers);
         linkobjs(otherTypes);
         (!behaviorGraph->link()) ? result = false : NULL;
-        (variableValues->link()) ? result = false : NULL;
-        (graphData->link()) ? result = false : NULL;
+        (!variableValues->link()) ? result = false : NULL;
+        (!graphData->link()) ? result = false : NULL;
         HkxSignature sig;
         for (auto i = 0; i < generators.size(); i++){
             sig = generators.at(i)->getSignature();
@@ -1749,7 +1749,6 @@ int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) con
 
 int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
     //std::lock_guard <std::mutex> guard(mutex);
-    hkbCharacterStringData *strings = nullptr;
     if (character){
         return character->getCharacterPropertyIndex(name);
     }

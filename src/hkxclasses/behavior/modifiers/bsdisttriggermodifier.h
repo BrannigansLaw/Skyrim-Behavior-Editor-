@@ -3,6 +3,8 @@
 
 #include "hkbmodifier.h"
 
+class hkbStringEventPayload;
+
 class BSDistTriggerModifier final: public hkbModifier
 {
     friend class BSDistTriggerModifierUI;
@@ -15,6 +17,19 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkQuadVariable getTargetPosition() const;
+    void setTargetPosition(const hkQuadVariable &value);
+    qreal getDistance() const;
+    void setDistance(const qreal &value);
+    qreal getDistanceTrigger() const;
+    void setDistanceTrigger(const qreal &value);
+    hkbStringEventPayload * getTriggerEventPayload() const;
+    int getTriggerEventID() const;
+    void setTriggerEventID(int value);
+    void setTriggerEventPayload(hkbStringEventPayload *value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

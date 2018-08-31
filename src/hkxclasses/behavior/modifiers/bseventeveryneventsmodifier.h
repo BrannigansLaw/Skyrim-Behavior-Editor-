@@ -3,6 +3,8 @@
 
 #include "hkbmodifier.h"
 
+class hkbStringEventPayload;
+
 class BSEventEveryNEventsModifier final: public hkbModifier
 {
     friend class BSEventEveryNEventsModifierUI;
@@ -15,6 +17,23 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    void setEventToCheckForPayload(hkbStringEventPayload *value);
+    void setEventToSendPayload(hkbStringEventPayload *value);
+    hkbStringEventPayload *getEventToSendPayload() const;
+    hkbStringEventPayload *getEventToCheckForPayload() const;
+    int getEventToCheckForID() const;
+    void setEventToCheckForID(int value);
+    int getEventToSendID() const;
+    void setEventToSendID(int value);
+    int getNumberOfEventsBeforeSend() const;
+    void setNumberOfEventsBeforeSend(int value);
+    int getMinimumNumberOfEventsBeforeSend() const;
+    void setMinimumNumberOfEventsBeforeSend(int value);
+    bool getRandomizeNumberOfEvents() const;
+    void setRandomizeNumberOfEvents(bool value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

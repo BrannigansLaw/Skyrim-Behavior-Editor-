@@ -218,9 +218,8 @@ void ClipGeneratorUI::addTrigger(){
 }
 
 void ClipGeneratorUI::removeTrigger(int index){
-    hkbClipTriggerArray *triggers = nullptr;
     if (bsData){
-        triggers = bsData->getTriggers();
+        auto triggers = bsData->getTriggers();
         if (triggers){
             if (index < triggers->triggers.size() && index >= 0){
                 triggers->removeTrigger(index);
@@ -272,7 +271,7 @@ void ClipGeneratorUI::loadData(HkxObject *data){
             }else{
                 LogFile::writeToLog(QString("ClipGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
-            (mode->count() == 0) ? mode->insertItems(0, bsData->PlaybackMode) : NULL;
+            (!mode->count()) ? mode->insertItems(0, bsData->PlaybackMode) : NULL;
             mode->setCurrentIndex(bsData->PlaybackMode.indexOf(bsData->mode));
             auto varBind = bsData->getVariableBindingSetData();
             UIHelper::loadBinding(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN, varBind, "cropStartAmountLocalTime", table, bsData);
@@ -309,10 +308,10 @@ void ClipGeneratorUI::loadDynamicTableRows(){
 
 void ClipGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        auto isProperty = false;
         auto row = table->currentRow();
         auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
-            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
             UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
         };
         switch (row){
@@ -444,8 +443,8 @@ void ClipGeneratorUI::setFlagIgnoreMotion(){
 
 void ClipGeneratorUI::viewSelectedChild(int row, int column){
     auto checkisproperty = [&](int row, const QString & fieldname){
-        auto properties = false;
-        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+        bool properties;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
         selectTableToView(properties, fieldname);
     };
     if (bsData){

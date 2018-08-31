@@ -15,6 +15,17 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    int getPoseMatchingBone0() const;
+    void setPoseMatchingBone0(int value);
+    int getPoseMatchingBone1() const;
+    void setPoseMatchingBone1(int value);
+    int getPoseMatchingBone2() const;
+    void setPoseMatchingBone2(int value);
+    bool getEnableComputeWorldFromModel() const;
+    void setEnableComputeWorldFromModel(bool value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

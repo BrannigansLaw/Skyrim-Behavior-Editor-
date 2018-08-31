@@ -27,7 +27,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList TwistModifierUI::headerLabels = {
+const QStringList TwistModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -90,32 +90,33 @@ TwistModifierUI::TwistModifierUI()
     table->setCellWidget(IS_ADDITIVE_ROW, VALUE_COLUMN, isAdditive);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void TwistModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(axisOfRotation, SIGNAL(editingFinished()), this, SLOT(setAxisOfRotation()), Qt::UniqueConnection);
-    connect(twistAngle, SIGNAL(editingFinished()), this, SLOT(setTwistAngle()), Qt::UniqueConnection);
-    connect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)), Qt::UniqueConnection);
-    connect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)), Qt::UniqueConnection);
-    connect(setAngleMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(setSetAngleMethod(int)), Qt::UniqueConnection);
-    connect(rotationAxisCoordinates, SIGNAL(currentIndexChanged(int)), this, SLOT(setRotationAxisCoordinates(int)), Qt::UniqueConnection);
-    connect(isAdditive, SIGNAL(released()), this, SLOT(setIsAdditive()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void TwistModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(axisOfRotation, SIGNAL(editingFinished()), this, SLOT(setAxisOfRotation()));
-    disconnect(twistAngle, SIGNAL(editingFinished()), this, SLOT(setTwistAngle()));
-    disconnect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)));
-    disconnect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)));
-    disconnect(setAngleMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(setSetAngleMethod(int)));
-    disconnect(rotationAxisCoordinates, SIGNAL(currentIndexChanged(int)), this, SLOT(setRotationAxisCoordinates(int)));
-    disconnect(isAdditive, SIGNAL(released()), this, SLOT(setIsAdditive()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void TwistModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(axisOfRotation, SIGNAL(editingFinished()), this, SLOT(setAxisOfRotation()), Qt::UniqueConnection);
+        connect(twistAngle, SIGNAL(editingFinished()), this, SLOT(setTwistAngle()), Qt::UniqueConnection);
+        connect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)), Qt::UniqueConnection);
+        connect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)), Qt::UniqueConnection);
+        connect(setAngleMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(setSetAngleMethod(int)), Qt::UniqueConnection);
+        connect(rotationAxisCoordinates, SIGNAL(currentIndexChanged(int)), this, SLOT(setRotationAxisCoordinates(int)), Qt::UniqueConnection);
+        connect(isAdditive, SIGNAL(released()), this, SLOT(setIsAdditive()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(axisOfRotation, SIGNAL(editingFinished()), this, SLOT(setAxisOfRotation()));
+        disconnect(twistAngle, SIGNAL(editingFinished()), this, SLOT(setTwistAngle()));
+        disconnect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)));
+        disconnect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)));
+        disconnect(setAngleMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(setSetAngleMethod(int)));
+        disconnect(rotationAxisCoordinates, SIGNAL(currentIndexChanged(int)), this, SLOT(setRotationAxisCoordinates(int)));
+        disconnect(isAdditive, SIGNAL(released()), this, SLOT(setIsAdditive()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void TwistModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -127,202 +128,118 @@ void TwistModifierUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void TwistModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_TWIST_MODIFIER){
-            QStringList boneNames("None");
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbTwistModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            axisOfRotation->setValue(bsData->axisOfRotation);
-            twistAngle->setValue(bsData->twistAngle);
-            if (startBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                startBoneIndex->insertItems(0, boneNames);
-            }
-            startBoneIndex->setCurrentIndex(bsData->startBoneIndex + 1);
-            if (endBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                endBoneIndex->insertItems(0, boneNames);
-            }
-            endBoneIndex->setCurrentIndex(bsData->endBoneIndex + 1);
-            if (setAngleMethod->count() == 0){
-                setAngleMethod->insertItems(0, bsData->SetAngleMethod);
-            }
-            setAngleMethod->setCurrentIndex(bsData->SetAngleMethod.indexOf(bsData->setAngleMethod));
-
-            if (rotationAxisCoordinates->count() == 0){
-                rotationAxisCoordinates->insertItems(0, bsData->RotationAxisCoordinates);
-            }
-            rotationAxisCoordinates->setCurrentIndex(bsData->RotationAxisCoordinates.indexOf(bsData->rotationAxisCoordinates));
-            isAdditive->setChecked(bsData->isAdditive);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(AXIS_OF_ROTATION_ROW, BINDING_COLUMN, varBind, "axisOfRotation");
-                loadBinding(TWIST_ANGLE_ROW, BINDING_COLUMN, varBind, "twistAngle");
-                loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex");
-                loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex");
-                loadBinding(IS_ADDITIVE_ROW, BINDING_COLUMN, varBind, "isAdditive");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TWIST_ANGLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            axisOfRotation->setValue(bsData->getAxisOfRotation());
+            twistAngle->setValue(bsData->getTwistAngle());
+            auto loadbones = [&](ComboBox *combobox, int indextoset){
+                if (!combobox->count()){
+                    auto boneNames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(startBoneIndex, bsData->getStartBoneIndex() + 1);
+            loadbones(endBoneIndex, bsData->getEndBoneIndex() + 1);
+            auto loadmethods = [&](ComboBox *combobox, const QString & method, const QStringList & methodlist){
+                (!combobox->count()) ? combobox->insertItems(0, methodlist) : NULL;
+                combobox->setCurrentIndex(methodlist.indexOf(method));
+            };
+            loadmethods(setAngleMethod, bsData->getSetAngleMethod(), bsData->SetAngleMethod);
+            loadmethods(rotationAxisCoordinates, bsData->getRotationAxisCoordinates(), bsData->RotationAxisCoordinates);
+            isAdditive->setChecked(bsData->getIsAdditive());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(AXIS_OF_ROTATION_ROW, BINDING_COLUMN, varBind, "axisOfRotation", table, bsData);
+            UIHelper::loadBinding(TWIST_ANGLE_ROW, BINDING_COLUMN, varBind, "twistAngle", table, bsData);
+            UIHelper::loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex", table, bsData);
+            UIHelper::loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex", table, bsData);
+            UIHelper::loadBinding(IS_ADDITIVE_ROW, BINDING_COLUMN, varBind, "isAdditive", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("TwistModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void TwistModifierUI::setName(){
+void TwistModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void TwistModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("TwistModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void TwistModifierUI::setAxisOfRotation(){
-    if (bsData){
-        if (bsData->axisOfRotation != axisOfRotation->value()){
-            bsData->axisOfRotation = axisOfRotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setaxisOfRotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setAxisOfRotation(axisOfRotation->value()) : LogFile::writeToLog("TwistModifierUI::setAxisOfRotation(): The 'bsData' pointer is nullptr!!");
 }
 
 void TwistModifierUI::setStartBoneIndex(int index){
-    if (bsData){
-        bsData->startBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setStartBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setStartBoneIndex(index - 1) : LogFile::writeToLog("TwistModifierUI::setStartBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void TwistModifierUI::setEndBoneIndex(int index){
-    if (bsData){
-        bsData->endBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setEndBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEndBoneIndex(index - 1) : LogFile::writeToLog("TwistModifierUI::setEndBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void TwistModifierUI::setTwistAngle(){
-    if (bsData){
-        if (bsData->twistAngle != twistAngle->value()){
-            bsData->twistAngle = twistAngle->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::settwistAngle(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTwistAngle(twistAngle->value()) : LogFile::writeToLog("TwistModifierUI::setTwistAngle(): The data is nullptr!!");
 }
 
 void TwistModifierUI::setSetAngleMethod(int index){
-    if (bsData){
-        bsData->setAngleMethod = bsData->SetAngleMethod.at(index);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setSetAngleMethod(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSetAngleMethod(index) : LogFile::writeToLog("TwistModifierUI::setSetAngleMethod(): The data is nullptr!!");
 }
 
 void TwistModifierUI::setRotationAxisCoordinates(int index){
-    if (bsData){
-        bsData->rotationAxisCoordinates = bsData->RotationAxisCoordinates.at(index);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setRotationAxisCoordinates(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRotationAxisCoordinates(index) : LogFile::writeToLog("TwistModifierUI::setRotationAxisCoordinates(): The data is nullptr!!");
 }
 
 void TwistModifierUI::setIsAdditive(){
-    if (bsData){
-        bsData->isAdditive = isAdditive->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setIsAdditive(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setIsAdditive(isAdditive->isChecked()) : LogFile::writeToLog("TwistModifierUI::setIsAdditive(): The 'bsData' pointer is nullptr!!");
 }
 
 void TwistModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case AXIS_OF_ROTATION_ROW:
-                if (table->item(AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "axisOfRotation");
-                break;
+                checkisproperty(AXIS_OF_ROTATION_ROW, "axisOfRotation"); break;
             case TWIST_ANGLE_ROW:
-                if (table->item(TWIST_ANGLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "twistAngle");
-                break;
+                checkisproperty(TWIST_ANGLE_ROW, "twistAngle"); break;
             case START_BONE_INDEX_ROW:
-                if (table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "startBoneIndex");
-                break;
+                checkisproperty(START_BONE_INDEX_ROW, "startBoneIndex"); break;
             case END_BONE_INDEX_ROW:
-                if (table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "endBoneIndex");
-                break;
+                checkisproperty(END_BONE_INDEX_ROW, "endBoneIndex"); break;
             case IS_ADDITIVE_ROW:
-                if (table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "isAdditive");
-                break;
-            default:
-                return;
+                checkisproperty(IS_ADDITIVE_ROW, "isAdditive"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -342,148 +259,54 @@ void TwistModifierUI::selectTableToView(bool viewisProperty, const QString & pat
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void TwistModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("axisOfRotation");
-            if (bindIndex == index){
-                table->item(AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("twistAngle");
-            if (bindIndex == index){
-                table->item(TWIST_ANGLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("startBoneIndex");
-            if (bindIndex == index){
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("endBoneIndex");
-            if (bindIndex == index){
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("isAdditive");
-            if (bindIndex == index){
-                table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("axisOfRotation", AXIS_OF_ROTATION_ROW);
+            setname("twistAngle", TWIST_ANGLE_ROW);
+            setname("startBoneIndex", START_BONE_INDEX_ROW);
+            setname("endBoneIndex", END_BONE_INDEX_ROW);
+            setname("isAdditive", IS_ADDITIVE_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool TwistModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void TwistModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case AXIS_OF_ROTATION_ROW:
-            if (table->item(AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "axisOfRotation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(AXIS_OF_ROTATION_ROW, "axisOfRotation", VARIABLE_TYPE_VECTOR4); break;
         case TWIST_ANGLE_ROW:
-            if (table->item(TWIST_ANGLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "twistAngle", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(TWIST_ANGLE_ROW, "twistAngle", VARIABLE_TYPE_REAL); break;
         case START_BONE_INDEX_ROW:
-            if (table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "startBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(START_BONE_INDEX_ROW, "startBoneIndex", VARIABLE_TYPE_INT32); break;
         case END_BONE_INDEX_ROW:
-            if (table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "endBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(END_BONE_INDEX_ROW, "endBoneIndex", VARIABLE_TYPE_INT32); break;
         case IS_ADDITIVE_ROW:
-            if (table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "isAdditive", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void TwistModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(IS_ADDITIVE_ROW, "isAdditive", VARIABLE_TYPE_BOOL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("TwistModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

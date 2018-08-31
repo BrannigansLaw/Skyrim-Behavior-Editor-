@@ -17,6 +17,9 @@ public:
     static const QString getClassname();
     QVector <DataIconManager *> getChildren() const;
 private:
+    void setName(const QString &newname);
+    QString getGeneratorName() const;
+    QString getModifierName() const;
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

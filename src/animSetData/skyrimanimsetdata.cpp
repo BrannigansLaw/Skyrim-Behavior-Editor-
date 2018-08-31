@@ -70,7 +70,7 @@ bool SkyrimAnimSetData::write(const QString &filename){
 
 bool SkyrimAnimSetData::addNewProject(const QString &projectname){
     for (auto i = 0; i < projectNames.size(); i++){
-        if (QString::compare(projectNames.at(i), projectname, Qt::CaseInsensitive) == 0){
+        if (!QString::compare(projectNames.at(i), projectname, Qt::CaseInsensitive)){
             return false;
         }
     }
@@ -95,7 +95,7 @@ bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QS
             }
         }
     }
-    /*if (count == 0){
+    /*if (!count){
         createNewCacheBlock(event, animations, vars, clips);
     }*/
     return true;

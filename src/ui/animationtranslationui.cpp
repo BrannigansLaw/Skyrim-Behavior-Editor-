@@ -21,7 +21,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList AnimationTranslationUI::headerLabels = {
+const QStringList AnimationTranslationUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -57,80 +57,52 @@ AnimationTranslationUI::AnimationTranslationUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void AnimationTranslationUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()), Qt::UniqueConnection);
-    connect(x, SIGNAL(editingFinished()), this, SLOT(setX()), Qt::UniqueConnection);
-    connect(y, SIGNAL(editingFinished()), this, SLOT(setY()), Qt::UniqueConnection);
-    connect(z, SIGNAL(editingFinished()), this, SLOT(setZ()), Qt::UniqueConnection);
-}
-
-void AnimationTranslationUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()));
-    disconnect(x, SIGNAL(editingFinished()), this, SLOT(setX()));
-    disconnect(y, SIGNAL(editingFinished()), this, SLOT(setY()));
-    disconnect(z, SIGNAL(editingFinished()), this, SLOT(setZ()));
+void AnimationTranslationUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()), Qt::UniqueConnection);
+        connect(x, SIGNAL(editingFinished()), this, SLOT(setX()), Qt::UniqueConnection);
+        connect(y, SIGNAL(editingFinished()), this, SLOT(setY()), Qt::UniqueConnection);
+        connect(z, SIGNAL(editingFinished()), this, SLOT(setZ()), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(localTime, SIGNAL(editingFinished()), this, SLOT(setLocalTime()));
+        disconnect(x, SIGNAL(editingFinished()), this, SLOT(setX()));
+        disconnect(y, SIGNAL(editingFinished()), this, SLOT(setY()));
+        disconnect(z, SIGNAL(editingFinished()), this, SLOT(setZ()));
+    }
 }
 
 void AnimationTranslationUI::loadData(SkyrimAnimationTranslation *trans, qreal maxtime){
-    disconnectSignals();
+    toggleSignals(false);
     if (trans){
-        localTime->setMaximum(maxtime);
         bsData = trans;
+        localTime->setMaximum(maxtime);
         localTime->setValue(bsData->localTime);
         x->setValue(bsData->x);
         y->setValue(bsData->y);
         z->setValue(bsData->z);
     }else{
-        CRITICAL_ERROR_MESSAGE("AnimationTranslationUI::loadData(): Data is null!!!");
+        LogFile::writeToLog("AnimationTranslationUI::loadData(): Data is null!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void AnimationTranslationUI::setLocalTime(){
-    if (bsData){
-        if (bsData->localTime != localTime->value()){
-            bsData->localTime = localTime->value();
-            //file->toggleChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationTranslationUI::setlocalTime(): Data is null!!!");
-    }
+    (bsData) ? bsData->localTime = localTime->value() : LogFile::writeToLog("AnimationTranslationUI::setlocalTime(): Data is null!!!");
 }
 
 void AnimationTranslationUI::setX(){
-    if (bsData){
-        if (bsData->x != x->value()){
-            bsData->x = x->value();
-            //file->toggleChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationTranslationUI::setx(): Data is null!!!");
-    }
+    (bsData) ? bsData->x = x->value() : LogFile::writeToLog("AnimationTranslationUI::setx(): Data is null!!!");
 }
 
 void AnimationTranslationUI::setY(){
-    if (bsData){
-        if (bsData->y != y->value()){
-            bsData->y = y->value();
-            //file->toggleChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationTranslationUI::sety(): Data is null!!!");
-    }
+    (bsData) ? bsData->y = y->value() : LogFile::writeToLog("AnimationTranslationUI::sety(): Data is null!!!");
 }
 
 void AnimationTranslationUI::setZ(){
-    if (bsData){
-        if (bsData->z != z->value()){
-            bsData->z = z->value();
-            //file->toggleChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("AnimationTranslationUI::setz(): Data is null!!!");
-    }
+    (bsData) ? bsData->z = z->value() : LogFile::writeToLog("AnimationTranslationUI::setz(): Data is null!!!");
 }

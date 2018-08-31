@@ -26,7 +26,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSDecomposeVectorModifierUI::headerLabels = {
+const QStringList BSDecomposeVectorModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -79,28 +79,29 @@ BSDecomposeVectorModifierUI::BSDecomposeVectorModifierUI()
     table->setCellWidget(W_ROW, VALUE_COLUMN, w);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSDecomposeVectorModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(vector, SIGNAL(editingFinished()), this, SLOT(setVector()), Qt::UniqueConnection);
-    connect(x, SIGNAL(editingFinished()), this, SLOT(setX()), Qt::UniqueConnection);
-    connect(y, SIGNAL(editingFinished()), this, SLOT(setY()), Qt::UniqueConnection);
-    connect(z, SIGNAL(editingFinished()), this, SLOT(setZ()), Qt::UniqueConnection);
-    connect(w, SIGNAL(editingFinished()), this, SLOT(setW()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSDecomposeVectorModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(vector, SIGNAL(editingFinished()), this, SLOT(setVector()));
-    disconnect(x, SIGNAL(editingFinished()), this, SLOT(setX()));
-    disconnect(y, SIGNAL(editingFinished()), this, SLOT(setY()));
-    disconnect(z, SIGNAL(editingFinished()), this, SLOT(setZ()));
-    disconnect(w, SIGNAL(editingFinished()), this, SLOT(setW()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSDecomposeVectorModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(vector, SIGNAL(editingFinished()), this, SLOT(setVector()), Qt::UniqueConnection);
+        connect(x, SIGNAL(editingFinished()), this, SLOT(setX()), Qt::UniqueConnection);
+        connect(y, SIGNAL(editingFinished()), this, SLOT(setY()), Qt::UniqueConnection);
+        connect(z, SIGNAL(editingFinished()), this, SLOT(setZ()), Qt::UniqueConnection);
+        connect(w, SIGNAL(editingFinished()), this, SLOT(setW()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(vector, SIGNAL(editingFinished()), this, SLOT(setVector()));
+        disconnect(x, SIGNAL(editingFinished()), this, SLOT(setX()));
+        disconnect(y, SIGNAL(editingFinished()), this, SLOT(setY()));
+        disconnect(z, SIGNAL(editingFinished()), this, SLOT(setZ()));
+        disconnect(w, SIGNAL(editingFinished()), this, SLOT(setW()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSDecomposeVectorModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -112,172 +113,97 @@ void BSDecomposeVectorModifierUI::connectToTables(GenericTableWidget *variables,
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSDecomposeVectorModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_DECOMPOSE_VECTOR_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<BSDecomposeVectorModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            vector->setValue(bsData->vector);
-            x->setValue(bsData->x);
-            y->setValue(bsData->y);
-            z->setValue(bsData->z);
-            w->setValue(bsData->w);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(VECTOR_ROW, BINDING_COLUMN, varBind, "vector");
-                loadBinding(X_ROW, BINDING_COLUMN, varBind, "x");
-                loadBinding(Y_ROW, BINDING_COLUMN, varBind, "y");
-                loadBinding(Z_ROW, BINDING_COLUMN, varBind, "z");
-                loadBinding(W_ROW, BINDING_COLUMN, varBind, "w");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VECTOR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(X_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(Y_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(Z_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(W_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            vector->setValue(bsData->getVector());
+            x->setValue(bsData->getX());
+            y->setValue(bsData->getY());
+            z->setValue(bsData->getZ());
+            w->setValue(bsData->getW());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(VECTOR_ROW, BINDING_COLUMN, varBind, "vector", table, bsData);
+            UIHelper::loadBinding(X_ROW, BINDING_COLUMN, varBind, "x", table, bsData);
+            UIHelper::loadBinding(Y_ROW, BINDING_COLUMN, varBind, "y", table, bsData);
+            UIHelper::loadBinding(Z_ROW, BINDING_COLUMN, varBind, "z", table, bsData);
+            UIHelper::loadBinding(W_ROW, BINDING_COLUMN, varBind, "w", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSDecomposeVectorModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSDecomposeVectorModifierUI::setName(){
+void BSDecomposeVectorModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSDecomposeVectorModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSDecomposeVectorModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void BSDecomposeVectorModifierUI::setVector(){
-    if (bsData){
-        if (bsData->vector != vector->value()){
-            bsData->vector = vector->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setVector(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVector(vector->value()) : LogFile::writeToLog("BSDecomposeVectorModifierUI::setVector(): The data is nullptr!!");
 }
 
 void BSDecomposeVectorModifierUI::setX(){
-    if (bsData){
-        if (bsData->x != x->value()){
-            bsData->x = x->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setX(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setX(x->value()) : LogFile::writeToLog("BSDecomposeVectorModifierUI::setX(): The data is nullptr!!");
 }
 
 void BSDecomposeVectorModifierUI::setY(){
-    if (bsData){
-        if (bsData->y != y->value()){
-            bsData->y = y->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setY(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setY(y->value()) : LogFile::writeToLog("BSDecomposeVectorModifierUI::setY(): The data is nullptr!!");
 }
 
 void BSDecomposeVectorModifierUI::setZ(){
-    if (bsData){
-        if (bsData->z != z->value()){
-            bsData->z = z->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setZ(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setZ(z->value()) : LogFile::writeToLog("BSDecomposeVectorModifierUI::setZ(): The data is nullptr!!");
 }
 
 void BSDecomposeVectorModifierUI::setW(){
-    if (bsData){
-        if (bsData->w != w->value()){
-            bsData->w = w->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setW(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setW(w->value()) : LogFile::writeToLog("BSDecomposeVectorModifierUI::setW(): The data is nullptr!!");
 }
 
 void BSDecomposeVectorModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case VECTOR_ROW:
-                if (table->item(VECTOR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "vector");
-                break;
+                checkisproperty(VECTOR_ROW, "vector"); break;
             case X_ROW:
-                if (table->item(X_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "x");
-                break;
+                checkisproperty(X_ROW, "x"); break;
             case Y_ROW:
-                if (table->item(Y_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "y");
-                break;
+                checkisproperty(Y_ROW, "y"); break;
             case Z_ROW:
-                if (table->item(Z_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "z");
-                break;
+                checkisproperty(Z_ROW, "z"); break;
             case W_ROW:
-                if (table->item(W_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "w");
-                break;
-            default:
-                return;
+                checkisproperty(W_ROW, "w"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -297,148 +223,54 @@ void BSDecomposeVectorModifierUI::selectTableToView(bool viewisProperty, const Q
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSDecomposeVectorModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("vector");
-            if (bindIndex == index){
-                table->item(VECTOR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("x");
-            if (bindIndex == index){
-                table->item(X_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("y");
-            if (bindIndex == index){
-                table->item(Y_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("z");
-            if (bindIndex == index){
-                table->item(Z_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("w");
-            if (bindIndex == index){
-                table->item(W_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("vector", VECTOR_ROW);
+            setname("x", X_ROW);
+            setname("y", Y_ROW);
+            setname("z", Z_ROW);
+            setname("w", W_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSDecomposeVectorModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSDecomposeVectorModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case VECTOR_ROW:
-            if (table->item(VECTOR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "vector", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(VECTOR_ROW, "vector", VARIABLE_TYPE_VECTOR4); break;
         case X_ROW:
-            if (table->item(X_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "x", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(X_ROW, "x", VARIABLE_TYPE_REAL); break;
         case Y_ROW:
-            if (table->item(Y_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "y", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(Y_ROW, "y", VARIABLE_TYPE_REAL); break;
         case Z_ROW:
-            if (table->item(Z_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "z", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(Z_ROW, "z", VARIABLE_TYPE_REAL); break;
         case W_ROW:
-            if (table->item(W_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "w", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSDecomposeVectorModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(W_ROW, "w", VARIABLE_TYPE_REAL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDecomposeVectorModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSDecomposeVectorModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

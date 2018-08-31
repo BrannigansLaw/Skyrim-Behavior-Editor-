@@ -93,6 +93,51 @@ bool hkbComputeRotationFromAxisAngleModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal hkbComputeRotationFromAxisAngleModifier::getAngleDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return angleDegrees;
+}
+
+void hkbComputeRotationFromAxisAngleModifier::setAngleDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != angleDegrees) ? angleDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'angleDegrees' was not set!");
+}
+
+hkQuadVariable hkbComputeRotationFromAxisAngleModifier::getAxis() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return axis;
+}
+
+void hkbComputeRotationFromAxisAngleModifier::setAxis(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != axis) ? axis = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'axis' was not set!");
+}
+
+hkQuadVariable hkbComputeRotationFromAxisAngleModifier::getRotationOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rotationOut;
+}
+
+void hkbComputeRotationFromAxisAngleModifier::setRotationOut(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rotationOut) ? rotationOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rotationOut' was not set!");
+}
+
+bool hkbComputeRotationFromAxisAngleModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbComputeRotationFromAxisAngleModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbComputeRotationFromAxisAngleModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbComputeRotationFromAxisAngleModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -109,7 +154,7 @@ void hkbComputeRotationFromAxisAngleModifier::unlink(){
 QString hkbComputeRotationFromAxisAngleModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

@@ -16,16 +16,17 @@ class QPushButton;
 class QGroupBox;
 class FootIkDriverInfoLegUI;
 
-class FootIkDriverInfoUI: public QStackedWidget
+class FootIkDriverInfoUI final: public QStackedWidget
 {
     Q_OBJECT
-    //friend class HkDataUI;
 public:
     FootIkDriverInfoUI();
-    virtual ~FootIkDriverInfoUI(){}
+    FootIkDriverInfoUI& operator=(const FootIkDriverInfoUI&) = delete;
+    FootIkDriverInfoUI(const FootIkDriverInfoUI &) = delete;
+    ~FootIkDriverInfoUI() = default;
+public:
     void loadData(HkxObject *data);
     void loadBoneList(QStringList &bones);
-signals:
 private slots:
     void setRaycastDistanceUp();
     void setRaycastDistanceDown();
@@ -44,11 +45,11 @@ private slots:
     void returnToWidget();
 private:
     enum ACTIVE_WIDGET {
-        FOOT_IK_DRIVER_INFO = 0,
-        FOOT_IK_DRIVER_INFO_LEG = 1
+        FOOT_IK_DRIVER_INFO,
+        FOOT_IK_DRIVER_INFO_LEG
     };
-
-    static QStringList headerLabels1;
+private:
+    static const QStringList headerLabels1;
     hkbFootIkDriverInfo *bsData;
     QGroupBox *footDriverGB;
     FootIkDriverInfoLegUI *legUI;

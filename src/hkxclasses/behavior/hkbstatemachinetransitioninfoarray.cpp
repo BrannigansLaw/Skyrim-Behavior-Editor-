@@ -75,31 +75,31 @@ int hkbStateMachineTransitionInfoArray::getNumTransitions() const{
 
 void hkbStateMachineTransitionInfoArray::addTransition(){
     std::lock_guard <std::mutex> guard(mutex);
-    transitions.append(HkTransition());
+    transitions.append(HkTransition()), setIsFileChanged(true);
 }
 
 void hkbStateMachineTransitionInfoArray::removeTransition(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (transitions.size() > index && index > -1) ? transitions.removeAt(index) : NULL;
+    (transitions.size() > index && index > -1) ? transitions.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": Transition was not removed!");
 }
 
 void hkbStateMachineTransitionInfoArray::removeTransitionToState(ulong stateId){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = transitions.size() - 1; i >= 0; i--){
-        (transitions.at(i).toStateId == stateId) ? transitions.removeAt(i) : NULL;
+        (transitions.at(i).toStateId == stateId) ? transitions.removeAt(i), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": Transition was not removed!");
     }
 }
 
 void hkbStateMachineTransitionInfoArray::updateTransitionStateId(int oldid, int newid){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto j = 0; j < transitions.size(); j++){
-        (transitions.at(j).toStateId == oldid) ? transitions[j].toStateId = newid : NULL;
+        (transitions.at(j).toStateId == oldid) ? transitions[j].toStateId = newid, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": Transition state id was not updated!");
     }
 }
 
 void hkbStateMachineTransitionInfoArray::setParentSM(hkbGenerator *parS){
     std::lock_guard <std::mutex> guard(mutex);
-    parS ? parent = parS : NULL;
+    parent = parS;
 }
 
 QString hkbStateMachineTransitionInfoArray::getTransitionNameAt(int index) const{
@@ -129,7 +129,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    int numtrans = 0;
+    auto numtrans = 0;
     QStringList list;
     Interval_Type intervalType;
     auto ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -427,7 +427,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
 QString hkbStateMachineTransitionInfoArray::evaluateDataValidity(){ //Do not call this outside it's parent state machine or state in a multithreaded context or there will be a potential race condition...
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (!parent){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Null parent!");

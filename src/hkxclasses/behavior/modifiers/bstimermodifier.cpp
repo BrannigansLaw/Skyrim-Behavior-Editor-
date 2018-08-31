@@ -2,6 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSTimerModifier::refCount = 0;
 
@@ -177,6 +178,61 @@ bool BSTimerModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread sa
     return false;
 }
 
+hkbStringEventPayload *BSTimerModifier::getAlarmEventPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(alarmEvent.payload.data());
+}
+
+void BSTimerModifier::setAlarmEventPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(alarmEvent.payload.data())) ? alarmEvent.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'alarmEvent.payload' was not set!");
+}
+
+int BSTimerModifier::getAlarmEventID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return alarmEvent.id;
+}
+
+void BSTimerModifier::setAlarmEventID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != alarmEvent.id && alarmEvent.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? alarmEvent.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'alarmEvent.id' was not set!");
+}
+
+bool BSTimerModifier::getResetAlarm() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return resetAlarm;
+}
+
+void BSTimerModifier::setResetAlarm(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != resetAlarm) ? resetAlarm = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'resetAlarm' was not set!");
+}
+
+qreal BSTimerModifier::getAlarmTimeSeconds() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return alarmTimeSeconds;
+}
+
+void BSTimerModifier::setAlarmTimeSeconds(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != alarmTimeSeconds) ? alarmTimeSeconds = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'alarmTimeSeconds' was not set!");
+}
+
+bool BSTimerModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSTimerModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSTimerModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSTimerModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -202,7 +258,7 @@ void BSTimerModifier::unlink(){
 QString BSTimerModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

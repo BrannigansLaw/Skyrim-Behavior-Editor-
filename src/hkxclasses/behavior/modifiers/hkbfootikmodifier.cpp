@@ -440,7 +440,7 @@ void hkbFootIkModifier::unlink(){
 QString hkbFootIkModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (legs.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": legs is empty!");

@@ -250,31 +250,31 @@ SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimDat
 
 void hkbClipGenerator::setName(const QString &oldclipname, const QString &newclipname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newclipname != name && newclipname != "") ? name = newclipname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newclipname != name && newclipname != "") ? name = newclipname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
 }
 
 void hkbClipGenerator::setAnimationName(int index, const QString &animationname){
     std::lock_guard <std::mutex> guard(mutex);
-    (animationname != animationName && animationname != "" && animationname.contains(".hkx", Qt::CaseInsensitive)) ? animationName = animationname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'animationName' was not set!");
+    (animationname != animationName && animationname != "" && animationname.contains(".hkx", Qt::CaseInsensitive)) ? animationName = animationname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'animationName' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setAnimationIndexAnimData(index, name);    //Unsafe...
 }
 
 void hkbClipGenerator::setPlaybackSpeed(qreal speed){
     std::lock_guard <std::mutex> guard(mutex);
-    (speed != playbackSpeed) ? playbackSpeed = speed, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'playbackSpeed' was not set!");
+    (speed != playbackSpeed) ? playbackSpeed = speed, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'playbackSpeed' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setPlaybackSpeedAnimData(name, speed);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropStartAmountLocalTime(qreal time){
     std::lock_guard <std::mutex> guard(mutex);
-    (time != cropStartAmountLocalTime) ? cropStartAmountLocalTime = time, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'cropStartAmountLocalTime' was not set!");
+    (time != cropStartAmountLocalTime) ? cropStartAmountLocalTime = time, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'cropStartAmountLocalTime' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setCropStartAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropEndAmountLocalTime(qreal time){
     std::lock_guard <std::mutex> guard(mutex);
-    (time != cropEndAmountLocalTime) ? cropEndAmountLocalTime = time, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'cropEndAmountLocalTime' was not set!");
+    (time != cropEndAmountLocalTime) ? cropEndAmountLocalTime = time, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'cropEndAmountLocalTime' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setCropEndAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
@@ -290,7 +290,7 @@ QString hkbClipGenerator::getFlags() const{
 
 void hkbClipGenerator::setFlags(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != flags && value != "") ? flags = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
+    (value != flags && value != "") ? flags = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
 }
 
 QString hkbClipGenerator::getMode() const{
@@ -300,7 +300,7 @@ QString hkbClipGenerator::getMode() const{
 
 void hkbClipGenerator::setMode(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index >= 0 && index < PlaybackMode.size() && mode != PlaybackMode.at(index)) ? mode = PlaybackMode.at(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'mode' was not set!");
+    (index >= 0 && index < PlaybackMode.size() && mode != PlaybackMode.at(index)) ? mode = PlaybackMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'mode' was not set!");
 }
 
 int hkbClipGenerator::getAnimationBindingIndex() const{
@@ -310,7 +310,7 @@ int hkbClipGenerator::getAnimationBindingIndex() const{
 
 void hkbClipGenerator::setAnimationBindingIndex(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != animationBindingIndex) ? animationBindingIndex = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'animationBindingIndex' was not set!");
+    (value != animationBindingIndex) ? animationBindingIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'animationBindingIndex' was not set!");
 }
 
 qreal hkbClipGenerator::getUserControlledTimeFraction() const{
@@ -320,7 +320,7 @@ qreal hkbClipGenerator::getUserControlledTimeFraction() const{
 
 void hkbClipGenerator::setUserControlledTimeFraction(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != userControlledTimeFraction) ? userControlledTimeFraction = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'userControlledTimeFraction' was not set!");
+    (value != userControlledTimeFraction) ? userControlledTimeFraction = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'userControlledTimeFraction' was not set!");
 }
 
 qreal hkbClipGenerator::getEnforcedDuration() const{
@@ -330,7 +330,7 @@ qreal hkbClipGenerator::getEnforcedDuration() const{
 
 void hkbClipGenerator::setEnforcedDuration(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != enforcedDuration) ? enforcedDuration = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'enforcedDuration' was not set!");
+    (value != enforcedDuration) ? enforcedDuration = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enforcedDuration' was not set!");
 }
 
 qreal hkbClipGenerator::getPlaybackSpeed() const{
@@ -345,7 +345,7 @@ qreal hkbClipGenerator::getStartTime() const{
 
 void hkbClipGenerator::setStartTime(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != startTime) ? startTime = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'startTime' was not set!");
+    (value != startTime) ? startTime = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startTime' was not set!");
 }
 
 qreal hkbClipGenerator::getCropEndAmountLocalTime() const{
@@ -360,7 +360,7 @@ qreal hkbClipGenerator::getCropStartAmountLocalTime() const{
 
 void hkbClipGenerator::setTriggers(hkbClipTriggerArray *value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != triggers.data()) ? triggers = HkxSharedPtr(value), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'triggers' was not set!");
+    (value != triggers.data()) ? triggers = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'triggers' was not set!");
 }
 
 bool hkbClipGenerator::link(){

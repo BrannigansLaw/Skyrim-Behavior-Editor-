@@ -174,6 +174,211 @@ bool BSDirectAtModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal BSDirectAtModifier::getCurrentPitchOffset() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return currentPitchOffset;
+}
+
+void BSDirectAtModifier::setCurrentPitchOffset(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != currentPitchOffset) ? currentPitchOffset = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'currentPitchOffset' was not set!");
+}
+
+qreal BSDirectAtModifier::getCurrentHeadingOffset() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return currentHeadingOffset;
+}
+
+void BSDirectAtModifier::setCurrentHeadingOffset(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != currentHeadingOffset) ? currentHeadingOffset = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'currentHeadingOffset' was not set!");
+}
+
+bool BSDirectAtModifier::getActive() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return active;
+}
+
+void BSDirectAtModifier::setActive(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != active) ? active = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'active' was not set!");
+}
+
+qreal BSDirectAtModifier::getDirectAtCameraZ() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return directAtCameraZ;
+}
+
+void BSDirectAtModifier::setDirectAtCameraZ(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != directAtCameraZ) ? directAtCameraZ = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'directAtCameraZ' was not set!");
+}
+
+qreal BSDirectAtModifier::getDirectAtCameraY() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return directAtCameraY;
+}
+
+void BSDirectAtModifier::setDirectAtCameraY(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != directAtCameraY) ? directAtCameraY = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'directAtCameraY' was not set!");
+}
+
+qreal BSDirectAtModifier::getDirectAtCameraX() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return directAtCameraX;
+}
+
+void BSDirectAtModifier::setDirectAtCameraX(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != directAtCameraX) ? directAtCameraX = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'directAtCameraX' was not set!");
+}
+
+bool BSDirectAtModifier::getDirectAtCamera() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return directAtCamera;
+}
+
+void BSDirectAtModifier::setDirectAtCamera(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != directAtCamera) ? directAtCamera = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'directAtCamera' was not set!");
+}
+
+int BSDirectAtModifier::getUserInfo() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return userInfo;
+}
+
+void BSDirectAtModifier::setUserInfo(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != userInfo) ? userInfo = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'userInfo' was not set!");
+}
+
+hkQuadVariable BSDirectAtModifier::getTargetLocation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetLocation;
+}
+
+void BSDirectAtModifier::setTargetLocation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetLocation) ? targetLocation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetLocation' was not set!");
+}
+
+qreal BSDirectAtModifier::getOffGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return offGain;
+}
+
+void BSDirectAtModifier::setOffGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != offGain) ? offGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'offGain' was not set!");
+}
+
+qreal BSDirectAtModifier::getOnGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return onGain;
+}
+
+void BSDirectAtModifier::setOnGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != onGain) ? onGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'onGain' was not set!");
+}
+
+qreal BSDirectAtModifier::getOffsetPitchDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return offsetPitchDegrees;
+}
+
+void BSDirectAtModifier::setOffsetPitchDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != offsetPitchDegrees) ? offsetPitchDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'offsetPitchDegrees' was not set!");
+}
+
+qreal BSDirectAtModifier::getOffsetHeadingDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return offsetHeadingDegrees;
+}
+
+void BSDirectAtModifier::setOffsetHeadingDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != offsetHeadingDegrees) ? offsetHeadingDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'offsetHeadingDegrees' was not set!");
+}
+
+qreal BSDirectAtModifier::getLimitPitchDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return limitPitchDegrees;
+}
+
+void BSDirectAtModifier::setLimitPitchDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != limitPitchDegrees) ? limitPitchDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'limitPitchDegrees' was not set!");
+}
+
+qreal BSDirectAtModifier::getLimitHeadingDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return limitHeadingDegrees;
+}
+
+void BSDirectAtModifier::setLimitHeadingDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != limitHeadingDegrees) ? limitHeadingDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'limitHeadingDegrees' was not set!");
+}
+
+int BSDirectAtModifier::getEndBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return endBoneIndex;
+}
+
+void BSDirectAtModifier::setEndBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != endBoneIndex && endBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? endBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'endBoneIndex' was not set!");
+}
+
+int BSDirectAtModifier::getStartBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startBoneIndex;
+}
+
+void BSDirectAtModifier::setStartBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startBoneIndex && startBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? startBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startBoneIndex' was not set!");
+}
+
+int BSDirectAtModifier::getSourceBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return sourceBoneIndex;
+}
+
+void BSDirectAtModifier::setSourceBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != sourceBoneIndex && sourceBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? sourceBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'sourceBoneIndex' was not set!");
+}
+
+bool BSDirectAtModifier::getDirectAtTarget() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return directAtTarget;
+}
+
+void BSDirectAtModifier::setDirectAtTarget(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != directAtTarget) ? directAtTarget = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'directAtTarget' was not set!");
+}
+
+bool BSDirectAtModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSDirectAtModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSDirectAtModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSDirectAtModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -189,7 +394,7 @@ void BSDirectAtModifier::unlink(){
 QString BSDirectAtModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto evaluateindices = [&](int & bone, const QString & fieldname){
         if (bone >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
             isvalid = false;

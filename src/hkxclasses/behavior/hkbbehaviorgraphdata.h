@@ -30,12 +30,14 @@ public:
     QStringList getVariableTypeNames() const;
     int getIndexOfVariable(const QString & name) const;
     int getIndexOfEvent(const QString & name) const;
-    hkQuadVariable getQuadVariable(int index, bool *ok) const;
+    hkQuadVariable getQuadVariableValueAt(int index, bool *ok = nullptr) const;
     hkVariableType getCharacterPropertyTypeAt(int index) const;
     QString getCharacterPropertyNameAt(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     QString getVariableNameAt(int index) const;
     QString getEventNameAt(int index) const;
+    QString getEventInfoAt(int index) const;
+    int getWordVariableValueAt(int index) const;
 private:
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();

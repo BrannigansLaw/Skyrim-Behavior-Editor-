@@ -10,10 +10,9 @@ class QPushButton;
 class DoubleSpinBox;
 class TableWidget;
 
-class AnimationTranslationUI: public QGroupBox
+class AnimationTranslationUI final: public QGroupBox
 {
     Q_OBJECT
-    //friend class AnimationUI;
 public:
     AnimationTranslationUI();
     void loadData(SkyrimAnimationTranslation *trans, qreal maxtime);
@@ -25,10 +24,9 @@ private slots:
     void setY();
     void setZ();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     SkyrimAnimationTranslation *bsData;
     QGridLayout *topLyt;
     QPushButton *returnPB;

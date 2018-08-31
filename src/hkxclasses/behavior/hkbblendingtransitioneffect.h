@@ -12,10 +12,26 @@ public:
     hkbBlendingTransitionEffect(const hkbBlendingTransitionEffect &) = delete;
     ~hkbBlendingTransitionEffect();
 public:
-    bool operator ==(const hkbBlendingTransitionEffect & other) const;
+    bool operator==(const hkbBlendingTransitionEffect & other) const;
 public:
     QString getName() const;
 private:
+    void setName(const QString &newname);
+    QString getSelfTransitionMode() const;
+    void setSelfTransitionMode(int index);
+    QString getEventMode() const;
+    void setEventMode(int index);
+    qreal getDuration() const;
+    void setDuration(const qreal &value);
+    qreal getToGeneratorStartTimeFraction() const;
+    void setToGeneratorStartTimeFraction(const qreal &value);
+    QString getFlags() const;
+    void setFlags(int index);
+    void setFlags(const QString &value);
+    QString getEndMode() const;
+    void setEndMode(int index);
+    QString getBlendCurve() const;
+    void setBlendCurve(int index);
     bool link();
     bool readData(const HkxXmlReader & reader, long & index);
     void unlink();

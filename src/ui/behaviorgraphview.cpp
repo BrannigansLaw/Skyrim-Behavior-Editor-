@@ -108,10 +108,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QSize>
 
-/**
- * BehaviorGraphView
- */
-
 BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     : TreeGraphicsView(0),
       ui(mainUI),
@@ -284,7 +280,6 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     appendModifierMenu->addAction(appendBSPassByTargetTriggerModifierAct);
     appendModifierMenu->addAction(appendHandIKControlsModifierAct);
     contextMenu->addAction(removeObjBranchAct);
-    //setContextMenu(contextMenu);
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(appendStateMachineAct, SIGNAL(triggered()), this, SLOT(appendStateMachine()), Qt::UniqueConnection);
     connect(appendStateAct, SIGNAL(triggered()), this, SLOT(appendState()), Qt::UniqueConnection);
@@ -368,191 +363,126 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
 }
 
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
-    QMessageBox::StandardButton ret;
-    ret = QMessageBox::warning(parent, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::Cancel);
+    auto ret = QMessageBox::warning(parent, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::Cancel);
     if (ret == QMessageBox::Yes){
         return true;
-    }else if (ret == QMessageBox::Cancel){
-        return false;
     }
     return false;
 }
 
 TreeGraphicsItem * BehaviorGraphView::getSelectedIconsChildIcon(HkxObject *child){
-    if (getSelectedItem()){
-        return getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(child));
+    auto selecteditem = getSelectedItem();
+    if (selecteditem){
+        return selecteditem->getChildWithData(static_cast<DataIconManager*>(child));
     }
     return nullptr;
 }
 
 QStringList BehaviorGraphView::getEventNames() const{
-    return behavior->getEventNames();
+    if (behavior){
+        return behavior->getEventNames();
+    }else{
+        LogFile::writeToLog("BehaviorGraphView: behavior file is nullptr!");
+    }
+    return QStringList();
 }
 
 void BehaviorGraphView::removeGeneratorData(){
-    QVector <int> removedIndices;
-    removedIndices = behavior->removeGeneratorData();
+    auto removedIndices = behavior->removeGeneratorData();
     for (auto i = 0; i < removedIndices.size(); i++){
         emit removedGenerator(removedIndices.at(i) + 1);
     }
 }
 
 void BehaviorGraphView::removeModifierData(){
-    QVector <int> removedIndices = behavior->removeModifierData();
+    auto removedIndices = behavior->removeModifierData();
     for (auto i = 0; i < removedIndices.size(); i++){
         emit removedModifier(removedIndices.at(i) + 1);
     }
 }
 
 void BehaviorGraphView::removeOtherData(){
-    behavior->removeOtherData();
+    (behavior) ? behavior->removeOtherData() : LogFile::writeToLog("BehaviorGraphView: behavior file is nullptr!");
 }
 
 bool BehaviorGraphView::refocus(){
-    if (getSelectedItem()){
-        //resetMatrix();
-        //scale(1, 1);
-        centerOn(getSelectedItem());
+    auto selecteditem = getSelectedItem();
+    if (selecteditem){
+        centerOn(selecteditem);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 void BehaviorGraphView::setSelectedItem(TreeGraphicsItem *item){
-    if (/*ui && */scene()){
-        static_cast<TreeGraphicsScene *>(scene())->selectIcon(item, TreeGraphicsScene::EXPAND_CONTRACT_ONE);
-        //ui->changeCurrentDataWidget(item);
-    }
+    (scene()) ? static_cast<TreeGraphicsScene *>(scene())->selectIcon(item, TreeGraphicsScene::EXPAND_CONTRACT_ONE) : NULL;
 }
 
 QString BehaviorGraphView::getBehaviorFilename() const{
     if (behavior){
         return behavior->fileName();
+    }else{
+        LogFile::writeToLog("BehaviorGraphView: behavior file is nullptr!");
     }
     return "";
 }
 
-void BehaviorGraphView::focusOnGeneratorIcon(int index, const QString &name){
-    if (behavior){
-        behavior->setFocusGeneratorIcon(index);
-    }else{
-        LogFile::writeToLog("BehaviorGraphView::focusOnGeneratorIcon(): No behavior file!");
-    }
+void BehaviorGraphView::focusOnGeneratorIcon(int index, const QString &){
+    (behavior) ? behavior->setFocusGeneratorIcon(index) : LogFile::writeToLog("BehaviorGraphView: behavior file is nullptr!");
     emit disconnectTablesFromHkDataUI();
 }
 
-void BehaviorGraphView::focusOnModifierIcon(int index, const QString &name){
-    if (behavior){
-        behavior->setFocusModifierIcon(index);
-    }else{
-        LogFile::writeToLog("BehaviorGraphView::focusOnModifierIcon(): No behavior file!");
-    }
+void BehaviorGraphView::focusOnModifierIcon(int index, const QString &){
+    (behavior) ? behavior->setFocusModifierIcon(index) : LogFile::writeToLog("BehaviorGraphView: behavior file is nullptr!");
     emit disconnectTablesFromHkDataUI();
 }
 
 void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
-    if (getSelectedItem()){
-        getSelectedItem()->unselect();
-        removeItemFromGraph(getSelectedItem(), 0, true, true);
+    auto selecteditem = getSelectedItem();
+    if (selecteditem){
+        selecteditem->unselect();
+        removeItemFromGraph(selecteditem, 0, true, true);
         ui->changeCurrentDataWidget(nullptr);
         removeObjects();
     }
 }
 
 void BehaviorGraphView::removeObjects(){
-    removeGeneratorData();
-    //behavior->removeGeneratorChildrenData();
-    //removeGeneratorData();//Inefficient...
-    removeModifierData();
-    behavior->removeOtherData();
-    behavior->setIsChanged(true);
+    if (behavior){
+        removeGeneratorData();
+        removeModifierData();
+        behavior->removeOtherData();
+        behavior->setIsChanged(true);
+    }else{
+        LogFile::writeToLog("BehaviorGraphView: behavior file is nullptr!");
+    }
 }
 
 void BehaviorGraphView::deleteAllObjectBranches(){
-    hkbBehaviorGraph *graph = static_cast<hkbBehaviorGraph *>(behavior->getBehaviorGraph());
-    if (!graph->icons.isEmpty()){
-        QList <QGraphicsItem *> list = graph->icons.first()->childItems();
-        if (!list.isEmpty()){
-            TreeGraphicsItem *root = static_cast<TreeGraphicsItem *>(list.first());
-            root->unselect();
-            removeItemFromGraph(root, 0, true, true);
-            ui->changeCurrentDataWidget(nullptr);
-            removeObjects();
+    if (behavior && ui){
+        auto graph = static_cast<hkbBehaviorGraph *>(behavior->getBehaviorGraph());
+        if (graph->getNumberOfIcons() > 0){
+            auto firsticon = graph->getFirstIcon();
+            if (firsticon){
+                auto list = firsticon->childItems();
+                if (!list.isEmpty()){
+                    auto root = static_cast<TreeGraphicsItem *>(list.first());
+                    root->unselect();
+                    removeItemFromGraph(root, 0, true, true);
+                    ui->changeCurrentDataWidget(nullptr);
+                    removeObjects();
+                }
+            }else{
+                LogFile::writeToLog("BehaviorGraphView: behavior graph has no icon!");
+            }
         }
+    }else{
+        LogFile::writeToLog("BehaviorGraphView: behavior file or ui are nullptr!");
     }
 }
 
 BehaviorFile *BehaviorGraphView::getBehavior() const{
     return behavior;
-}
-
-template <typename T>
-void BehaviorGraphView::append(T *obj){
-    if (getSelectedItem()){
-        TreeGraphicsItem *newIcon = nullptr;
-        DataIconManager *selectedItemData = static_cast<DataIconManager *>(getSelectedItem()->itemData);
-        if (selectedItemData){
-            HkxSignature sig = selectedItemData->getSignature();
-            if (selectedItemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_MANUAL_SELECTOR_GENERATOR && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
-                /*if (sig == HKB_MODIFIER_GENERATOR){
-                    if (selectedItemData->getIndexOfObj(nullptr) == 0 && obj->getType() == HkxObject::TYPE_MODIFIER && !confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
-                        behavior->removeModifierData();
-                    }else if (selectedItemData->getIndexOfObj(nullptr) == 1 && obj->getType() == HkxObject::TYPE_GENERATOR && !confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
-                        behavior->removeGeneratorData();
-                    }
-                    return;
-                }else{*/
-                    if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
-                        if (obj->getType() == HkxObject::TYPE_GENERATOR){
-                            behavior->removeGeneratorData();
-                        }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-                            behavior->removeModifierData();
-                        }/*else if (obj->getType() == HkxObject::TYPE_OTHER){
-                            behavior->removeOtherData();
-                        }*/
-                        return;
-                    //}
-                }
-                if (!getSelectedItem()->childItems().isEmpty()){
-                    if (sig == HKB_MODIFIER_GENERATOR){
-                        if (getSelectedItem()->childItems().size() == 2 && obj->getType() == HkxObject::TYPE_GENERATOR){
-                            removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems()[1]), 1);
-                        }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-                            if (((TreeGraphicsItem *)getSelectedItem()->childItems().first())->itemData->getType() == HkxObject::TYPE_MODIFIER){
-                                removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems().first()), 0);
-                                newIcon = addItemToGraph(getSelectedItem(), obj, 0);
-                            }else{
-                                newIcon = addItemToGraph(getSelectedItem(), obj, 0);
-                            }
-                        }
-                    }else{
-                        removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems().first()), 0);
-                    }
-                }
-            }
-            if (!newIcon){
-                newIcon = addItemToGraph(getSelectedItem(), obj, -1);
-            }
-            if (((TreeGraphicsItem *)getSelectedItem()->parentItem())){
-                ((HkxObject *)((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData)->evaluateDataValidity();
-            }
-            selectedItemData->evaluateDataValidity();
-            behavior->setIsChanged(true);
-            getSelectedItem()->reposition();
-            treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);    //Removing this breaks adding child with generator!!!
-            QRectF rect = sceneRect();
-            setSceneRect(rect.marginsAdded(QMarginsF(0, 0, newIcon->boundingRect().width()*2, newIcon->boundingRect().height()*2)));
-            if (obj->getType() == HkxObject::TYPE_GENERATOR){
-                emit addedGenerator(obj->getName(), obj->getClassname());
-            }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-                emit addedModifier(obj->getName(), obj->getClassname());
-            }
-        }else{
-            delete obj;
-            CRITICAL_ERROR_MESSAGE("BehaviorGraphView::append(): \n The selected icon has no data!!");
-        }
-    }
 }
 
 void BehaviorGraphView::appendStateMachine(){
@@ -824,10 +754,79 @@ void BehaviorGraphView::appendHandIKControlsModifier(){
 }
 
 template <typename T>
+void BehaviorGraphView::append(T *obj){
+    auto selecteditem = getSelectedItem();
+    if (selecteditem && behavior){
+        TreeGraphicsItem *newIcon = nullptr;
+        auto selectedItemData = selecteditem->getItemData();
+        if (selectedItemData){
+            auto sig = selectedItemData->getSignature();
+            if (selectedItemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_MANUAL_SELECTOR_GENERATOR && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
+                /*if (sig == HKB_MODIFIER_GENERATOR){
+                    if (!selectedItemData->getIndexOfObj(nullptr) && obj->getType() == HkxObject::TYPE_MODIFIER && !confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                        behavior->removeModifierData();
+                    }else if (selectedItemData->getIndexOfObj(nullptr) == 1 && obj->getType() == HkxObject::TYPE_GENERATOR && !confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                        behavior->removeGeneratorData();
+                    }
+                    return;
+                }else{*/
+                    if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                        if (obj->getType() == HkxObject::TYPE_GENERATOR){
+                            behavior->removeGeneratorData();
+                        }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
+                            behavior->removeModifierData();
+                        }/*else if (obj->getType() == HkxObject::TYPE_OTHER){
+                            behavior->removeOtherData();
+                        }*/
+                        return;
+                    //}
+                }
+                if (!selecteditem->childItems().isEmpty()){
+                    if (sig == HKB_MODIFIER_GENERATOR){
+                        if (selecteditem->childItems().size() == 2 && obj->getType() == HkxObject::TYPE_GENERATOR){
+                            removeItemFromGraph(((TreeGraphicsItem *)selecteditem->childItems()[1]), 1);
+                        }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
+                            if (((TreeGraphicsItem *)selecteditem->childItems().first())->getItemData()->getType() == HkxObject::TYPE_MODIFIER){
+                                removeItemFromGraph(((TreeGraphicsItem *)selecteditem->childItems().first()), 0);
+                                newIcon = addItemToGraph(selecteditem, obj, 0);
+                            }else{
+                                newIcon = addItemToGraph(selecteditem, obj, 0);
+                            }
+                        }
+                    }else{
+                        removeItemFromGraph(((TreeGraphicsItem *)selecteditem->childItems().first()), 0);
+                    }
+                }
+            }
+            if (!newIcon){
+                newIcon = addItemToGraph(selecteditem, obj, -1);
+            }
+            if (((TreeGraphicsItem *)selecteditem->parentItem())){
+                ((HkxObject *)((TreeGraphicsItem *)selecteditem->parentItem())->itemData)->evaluateDataValidity();
+            }
+            selectedItemData->evaluateDataValidity();
+            behavior->setIsChanged(true);
+            getSelectedItem()->reposition();
+            treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);    //Removing this breaks adding child with generator!!!
+            auto rect = sceneRect();
+            setSceneRect(rect.marginsAdded(QMarginsF(0, 0, newIcon->boundingRect().width()*2, newIcon->boundingRect().height()*2)));
+            if (obj->getType() == HkxObject::TYPE_GENERATOR){
+                emit addedGenerator(obj->getName(), obj->getClassname());
+            }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
+                emit addedModifier(obj->getName(), obj->getClassname());
+            }
+        }else{
+            delete obj;
+            LogFile::writeToLog("BehaviorGraphView::append(): \n The selected icon has no data!!");
+        }
+    }
+}
+
+template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
         behavior->setIsChanged(true);
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);
+        auto newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
@@ -860,38 +859,38 @@ void BehaviorGraphView::wrapCyclicBlendTransitionGenerator(){
 }
 
 void BehaviorGraphView::wrapBoneSwitchGenerator(){
-    BSBoneSwitchGenerator *bonegen = new BSBoneSwitchGenerator(behavior);
+    auto bonegen = new BSBoneSwitchGenerator(behavior);
     wrap(new BSBoneSwitchGeneratorBoneData(behavior, bonegen));
     wrap(bonegen);
 }
 
 void BehaviorGraphView::wrapStateMachine(){
-    hkbStateMachine *statemachine = new hkbStateMachine(behavior);
+    auto statemachine = new hkbStateMachine(behavior);
     wrap(new hkbStateMachineStateInfo(behavior, statemachine));
     wrap(statemachine);
 }
 
 void BehaviorGraphView::wrapBlenderGenerator(){
-    hkbBlenderGenerator *blender = new hkbBlenderGenerator(behavior);
+    auto blender = new hkbBlenderGenerator(behavior);
     wrap(new hkbBlenderGeneratorChild(behavior, blender));
     wrap(blender);
 }
 
 void BehaviorGraphView::wrapPoseMatchingGenerator(){
-    hkbPoseMatchingGenerator *pose = new hkbPoseMatchingGenerator(behavior);
+    auto pose = new hkbPoseMatchingGenerator(behavior);
     wrap(new hkbBlenderGeneratorChild(behavior, pose));
     wrap(pose);
 }
 
 void BehaviorGraphView::enableAllMenuActions(QMenu *menu){
-    QList <QAction *> actions = menu->actions();
+    auto actions = menu->actions();
     for (auto i = 0; i < actions.size(); i++){
         actions.at(i)->setDisabled(false);
     }
 }
 
 void BehaviorGraphView::disableAllMenuActions(QMenu *menu){
-    QList <QAction *> actions = menu->actions();
+    auto actions = menu->actions();
     for (auto i = 0; i < actions.size(); i++){
         actions.at(i)->setDisabled(true);
     }
@@ -901,12 +900,12 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
     if (!getSelectedItem() || !getSelectedItem()->itemData){
         return;
     }
-    HkxSignature sig = ((HkxObject *)(getSelectedItem()->itemData))->getSignature();
-    HkxSignature parentSig = NULL_SIGNATURE;
+    auto sig = ((HkxObject *)(getSelectedItem()->itemData))->getSignature();
+    auto parentSig = NULL_SIGNATURE;
     if (getSelectedItem()->parentItem()){
         parentSig = ((HkxObject *)(((TreeGraphicsItem *)(getSelectedItem()->parentItem()))->itemData))->getSignature();
     }
-    HkxObject::HkxType type = ((HkxObject *)(getSelectedItem()->itemData))->getType();
+    auto type = ((HkxObject *)(getSelectedItem()->itemData))->getType();
     removeObjBranchAct->setDisabled(false);
     appendStateAct->setDisabled(true);
     if (type == HkxObject::TYPE_MODIFIER){

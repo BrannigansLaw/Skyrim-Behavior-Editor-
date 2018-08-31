@@ -34,7 +34,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSEventOnFalseToTrueModifierUI::headerLabels = {
+const QStringList BSEventOnFalseToTrueModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -119,36 +119,37 @@ BSEventOnFalseToTrueModifierUI::BSEventOnFalseToTrueModifierUI()
     table->setCellWidget(EVENT_TO_SEND_3_PAYLOAD_ROW, VALUE_COLUMN, eventToSend3Payload);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSEventOnFalseToTrueModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(bEnableEvent1, SIGNAL(released()), this, SLOT(setEnableEvent1()), Qt::UniqueConnection);
-    connect(bVariableToTest1, SIGNAL(released()), this, SLOT(setVariableToTest1()), Qt::UniqueConnection);
-    connect(eventToSend1Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend1Payload()), Qt::UniqueConnection);
-    connect(bEnableEvent2, SIGNAL(released()), this, SLOT(setEnableEvent2()), Qt::UniqueConnection);
-    connect(bVariableToTest2, SIGNAL(released()), this, SLOT(setVariableToTest2()), Qt::UniqueConnection);
-    connect(eventToSend2Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend2Payload()), Qt::UniqueConnection);
-    connect(bEnableEvent3, SIGNAL(released()), this, SLOT(setEnableEvent3()), Qt::UniqueConnection);
-    connect(bVariableToTest3, SIGNAL(released()), this, SLOT(setVariableToTest3()), Qt::UniqueConnection);
-    connect(eventToSend3Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend3Payload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSEventOnFalseToTrueModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(bEnableEvent1, SIGNAL(released()), this, SLOT(setEnableEvent1()));
-    disconnect(bVariableToTest1, SIGNAL(released()), this, SLOT(setVariableToTest1()));
-    disconnect(eventToSend1Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend1Payload()));
-    disconnect(bEnableEvent2, SIGNAL(released()), this, SLOT(setEnableEvent2()));
-    disconnect(bVariableToTest2, SIGNAL(released()), this, SLOT(setVariableToTest2()));
-    disconnect(eventToSend2Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend2Payload()));
-    disconnect(bEnableEvent3, SIGNAL(released()), this, SLOT(setEnableEvent3()));
-    disconnect(bVariableToTest3, SIGNAL(released()), this, SLOT(setVariableToTest3()));
-    disconnect(eventToSend3Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend3Payload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSEventOnFalseToTrueModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(bEnableEvent1, SIGNAL(released()), this, SLOT(setEnableEvent1()), Qt::UniqueConnection);
+        connect(bVariableToTest1, SIGNAL(released()), this, SLOT(setVariableToTest1()), Qt::UniqueConnection);
+        connect(eventToSend1Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend1Payload()), Qt::UniqueConnection);
+        connect(bEnableEvent2, SIGNAL(released()), this, SLOT(setEnableEvent2()), Qt::UniqueConnection);
+        connect(bVariableToTest2, SIGNAL(released()), this, SLOT(setVariableToTest2()), Qt::UniqueConnection);
+        connect(eventToSend2Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend2Payload()), Qt::UniqueConnection);
+        connect(bEnableEvent3, SIGNAL(released()), this, SLOT(setEnableEvent3()), Qt::UniqueConnection);
+        connect(bVariableToTest3, SIGNAL(released()), this, SLOT(setVariableToTest3()), Qt::UniqueConnection);
+        connect(eventToSend3Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend3Payload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(bEnableEvent1, SIGNAL(released()), this, SLOT(setEnableEvent1()));
+        disconnect(bVariableToTest1, SIGNAL(released()), this, SLOT(setVariableToTest1()));
+        disconnect(eventToSend1Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend1Payload()));
+        disconnect(bEnableEvent2, SIGNAL(released()), this, SLOT(setEnableEvent2()));
+        disconnect(bVariableToTest2, SIGNAL(released()), this, SLOT(setVariableToTest2()));
+        disconnect(eventToSend2Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend2Payload()));
+        disconnect(bEnableEvent3, SIGNAL(released()), this, SLOT(setEnableEvent3()));
+        disconnect(bVariableToTest3, SIGNAL(released()), this, SLOT(setVariableToTest3()));
+        disconnect(eventToSend3Payload, SIGNAL(editingFinished()), this, SLOT(setEventToSend3Payload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSEventOnFalseToTrueModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
@@ -163,262 +164,174 @@ void BSEventOnFalseToTrueModifierUI::connectToTables(GenericTableWidget *variabl
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER){
             bsData = static_cast<BSEventOnFalseToTrueModifier *>(data);
-            hkbVariableBindingSet *varBind = nullptr;
-            hkbStringEventPayload *payload1 = static_cast<hkbStringEventPayload *>(bsData->eventToSend1.payload.data());
-            hkbStringEventPayload *payload2 = static_cast<hkbStringEventPayload *>(bsData->eventToSend2.payload.data());
-            hkbStringEventPayload *payload3 = static_cast<hkbStringEventPayload *>(bsData->eventToSend3.payload.data());
+            auto payload1 = bsData->getEventToSend1Payload();
+            auto payload2 = bsData->getEventToSend2Payload();
+            auto payload3 = bsData->getEventToSend3Payload();
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            bEnableEvent1->setChecked(bsData->bEnableEvent1);
-            bVariableToTest1->setChecked(bsData->bVariableToTest1);
-            QString text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->eventToSend1.id);
-            if (text != ""){
-                table->item(EVENT_TO_SEND_1_ID_ROW, VALUE_COLUMN)->setText(text);
-            }else{
-                table->item(EVENT_TO_SEND_1_ID_ROW, VALUE_COLUMN)->setText("None");
-            }
-            if (payload1){
-                eventToSend1Payload->setText(payload1->getData());
-            }else{
-                eventToSend1Payload->setText("");
-            }
-            bEnableEvent2->setChecked(bsData->bEnableEvent2);
-            bVariableToTest2->setChecked(bsData->bVariableToTest2);
-            text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->eventToSend2.id);
-            if (text != ""){
-                table->item(EVENT_TO_SEND_2_ID_ROW, VALUE_COLUMN)->setText(text);
-            }else{
-                table->item(EVENT_TO_SEND_2_ID_ROW, VALUE_COLUMN)->setText("None");
-            }
-            if (payload2){
-                eventToSend2Payload->setText(payload2->getData());
-            }else{
-                eventToSend2Payload->setText("");
-            }
-            bEnableEvent3->setChecked(bsData->bEnableEvent3);
-            bVariableToTest3->setChecked(bsData->bVariableToTest3);
-            text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->eventToSend3.id);
-            if (text != ""){
-                table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText(text);
-            }else{
-                table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText("None");
-            }
-            if (payload3){
-                eventToSend3Payload->setText(payload3->getData());
-            }else{
-                eventToSend3Payload->setText("");
-            }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(ENABLE_EVENT_1_ROW, BINDING_COLUMN, varBind, "bEnableEvent1");
-                loadBinding(VARIABLE_TO_TEST_1_ROW, BINDING_COLUMN, varBind, "bVariableToTest1");
-                loadBinding(ENABLE_EVENT_2_ROW, BINDING_COLUMN, varBind, "bEnableEvent2");
-                loadBinding(VARIABLE_TO_TEST_2_ROW, BINDING_COLUMN, varBind, "bVariableToTest2");
-                loadBinding(ENABLE_EVENT_3_ROW, BINDING_COLUMN, varBind, "bEnableEvent3");
-                loadBinding(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN, varBind, "bVariableToTest3");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ENABLE_EVENT_1_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VARIABLE_TO_TEST_1_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ENABLE_EVENT_2_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VARIABLE_TO_TEST_2_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ENABLE_EVENT_3_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            bEnableEvent1->setChecked(bsData->getBEnableEvent1());
+            bVariableToTest1->setChecked(bsData->getBVariableToTest1());
+            auto seteventtext = [&](const QString & eventname, int row){
+                (eventname != "") ? table->item(row, VALUE_COLUMN)->setText(eventname) : table->item(row, VALUE_COLUMN)->setText("None");
+            };
+            auto setpayloadtext = [&](hkbStringEventPayload *payload, QLineEdit *lineedit){
+                (payload) ? lineedit->setText(payload->getData()) : lineedit->setText("");
+            };
+            auto text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getEventToSend1ID());
+            seteventtext(text, EVENT_TO_SEND_1_ID_ROW);
+            setpayloadtext(payload1, eventToSend1Payload);
+            bEnableEvent2->setChecked(bsData->getBEnableEvent2());
+            bVariableToTest2->setChecked(bsData->getBVariableToTest2());
+            text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getEventToSend2ID());
+            seteventtext(text, EVENT_TO_SEND_2_ID_ROW);
+            setpayloadtext(payload2, eventToSend2Payload);
+            bEnableEvent3->setChecked(bsData->getBEnableEvent3());
+            bVariableToTest3->setChecked(bsData->getBVariableToTest3());
+            text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getEventToSend3ID());
+            seteventtext(text, EVENT_TO_SEND_3_ID_ROW);
+            setpayloadtext(payload3, eventToSend3Payload);
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(ENABLE_EVENT_1_ROW, BINDING_COLUMN, varBind, "bEnableEvent1", table, bsData);
+            UIHelper::loadBinding(VARIABLE_TO_TEST_1_ROW, BINDING_COLUMN, varBind, "bVariableToTest1", table, bsData);
+            UIHelper::loadBinding(ENABLE_EVENT_2_ROW, BINDING_COLUMN, varBind, "bEnableEvent2", table, bsData);
+            UIHelper::loadBinding(VARIABLE_TO_TEST_2_ROW, BINDING_COLUMN, varBind, "bVariableToTest2", table, bsData);
+            UIHelper::loadBinding(ENABLE_EVENT_3_ROW, BINDING_COLUMN, varBind, "bEnableEvent3", table, bsData);
+            UIHelper::loadBinding(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN, varBind, "bVariableToTest3", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSEventOnFalseToTrueModifierUI::setName(){
+void BSEventOnFalseToTrueModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void BSEventOnFalseToTrueModifierUI::setEnableEvent1(){
-    if (bsData){
-        bsData->bEnableEvent1 = bEnableEvent1->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setbEnableEvent1(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBEnableEvent1(bEnableEvent1->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setEnableEvent1(): The data is nullptr!!");
 }
 
 void BSEventOnFalseToTrueModifierUI::setVariableToTest1(){
-    if (bsData){
-        bsData->bVariableToTest1 = bVariableToTest1->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setbVariableToTest1(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBVariableToTest1(bVariableToTest1->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setBVariableToTest1(): The data is nullptr!!");
 }
 
 void BSEventOnFalseToTrueModifierUI::setEventToSend1Id(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->eventToSend1.id != index){
-            bsData->eventToSend1.id = index;
-            table->item(EVENT_TO_SEND_1_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setEventToSend1ID(index - 1);
+        table->item(EVENT_TO_SEND_1_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::seteventToSend1Id(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::seteventToSend1Id(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::setEventToSend1Payload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->eventToSend1.payload.data());
+        auto payload = bsData->getEventToSend1Payload();
         if (eventToSend1Payload->text() != ""){
             if (payload){
-                payload->getData() = eventToSend1Payload->text();
+                payload->setData(eventToSend1Payload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSend1Payload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->eventToSend1.payload = HkxSharedPtr(payload);
+                bsData->setEventToSend1Payload(payload);
             }
         }else{
-            bsData->eventToSend1.payload = HkxSharedPtr();
+            bsData->setEventToSend1Payload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::seteventToSend1Payload(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::seteventToSend1Payload(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::setEnableEvent2(){
-    if (bsData){
-        bsData->bEnableEvent2 = bEnableEvent2->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setbEnableEvent2(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBEnableEvent2(bEnableEvent2->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setEnableEvent2(): The data is nullptr!!");
 }
 
 void BSEventOnFalseToTrueModifierUI::setVariableToTest2(){
-    if (bsData){
-        bsData->bVariableToTest2 = bVariableToTest2->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setbVariableToTest2(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBVariableToTest2(bVariableToTest2->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setBVariableToTest2(): The data is nullptr!!");
 }
 
-void BSEventOnFalseToTrueModifierUI::setEventToSend2Id(int index, const QString &name){
+void BSEventOnFalseToTrueModifierUI::setEventToSend2Id(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->eventToSend2.id != index){
-            bsData->eventToSend2.id = index;
-            table->item(EVENT_TO_SEND_2_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setEventToSend2ID(index - 1);
+        table->item(EVENT_TO_SEND_2_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::seteventToSend2Id(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::seteventToSend2Id(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->eventToSend2.payload.data());
+        auto payload = bsData->getEventToSend2Payload();
         if (eventToSend2Payload->text() != ""){
             if (payload){
-                payload->getData() = eventToSend2Payload->text();
+                payload->setData(eventToSend2Payload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSend2Payload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->eventToSend2.payload = HkxSharedPtr(payload);
+                bsData->setEventToSend2Payload(payload);
             }
         }else{
-            bsData->eventToSend2.payload = HkxSharedPtr();
+            bsData->setEventToSend2Payload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::seteventToSend2Payload(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::setEnableEvent3(){
-    if (bsData){
-        bsData->bEnableEvent3 = bEnableEvent3->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setbEnableEvent3(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBEnableEvent3(bEnableEvent3->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setEnableEvent3(): The data is nullptr!!");
 }
 
 void BSEventOnFalseToTrueModifierUI::setVariableToTest3(){
-    if (bsData){
-        bsData->bVariableToTest3 = bVariableToTest3->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setbVariableToTest3(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBVariableToTest3(bVariableToTest3->isChecked()) : LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setBVariableToTest3(): The data is nullptr!!");
 }
 
-void BSEventOnFalseToTrueModifierUI::setEventToSend3Id(int index, const QString &name){
+void BSEventOnFalseToTrueModifierUI::setEventToSend3Id(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->eventToSend3.id != index){
-            bsData->eventToSend3.id = index;
-            table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setEventToSend3ID(index - 1);
+        table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::seteventToSend3Id(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::seteventToSend3Id(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->eventToSend3.payload.data());
+        auto payload = bsData->getEventToSend3Payload();
         if (eventToSend3Payload->text() != ""){
             if (payload){
-                payload->getData() = eventToSend3Payload->text();
+                payload->setData(eventToSend3Payload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSend3Payload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->eventToSend3.payload = HkxSharedPtr(payload);
+                bsData->setEventToSend3Payload(payload);
             }
         }else{
-            bsData->eventToSend3.payload = HkxSharedPtr();
+            bsData->setEventToSend3Payload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::seteventToSend3Payload(): The data is nullptr!!");
     }
 }
 
@@ -426,79 +339,49 @@ void BSEventOnFalseToTrueModifierUI::eventTableElementSelected(int index, const 
     index--;
     switch (table->currentRow()){
     case EVENT_TO_SEND_1_ID_ROW:
-        setEventToSend1Id(index, name);
-        break;
+        setEventToSend1Id(index, name); break;
     case EVENT_TO_SEND_2_ID_ROW:
-        setEventToSend2Id(index, name);
-        break;
+        setEventToSend2Id(index, name); break;
     case EVENT_TO_SEND_3_ID_ROW:
-        setEventToSend3Id(index, name);
-        break;
+        setEventToSend3Id(index, name); break;
     default:
         WARNING_MESSAGE("BSEventOnFalseToTrueModifierUI::eventTableElementSelected(): An unwanted element selected event was recieved!!");
-        return;
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case ENABLE_EVENT_1_ROW:
-                if (table->item(ENABLE_EVENT_1_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "bEnableEvent1");
-                break;
+                checkisproperty(ENABLE_EVENT_1_ROW, "bEnableEvent1"); break;
             case VARIABLE_TO_TEST_1_ROW:
-                if (table->item(VARIABLE_TO_TEST_1_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "bVariableToTest1");
-                break;
+                checkisproperty(VARIABLE_TO_TEST_1_ROW, "bVariableToTest1"); break;
             case ENABLE_EVENT_2_ROW:
-                if (table->item(ENABLE_EVENT_2_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "bEnableEvent2");
-                break;
+                checkisproperty(ENABLE_EVENT_2_ROW, "bEnableEvent2"); break;
             case VARIABLE_TO_TEST_2_ROW:
-                if (table->item(VARIABLE_TO_TEST_2_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "bVariableToTest2");
-                break;
+                checkisproperty(VARIABLE_TO_TEST_2_ROW, "bVariableToTest2"); break;
             case ENABLE_EVENT_3_ROW:
-                if (table->item(ENABLE_EVENT_3_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "bEnableEvent3");
-                break;
+                checkisproperty(ENABLE_EVENT_3_ROW, "bEnableEvent3"); break;
             case VARIABLE_TO_TEST_3_ROW:
-                if (table->item(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "bVariableToTest3");
-                break;
-            default:
-                return;
+                checkisproperty(VARIABLE_TO_TEST_3_ROW, "bVariableToTest3"); break;
             }
         }else if (column == VALUE_COLUMN && row == EVENT_TO_SEND_1_ID_ROW){
-            emit viewEvents(bsData->eventToSend1.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getEventToSend1ID() + 1, QString(), QStringList());
         }else if (column == VALUE_COLUMN && row == EVENT_TO_SEND_2_ID_ROW){
-            emit viewEvents(bsData->eventToSend2.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getEventToSend2ID() + 1, QString(), QStringList());
         }else if (column == VALUE_COLUMN && row == EVENT_TO_SEND_3_ID_ROW){
-            emit viewEvents(bsData->eventToSend3.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getEventToSend3ID() + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -518,176 +401,71 @@ void BSEventOnFalseToTrueModifierUI::selectTableToView(bool viewisProperty, cons
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        if (index == bsData->eventToSend1.id){
-            table->item(EVENT_TO_SEND_1_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->eventToSend2.id){
-            table->item(EVENT_TO_SEND_2_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->eventToSend3.id){
-            table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        auto rename = [&](int row, int id){
+            (index == id) ? table->item(row, VALUE_COLUMN)->setText(name) : NULL;
+        };
+        rename(bsData->getEventToSend1ID(), EVENT_TO_SEND_1_ID_ROW);
+        rename(bsData->getEventToSend2ID(), EVENT_TO_SEND_2_ID_ROW);
+        rename(bsData->getEventToSend3ID(), EVENT_TO_SEND_3_ID_ROW);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void BSEventOnFalseToTrueModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bEnableEvent1");
-            if (bindIndex == index){
-                table->item(ENABLE_EVENT_1_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bVariableToTest1");
-            if (bindIndex == index){
-                table->item(VARIABLE_TO_TEST_1_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bEnableEvent2");
-            if (bindIndex == index){
-                table->item(ENABLE_EVENT_2_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bVariableToTest2");
-            if (bindIndex == index){
-                table->item(VARIABLE_TO_TEST_2_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bEnableEvent3");
-            if (bindIndex == index){
-                table->item(ENABLE_EVENT_3_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bVariableToTest3");
-            if (bindIndex == index){
-                table->item(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("bEnableEvent1", ENABLE_EVENT_1_ROW);
+            setname("bVariableToTest1", VARIABLE_TO_TEST_1_ROW);
+            setname("bEnableEvent2", ENABLE_EVENT_2_ROW);
+            setname("bVariableToTest2", VARIABLE_TO_TEST_2_ROW);
+            setname("bEnableEvent3", ENABLE_EVENT_3_ROW);
+            setname("bVariableToTest3", VARIABLE_TO_TEST_3_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSEventOnFalseToTrueModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSEventOnFalseToTrueModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case ENABLE_EVENT_1_ROW:
-            if (table->item(ENABLE_EVENT_1_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bEnableEvent1", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_EVENT_1_ROW, "bEnableEvent1", VARIABLE_TYPE_BOOL); break;
         case VARIABLE_TO_TEST_1_ROW:
-            if (table->item(VARIABLE_TO_TEST_1_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bVariableToTest1", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(VARIABLE_TO_TEST_1_ROW, "bVariableToTest1", VARIABLE_TYPE_BOOL); break;
         case ENABLE_EVENT_2_ROW:
-            if (table->item(ENABLE_EVENT_2_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bEnableEvent2", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_EVENT_2_ROW, "bEnableEvent2", VARIABLE_TYPE_BOOL); break;
         case VARIABLE_TO_TEST_2_ROW:
-            if (table->item(VARIABLE_TO_TEST_2_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bVariableToTest2", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(VARIABLE_TO_TEST_2_ROW, "bVariableToTest2", VARIABLE_TYPE_BOOL); break;
         case ENABLE_EVENT_3_ROW:
-            if (table->item(ENABLE_EVENT_3_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bEnableEvent3", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_EVENT_3_ROW, "bEnableEvent3", VARIABLE_TYPE_BOOL); break;
         case VARIABLE_TO_TEST_3_ROW:
-            if (table->item(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bVariableToTest3", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSEventOnFalseToTrueModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(VARIABLE_TO_TEST_3_ROW, "bVariableToTest3", VARIABLE_TYPE_BOOL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnFalseToTrueModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnFalseToTrueModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
-

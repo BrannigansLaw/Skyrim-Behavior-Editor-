@@ -108,6 +108,81 @@ bool BSTweenerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+hkQuadVariable BSTweenerModifier::getTargetRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetRotation;
+}
+
+void BSTweenerModifier::setTargetRotation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetRotation) ? targetRotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetRotation' was not set!");
+}
+
+hkQuadVariable BSTweenerModifier::getTargetPosition() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetPosition;
+}
+
+void BSTweenerModifier::setTargetPosition(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetPosition) ? targetPosition = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetPosition' was not set!");
+}
+
+qreal BSTweenerModifier::getTweenDuration() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return tweenDuration;
+}
+
+void BSTweenerModifier::setTweenDuration(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != tweenDuration) ? tweenDuration = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'tweenDuration' was not set!");
+}
+
+bool BSTweenerModifier::getUseTweenDuration() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return useTweenDuration;
+}
+
+void BSTweenerModifier::setUseTweenDuration(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != useTweenDuration) ? useTweenDuration = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'useTweenDuration' was not set!");
+}
+
+bool BSTweenerModifier::getTweenRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return tweenRotation;
+}
+
+void BSTweenerModifier::setTweenRotation(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != tweenRotation) ? tweenRotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'tweenRotation' was not set!");
+}
+
+bool BSTweenerModifier::getTweenPosition() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return tweenPosition;
+}
+
+void BSTweenerModifier::setTweenPosition(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != tweenPosition) ? tweenPosition = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'tweenPosition' was not set!");
+}
+
+bool BSTweenerModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSTweenerModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSTweenerModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSTweenerModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -124,7 +199,7 @@ void BSTweenerModifier::unlink(){
 QString BSTweenerModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

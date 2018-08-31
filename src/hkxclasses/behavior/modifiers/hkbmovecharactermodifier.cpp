@@ -84,6 +84,31 @@ bool hkbMoveCharacterModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+hkQuadVariable hkbMoveCharacterModifier::getOffsetPerSecondMS() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return offsetPerSecondMS;
+}
+
+void hkbMoveCharacterModifier::setOffsetPerSecondMS(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != offsetPerSecondMS) ? offsetPerSecondMS = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'offsetPerSecondMS' was not set!");
+}
+
+bool hkbMoveCharacterModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbMoveCharacterModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbMoveCharacterModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbMoveCharacterModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -100,7 +125,7 @@ void hkbMoveCharacterModifier::unlink(){
 QString hkbMoveCharacterModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

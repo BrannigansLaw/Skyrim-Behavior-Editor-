@@ -110,6 +110,81 @@ bool BSLimbIKModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal BSLimbIKModifier::getCastOffset() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return castOffset;
+}
+
+void BSLimbIKModifier::setCastOffset(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != castOffset) ? castOffset = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'castOffset' was not set!");
+}
+
+qreal BSLimbIKModifier::getBoneRadius() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return boneRadius;
+}
+
+void BSLimbIKModifier::setBoneRadius(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != boneRadius) ? boneRadius = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'boneRadius' was not set!");
+}
+
+qreal BSLimbIKModifier::getGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gain;
+}
+
+void BSLimbIKModifier::setGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gain) ? gain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gain' was not set!");
+}
+
+int BSLimbIKModifier::getEndBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return endBoneIndex;
+}
+
+void BSLimbIKModifier::setEndBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != endBoneIndex && endBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? endBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'endBoneIndex' was not set!");
+}
+
+int BSLimbIKModifier::getStartBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startBoneIndex;
+}
+
+void BSLimbIKModifier::setStartBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startBoneIndex && startBoneIndex < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? startBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startBoneIndex' was not set!");
+}
+
+qreal BSLimbIKModifier::getLimitAngleDegrees() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return limitAngleDegrees;
+}
+
+void BSLimbIKModifier::setLimitAngleDegrees(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != limitAngleDegrees) ? limitAngleDegrees = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'limitAngleDegrees' was not set!");
+}
+
+bool BSLimbIKModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSLimbIKModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSLimbIKModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSLimbIKModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -126,7 +201,7 @@ void BSLimbIKModifier::unlink(){
 QString BSLimbIKModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");

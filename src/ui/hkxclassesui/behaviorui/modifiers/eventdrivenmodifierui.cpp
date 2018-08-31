@@ -29,7 +29,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList EventDrivenModifierUI::headerLabels = {
+const QStringList EventDrivenModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -75,21 +75,21 @@ EventDrivenModifierUI::EventDrivenModifierUI()
     table->setItem(MODIFIER_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_MODIFIERS_TABLE_TIP));
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void EventDrivenModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(activeByDefault, SIGNAL(released()), this, SLOT(setActiveByDefault()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void EventDrivenModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(activeByDefault, SIGNAL(released()), this, SLOT(setActiveByDefault()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void EventDrivenModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(activeByDefault, SIGNAL(released()), this, SLOT(setActiveByDefault()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(activeByDefault, SIGNAL(released()), this, SLOT(setActiveByDefault()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void EventDrivenModifierUI::connectToTables(GenericTableWidget *modifiers, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
@@ -107,231 +107,107 @@ void EventDrivenModifierUI::connectToTables(GenericTableWidget *modifiers, Gener
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
-    hkbVariableBindingSet *varBind = nullptr;
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_EVENT_DRIVEN_MODIFIER){
             bsData = static_cast<hkbEventDrivenModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            QString eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->activateEventId);
-            if (eventName != ""){
-                table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(eventName);
-            }else{
-                table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-            }
-            eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->deactivateEventId);
-            if (eventName != ""){
-                table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(eventName);
-            }else{
-                table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-            }
-            activeByDefault->setChecked(bsData->activeByDefault);
-            if (bsData->modifier.data()){
-                table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(static_cast<hkbModifier *>(bsData->modifier.data())->getName());
-            }else{
-                table->item(MODIFIER_ROW, VALUE_COLUMN)->setText("NONE");
-            }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(ACTIVE_BY_DEFAULT_ROW, BINDING_COLUMN, varBind, "activeByDefault");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ACTIVE_BY_DEFAULT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            auto seteventtext = [&](QTableWidgetItem *item, const QString & text){
+                (text != "") ? item->setText(text) : item->setText("NONE");
+            };
+            auto eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getActivateEventId());
+            seteventtext(table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN), eventName);
+            eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getDeactivateEventId());
+            seteventtext(table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN), eventName);
+            activeByDefault->setChecked(bsData->getActiveByDefault());
+            auto mod = bsData->getModifier();
+            auto item = table->item(MODIFIER_ROW, VALUE_COLUMN);
+            (mod) ? item->setText(mod->getName()) : item->setText("NONE");
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(ACTIVE_BY_DEFAULT_ROW, BINDING_COLUMN, varBind, "activeByDefault", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EventDrivenModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("EventDrivenModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::loadData(): The data passed to the UI is nullptr!!!");
+        LogFile::writeToLog("EventDrivenModifierUI::loadData(): The data passed to the UI is nullptr!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void EventDrivenModifierUI::setName(){
+void EventDrivenModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
+    }else{
+        LogFile::writeToLog("EventDrivenModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("EventDrivenModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void EventDrivenModifierUI::setActivateEventId(int index, const QString & name){
     if (bsData){
-        bsData->activateEventId = index - 1;
+        bsData->setActivateEventId(index - 1);
         table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setActivateEventId(): The data is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::setActivateEventId(): The data is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::setDeactivateEventId(int index, const QString & name){
     if (bsData){
-        bsData->deactivateEventId = index - 1;
+        bsData->setDeactivateEventId(index - 1);
         table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setDeactivateEventId(): The data is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::setDeactivateEventId(): The data is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::setActiveByDefault(){
-    if (bsData){
-        bsData->activeByDefault = activeByDefault->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setActiveByDefault(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setActiveByDefault(activeByDefault->isChecked()) : LogFile::writeToLog("EventDrivenModifierUI::setActiveByDefault(): The 'bsData' pointer is nullptr!!");
 }
 
 void EventDrivenModifierUI::eventTableElementSelected(int index, const QString &name){
     switch (table->currentRow()){
     case ACTIVATE_EVENT_ID_ROW:
-        setActivateEventId(index, name);
-        break;
+        setActivateEventId(index, name); break;
     case DEACTIVATE_EVENT_ID_ROW:
-        setDeactivateEventId(index, name);
-        break;
+        setDeactivateEventId(index, name); break;
     default:
         WARNING_MESSAGE("EventDrivenModifierUI::eventTableElementSelected(): An unwanted element selected event was recieved!!");
-        return;
     }
 }
 
 void EventDrivenModifierUI::setModifier(int index, const QString & name){
-    DataIconManager *ptr = nullptr;
-    int indexOfModifier = -1;
-    if (bsData){
-        if (behaviorView){
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index - 1);
-            indexOfModifier = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->modifier.data()));
-            if (ptr){
-                if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                    return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifier.data()), 0, ptr, false)){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                    return;
-                }
-            }else{
-                if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->modifier.data())), indexOfModifier);
-                }else{
-                    CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setModifier(): The selected icon is nullptr!!");
-                    return;
-                }
-            }
-            behaviorView->removeModifierData();
-            table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setModifier(): The 'bsData' pointer is nullptr!!");
-    }
-}
-
-void EventDrivenModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-bool EventDrivenModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setBinding(): The 'bsData' pointer is nullptr!!");
-        return false;
-    }
-    return true;
+    UIHelper::setModifier(index, name, bsData, bsData->getModifier(), NULL_SIGNATURE, HkxObject::TYPE_MODIFIER, table, behaviorView, MODIFIER_ROW, VALUE_COLUMN);
 }
 
 void EventDrivenModifierUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case ACTIVE_BY_DEFAULT_ROW:
-            if (table->item(ACTIVE_BY_DEFAULT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "activeByDefault", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(ACTIVE_BY_DEFAULT_ROW, "activeByDefault", VARIABLE_TYPE_BOOL); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -351,89 +227,75 @@ void EventDrivenModifierUI::selectTableToView(bool viewproperties, const QString
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::viewSelected(int row, int column){
     if (bsData){
-        int index = -1;
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case ACTIVE_BY_DEFAULT_ROW:
-                if (table->item(ACTIVE_BY_DEFAULT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "activeByDefault");
-                break;
+                checkisproperty(ACTIVE_BY_DEFAULT_ROW, "activeByDefault"); break;
             }
         }else if (row == MODIFIER_ROW && column == VALUE_COLUMN){
-            emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifier) + 1, QString(), QStringList());
+            emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->getModifier()) + 1, QString(), QStringList());
         }else if (column == VALUE_COLUMN){
+            auto index = -1;
             switch (row){
             case ACTIVATE_EVENT_ID_ROW:
-                index = bsData->activateEventId;
-                break;
+                index = bsData->getActivateEventId(); break;
             case DEACTIVATE_EVENT_ID_ROW:
-                index = bsData->deactivateEventId;
-                break;
-            default:
-                return;
+                index = bsData->getDeactivateEventId(); break;
             }
-            emit viewEvents(index + 1, QString(), QStringList());
+            emit viewEvents(++index, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("activeByDefault");
-            if (bindIndex == index){
-                table->item(ACTIVE_BY_DEFAULT_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("activeByDefault", ACTIVE_BY_DEFAULT_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (index == bsData->activateEventId){
-            table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->deactivateEventId){
-            table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->getActivateEventId()) ? table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
+        (index == bsData->getDeactivateEventId()) ? table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void EventDrivenModifierUI::modifierRenamed(const QString &name, int index){
     if (bsData){
         index--;
-        if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifier)){
+        if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->getModifier())){
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventDrivenModifierUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("EventDrivenModifierUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 

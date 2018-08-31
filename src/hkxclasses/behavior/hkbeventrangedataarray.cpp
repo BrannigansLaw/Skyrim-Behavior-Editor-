@@ -21,17 +21,24 @@ const QString hkbEventRangeDataArray::getClassname(){
     return classname;
 }
 
-void hkbEventRangeDataArray::addEventData(const hkbEventRangeData & data){
+void hkbEventRangeDataArray::addEventRange(const hkbEventRangeData & data){
     std::lock_guard <std::mutex> guard(mutex);
     eventData.append(data);
 }
 
-void hkbEventRangeDataArray::setEventDataId(int index, int id){
+void hkbEventRangeDataArray::setEventRangeIdAt(int index, int id){
     std::lock_guard <std::mutex> guard(mutex);
     (eventData.size() > index) ? eventData[index].event.id = id : NULL;
 }
 
-void hkbEventRangeDataArray::removeEventData(int index){
+int hkbEventRangeDataArray::getEventRangeIdAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int id;
+    (eventData.size() > index) ? id = eventData.at(index).event.id : id = -1;
+    return id;
+}
+
+void hkbEventRangeDataArray::removeEventRange(int index){
     std::lock_guard <std::mutex> guard(mutex);
     (eventData.size() > index) ? eventData.removeAt(index) : NULL;
 }
@@ -216,7 +223,7 @@ bool hkbEventRangeDataArray::link(){
 QString hkbEventRangeDataArray::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (eventData.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": eventData is empty!");

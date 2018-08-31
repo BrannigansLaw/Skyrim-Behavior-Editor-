@@ -15,12 +15,15 @@ class QStackedLayout;
 class LineEdit;
 class CheckBox;
 
-class EventsUI: public QGroupBox
+class EventsUI final: public QGroupBox
 {
     Q_OBJECT
 public:
     EventsUI(const QString & title);
-    virtual ~EventsUI(){}
+    EventsUI& operator=(const EventsUI&) = delete;
+    EventsUI(const EventsUI &) = delete;
+    ~EventsUI() = default;
+public:
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
     void clear();
@@ -36,14 +39,12 @@ signals:
     void eventAdded(const QString & name);
     void eventRemoved(int index);
 private:
-    EventsUI& operator=(const EventsUI&);
-    EventsUI(const EventsUI &);
-private:
     enum View {
-        TABLE_WIDGET = 0,
-        EVENT_WIDGET = 1
+        TABLE_WIDGET,
+        EVENT_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
     hkbBehaviorGraphData *loadedData;

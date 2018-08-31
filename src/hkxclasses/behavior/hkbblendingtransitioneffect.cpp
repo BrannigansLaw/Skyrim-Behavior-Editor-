@@ -96,6 +96,86 @@ QVector<HkxObject *> hkbBlendingTransitionEffect::getChildrenOtherTypes() const{
     return list;
 }
 
+QString hkbBlendingTransitionEffect::getBlendCurve() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return blendCurve;
+}
+
+void hkbBlendingTransitionEffect::setBlendCurve(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < BlendCurve.size() && blendCurve != BlendCurve.at(index)) ? blendCurve = BlendCurve.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'blendCurve' was not set!");
+}
+
+QString hkbBlendingTransitionEffect::getEndMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return endMode;
+}
+
+void hkbBlendingTransitionEffect::setEndMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < EndMode.size() && endMode != EndMode.at(index)) ? endMode = EndMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'endMode' was not set!");
+}
+
+QString hkbBlendingTransitionEffect::getFlags() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return flags;
+}
+
+void hkbBlendingTransitionEffect::setFlags(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < Flags.size() && flags != Flags.at(index)) ? flags = Flags.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
+}
+
+void hkbBlendingTransitionEffect::setFlags(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != flags && value != "") ? flags = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
+}
+
+qreal hkbBlendingTransitionEffect::getToGeneratorStartTimeFraction() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return toGeneratorStartTimeFraction;
+}
+
+void hkbBlendingTransitionEffect::setToGeneratorStartTimeFraction(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != toGeneratorStartTimeFraction) ? toGeneratorStartTimeFraction = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'toGeneratorStartTimeFraction' was not set!");
+}
+
+qreal hkbBlendingTransitionEffect::getDuration() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return duration;
+}
+
+void hkbBlendingTransitionEffect::setDuration(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != duration) ? duration = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'duration' was not set!");
+}
+
+QString hkbBlendingTransitionEffect::getEventMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventMode;
+}
+
+void hkbBlendingTransitionEffect::setEventMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < EventMode.size() && eventMode != EventMode.at(index)) ? eventMode = EventMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventMode' was not set!");
+}
+
+QString hkbBlendingTransitionEffect::getSelfTransitionMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return selfTransitionMode;
+}
+
+void hkbBlendingTransitionEffect::setSelfTransitionMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < SelfTransitionMode.size() && selfTransitionMode != SelfTransitionMode.at(index)) ? selfTransitionMode = SelfTransitionMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'selfTransitionMode' was not set!");
+}
+
+void hkbBlendingTransitionEffect::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
@@ -190,7 +270,7 @@ void hkbBlendingTransitionEffect::unlink(){
 QString hkbBlendingTransitionEffect::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkstrings = [&](QString & datafield, const QStringList & list, const QString & fieldname){
         if (!list.contains(datafield)){
             isvalid = false;

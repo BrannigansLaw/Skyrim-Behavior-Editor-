@@ -25,14 +25,17 @@ class HkDataUI;
 class TreeGraphicsItem;
 class hkbPoseMatchingGenerator;
 
-class BehaviorGraphView: public TreeGraphicsView
+class BehaviorGraphView final: public TreeGraphicsView
 {
     Q_OBJECT
     friend class MainWindow;
     friend class ModifierListUI;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
-    virtual ~BehaviorGraphView();
+    BehaviorGraphView& operator=(const BehaviorGraphView&) = delete;
+    BehaviorGraphView(const BehaviorGraphView &) = delete;
+    ~BehaviorGraphView();
+public:
     QStringList getEventNames() const;
     void removeGeneratorData();
     void removeModifierData();
@@ -66,10 +69,9 @@ public slots:
     void appendClipGenerator();
     void appendBehaviorReferenceGenerator();
     void appendBGSGamebryoSequenceGenerator();
-
 private slots:
-    void focusOnGeneratorIcon(int index, const QString & name);
-    void focusOnModifierIcon(int index, const QString & name);
+    void focusOnGeneratorIcon(int index, const QString &);
+    void focusOnModifierIcon(int index, const QString &);
     void appendModifierList();
     void appendTwistModifier();
     void appendEventDrivenModifier();
@@ -121,7 +123,6 @@ private slots:
     void appendBSLookAtModifier();
     void appendBSPassByTargetTriggerModifier();
     void appendHandIKControlsModifier();
-
     void wrapStateMachine();
     void wrapBlenderGenerator();
     void wrapPoseMatchingGenerator();
@@ -135,8 +136,10 @@ private slots:
     void deleteSelectedObjectBranchSlot();
     void popUpMenuRequested(const QPoint &pos);
 private:
-    template <typename T> void append(T *obj);
-    template <typename T> void wrap(T *obj);
+    template <typename T>
+    void append(T *obj);
+    template <typename T>
+    void wrap(T *obj);
     void enableAllMenuActions(QMenu *menu);
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);

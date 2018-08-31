@@ -3,6 +3,8 @@
 
 #include "hkbmodifier.h"
 
+class hkbStringEventPayload;
+
 class hkbTimerModifier final: public hkbModifier
 {
     friend class TimerModifierUI;
@@ -15,6 +17,15 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    qreal getAlarmTimeSeconds() const;
+    void setAlarmTimeSeconds(const qreal &value);
+    int getAlarmEventID() const;
+    void setAlarmEventID(int value);
+    hkbStringEventPayload * getAlarmEventPayload() const;
+    void setAlarmEventPayload(hkbStringEventPayload *value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

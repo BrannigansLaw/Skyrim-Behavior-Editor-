@@ -146,6 +146,31 @@ QVector<HkxObject *> hkbEvaluateExpressionModifier::getChildrenOtherTypes() cons
     return list;
 }
 
+void hkbEvaluateExpressionModifier::setExpressions(hkbExpressionDataArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    expressions = value;
+}
+
+hkbExpressionDataArray *hkbEvaluateExpressionModifier::getExpressions() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbExpressionDataArray *>(expressions.data());
+}
+
+bool hkbEvaluateExpressionModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbEvaluateExpressionModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbEvaluateExpressionModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbEvaluateExpressionModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -171,7 +196,7 @@ void hkbEvaluateExpressionModifier::unlink(){
 QString hkbEvaluateExpressionModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

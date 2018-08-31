@@ -337,7 +337,7 @@ void hkbAttachmentModifier::unlink(){
 QString hkbAttachmentModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkevents = [&](int & id, HkxSharedPtr & payload, const QString & fieldname){
         if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;

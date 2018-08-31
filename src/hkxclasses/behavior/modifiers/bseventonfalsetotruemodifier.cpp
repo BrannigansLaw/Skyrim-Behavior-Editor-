@@ -2,10 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
-
-/*
- * CLASS: BSEventOnFalseToTrueModifier
-*/
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSEventOnFalseToTrueModifier::refCount = 0;
 
@@ -269,6 +266,141 @@ bool BSEventOnFalseToTrueModifier::merge(HkxObject *recessiveObject){ //TO DO: M
     return false;
 }
 
+int BSEventOnFalseToTrueModifier::getEventToSend1ID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToSend1.id;
+}
+
+void BSEventOnFalseToTrueModifier::setEventToSend1ID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != eventToSend1.id && eventToSend1.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? eventToSend1.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend1.id' was not set!");
+}
+
+hkbStringEventPayload *BSEventOnFalseToTrueModifier::getEventToSend1Payload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(eventToSend1.payload.data());
+}
+
+void BSEventOnFalseToTrueModifier::setEventToSend1Payload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(eventToSend1.payload.data())) ? eventToSend1.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend1.payload' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getBVariableToTest1() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bVariableToTest1;
+}
+
+void BSEventOnFalseToTrueModifier::setBVariableToTest1(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != bVariableToTest1) ? bVariableToTest1 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bVariableToTest1' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getBEnableEvent1() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bEnableEvent1;
+}
+
+void BSEventOnFalseToTrueModifier::setBEnableEvent1(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != bEnableEvent1) ? bEnableEvent1 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bEnableEvent1' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSEventOnFalseToTrueModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSEventOnFalseToTrueModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+int BSEventOnFalseToTrueModifier::getEventToSend2ID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToSend2.id;
+}
+
+void BSEventOnFalseToTrueModifier::setEventToSend2ID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != eventToSend2.id && eventToSend2.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? eventToSend2.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend2.id' was not set!");
+}
+
+hkbStringEventPayload *BSEventOnFalseToTrueModifier::getEventToSend2Payload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(eventToSend2.payload.data());
+}
+
+void BSEventOnFalseToTrueModifier::setEventToSend2Payload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(eventToSend2.payload.data())) ? eventToSend2.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend2.payload' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getBVariableToTest2() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bVariableToTest2;
+}
+
+void BSEventOnFalseToTrueModifier::setBVariableToTest2(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != bVariableToTest2) ? bVariableToTest2 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bVariableToTest2' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getBEnableEvent2() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bEnableEvent2;
+}
+
+void BSEventOnFalseToTrueModifier::setBEnableEvent2(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != bEnableEvent2) ? bEnableEvent2 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bEnableEvent2' was not set!");
+}
+
+int BSEventOnFalseToTrueModifier::getEventToSend3ID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToSend3.id;
+}
+
+void BSEventOnFalseToTrueModifier::setEventToSend3ID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != eventToSend3.id && eventToSend3.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? eventToSend3.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend3.id' was not set!");
+}
+
+hkbStringEventPayload *BSEventOnFalseToTrueModifier::getEventToSend3Payload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(eventToSend3.payload.data());
+}
+
+void BSEventOnFalseToTrueModifier::setEventToSend3Payload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(eventToSend3.payload.data())) ? eventToSend3.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend3.payload' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getBVariableToTest3() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bVariableToTest3;
+}
+
+void BSEventOnFalseToTrueModifier::setBVariableToTest3(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != bVariableToTest3) ? bVariableToTest3 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bVariableToTest3' was not set!");
+}
+
+bool BSEventOnFalseToTrueModifier::getBEnableEvent3() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bEnableEvent3;
+}
+
+void BSEventOnFalseToTrueModifier::setBEnableEvent3(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != bEnableEvent3) ? bEnableEvent3 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bEnableEvent3' was not set!");
+}
+
 bool BSEventOnFalseToTrueModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
@@ -304,7 +436,7 @@ void BSEventOnFalseToTrueModifier::unlink(){
 QString BSEventOnFalseToTrueModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");

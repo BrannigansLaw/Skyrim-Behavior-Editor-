@@ -39,9 +39,10 @@ private:
         hkEventPayload event;
         QString eventMode;
     };
-    void addEventData(const hkbEventRangeData & data = hkbEventRangeData());
-    void setEventDataId(int index, int id);
-    void removeEventData(int index);
+    void addEventRange(const hkbEventRangeData & data = hkbEventRangeData());
+    void setEventRangeIdAt(int index, int id);
+    int getEventRangeIdAt(int index);
+    void removeEventRange(int index);
 private:
     static uint refCount;
     static const QString classname;

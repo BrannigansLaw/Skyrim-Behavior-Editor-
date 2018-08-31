@@ -81,7 +81,7 @@ bool hkbProjectData::write(HkxXMLWriter *writer){
 bool hkbProjectData::link(){
     std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
-    ProjectFile *file = dynamic_cast<ProjectFile *>(getParentFile());
+    auto file = dynamic_cast<ProjectFile *>(getParentFile());
     if (file){
         ptr = file->findProjectStringData(stringData.getShdPtrReference());
     }else{

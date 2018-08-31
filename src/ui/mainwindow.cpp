@@ -783,7 +783,7 @@ void MainWindow::exit(){
 void MainWindow::closeTab(int index){
     objectDataWid->unloadDataWidget();
     if (projectFile){
-        if (index == 0 && projectFile->behaviorFiles.isEmpty()){
+        if (!index && projectFile->behaviorFiles.isEmpty()){
             closeAll();
         }else{
             index--;
@@ -813,7 +813,7 @@ QString MainWindow::generateUniqueBehaviorName(){
         if (behaviornames.at(i) == name){
             index = name.lastIndexOf('_');
             if (index > -1){
-                name.remove(index + 1, name.size());
+                name.remove(++index, name.size());
             }
             name.append(QString::number(num)+".hkx");
             if (++num > 1){
@@ -1254,7 +1254,7 @@ void MainWindow::zoomOut(){
 
 int MainWindow::getBehaviorGraphIndex(const QString & filename){
     for (auto j = 0; j < behaviorGraphs.size(); j++){
-        if (filename.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
+        if (!filename.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
             if (j >= projectFile->behaviorFiles.size() || filename.compare(projectFile->behaviorFiles.at(j)->getFileName(), Qt::CaseInsensitive) != 0){
                 LogFile::writeToLog("MainWindow::getBehaviorGraphIndex(): The index is invalid!");
                 return -1;

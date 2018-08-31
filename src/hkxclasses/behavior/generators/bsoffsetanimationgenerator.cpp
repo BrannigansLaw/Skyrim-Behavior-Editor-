@@ -45,7 +45,7 @@ bool BSOffsetAnimationGenerator::insertObjectAt(int index, DataIconManager *obj)
 
 bool BSOffsetAnimationGenerator::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0){
+    if (!index){
         pDefaultGenerator = HkxSharedPtr();
     }else if (index == 1){
         pOffsetClipGenerator = HkxSharedPtr();
@@ -60,7 +60,7 @@ bool BSOffsetAnimationGenerator::removeObjectAt(int index){
 
 void BSOffsetAnimationGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 qreal BSOffsetAnimationGenerator::getFOffsetRangeEnd() const{
@@ -70,7 +70,7 @@ qreal BSOffsetAnimationGenerator::getFOffsetRangeEnd() const{
 
 void BSOffsetAnimationGenerator::setFOffsetRangeEnd(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fOffsetRangeEnd) ? fOffsetRangeEnd = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetRangeEnd' was not set!");
+    (value != fOffsetRangeEnd) ? fOffsetRangeEnd = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetRangeEnd' was not set!");
 }
 
 qreal BSOffsetAnimationGenerator::getFOffsetRangeStart() const{
@@ -80,7 +80,7 @@ qreal BSOffsetAnimationGenerator::getFOffsetRangeStart() const{
 
 void BSOffsetAnimationGenerator::setFOffsetRangeStart(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fOffsetRangeStart) ? fOffsetRangeStart = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetRangeStart' was not set!");
+    (value != fOffsetRangeStart) ? fOffsetRangeStart = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetRangeStart' was not set!");
 }
 
 qreal BSOffsetAnimationGenerator::getFOffsetVariable() const{
@@ -90,22 +90,22 @@ qreal BSOffsetAnimationGenerator::getFOffsetVariable() const{
 
 void BSOffsetAnimationGenerator::setFOffsetVariable(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fOffsetVariable) ? fOffsetVariable = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetVariable' was not set!");
+    (value != fOffsetVariable) ? fOffsetVariable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetVariable' was not set!");
 }
 
 QString BSOffsetAnimationGenerator::getDefaultGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
 QString BSOffsetAnimationGenerator::getOffsetClipGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(pOffsetClipGenerator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(pOffsetClipGenerator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
@@ -251,7 +251,7 @@ void BSOffsetAnimationGenerator::unlink(){
 QString BSOffsetAnimationGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
         QString sigstring;
         if (sig != NULL_SIGNATURE)

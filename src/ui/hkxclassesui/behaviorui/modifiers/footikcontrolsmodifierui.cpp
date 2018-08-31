@@ -43,7 +43,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList FootIkControlsModifierUI::headerLabels = {
+const QStringList FootIkControlsModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -150,324 +150,165 @@ FootIkControlsModifierUI::FootIkControlsModifierUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(legUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void FootIkControlsModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(onOffGain, SIGNAL(editingFinished()), this, SLOT(setonOffGain()), Qt::UniqueConnection);
-    connect(groundAscendingGain, SIGNAL(editingFinished()), this, SLOT(setgroundAscendingGain()), Qt::UniqueConnection);
-    connect(groundDescendingGain, SIGNAL(editingFinished()), this, SLOT(setgroundDescendingGain()), Qt::UniqueConnection);
-    connect(footPlantedGain, SIGNAL(editingFinished()), this, SLOT(setfootPlantedGain()), Qt::UniqueConnection);
-    connect(footRaisedGain, SIGNAL(editingFinished()), this, SLOT(setfootRaisedGain()), Qt::UniqueConnection);
-    connect(footUnlockGain, SIGNAL(editingFinished()), this, SLOT(setfootUnlockGain()), Qt::UniqueConnection);
-    connect(worldFromModelFeedbackGain, SIGNAL(editingFinished()), this, SLOT(setworldFromModelFeedbackGain()), Qt::UniqueConnection);
-    connect(errorUpDownBias, SIGNAL(editingFinished()), this, SLOT(seterrorUpDownBias()), Qt::UniqueConnection);
-    connect(alignWorldFromModelGain, SIGNAL(editingFinished()), this, SLOT(setalignWorldFromModelGain()), Qt::UniqueConnection);
-    connect(hipOrientationGain, SIGNAL(editingFinished()), this, SLOT(sethipOrientationGain()), Qt::UniqueConnection);
-    connect(maxKneeAngleDifference, SIGNAL(editingFinished()), this, SLOT(setmaxKneeAngleDifference()), Qt::UniqueConnection);
-    connect(ankleOrientationGain, SIGNAL(editingFinished()), this, SLOT(setankleOrientationGain()), Qt::UniqueConnection);
-    connect(errorOutTranslation, SIGNAL(editingFinished()), this, SLOT(seterrorOutTranslation()), Qt::UniqueConnection);
-    connect(alignWithGroundRotation, SIGNAL(editingFinished()), this, SLOT(setalignWithGroundRotation()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(legUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(legUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-}
-
-void FootIkControlsModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(onOffGain, SIGNAL(editingFinished()), this, SLOT(setonOffGain()));
-    disconnect(groundAscendingGain, SIGNAL(editingFinished()), this, SLOT(setgroundAscendingGain()));
-    disconnect(groundDescendingGain, SIGNAL(editingFinished()), this, SLOT(setgroundDescendingGain()));
-    disconnect(footPlantedGain, SIGNAL(editingFinished()), this, SLOT(setfootPlantedGain()));
-    disconnect(footRaisedGain, SIGNAL(editingFinished()), this, SLOT(setfootRaisedGain()));
-    disconnect(footUnlockGain, SIGNAL(editingFinished()), this, SLOT(setfootUnlockGain()));
-    disconnect(worldFromModelFeedbackGain, SIGNAL(editingFinished()), this, SLOT(setworldFromModelFeedbackGain()));
-    disconnect(errorUpDownBias, SIGNAL(editingFinished()), this, SLOT(seterrorUpDownBias()));
-    disconnect(alignWorldFromModelGain, SIGNAL(editingFinished()), this, SLOT(setalignWorldFromModelGain()));
-    disconnect(hipOrientationGain, SIGNAL(editingFinished()), this, SLOT(sethipOrientationGain()));
-    disconnect(maxKneeAngleDifference, SIGNAL(editingFinished()), this, SLOT(setmaxKneeAngleDifference()));
-    disconnect(ankleOrientationGain, SIGNAL(editingFinished()), this, SLOT(setankleOrientationGain()));
-    disconnect(errorOutTranslation, SIGNAL(editingFinished()), this, SLOT(seterrorOutTranslation()));
-    disconnect(alignWithGroundRotation, SIGNAL(editingFinished()), this, SLOT(setalignWithGroundRotation()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(legUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    disconnect(legUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+void FootIkControlsModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(onOffGain, SIGNAL(editingFinished()), this, SLOT(setOnOffGain()), Qt::UniqueConnection);
+        connect(groundAscendingGain, SIGNAL(editingFinished()), this, SLOT(setGroundAscendingGain()), Qt::UniqueConnection);
+        connect(groundDescendingGain, SIGNAL(editingFinished()), this, SLOT(setGroundDescendingGain()), Qt::UniqueConnection);
+        connect(footPlantedGain, SIGNAL(editingFinished()), this, SLOT(setFootPlantedGain()), Qt::UniqueConnection);
+        connect(footRaisedGain, SIGNAL(editingFinished()), this, SLOT(setFootRaisedGain()), Qt::UniqueConnection);
+        connect(footUnlockGain, SIGNAL(editingFinished()), this, SLOT(setFootUnlockGain()), Qt::UniqueConnection);
+        connect(worldFromModelFeedbackGain, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelFeedbackGain()), Qt::UniqueConnection);
+        connect(errorUpDownBias, SIGNAL(editingFinished()), this, SLOT(setErrorUpDownBias()), Qt::UniqueConnection);
+        connect(alignWorldFromModelGain, SIGNAL(editingFinished()), this, SLOT(setAlignWorldFromModelGain()), Qt::UniqueConnection);
+        connect(hipOrientationGain, SIGNAL(editingFinished()), this, SLOT(setHipOrientationGain()), Qt::UniqueConnection);
+        connect(maxKneeAngleDifference, SIGNAL(editingFinished()), this, SLOT(setMaxKneeAngleDifference()), Qt::UniqueConnection);
+        connect(ankleOrientationGain, SIGNAL(editingFinished()), this, SLOT(setAnkleOrientationGain()), Qt::UniqueConnection);
+        connect(errorOutTranslation, SIGNAL(editingFinished()), this, SLOT(setErrorOutTranslation()), Qt::UniqueConnection);
+        connect(alignWithGroundRotation, SIGNAL(editingFinished()), this, SLOT(setAlignWithGroundRotation()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(legUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(legUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(onOffGain, SIGNAL(editingFinished()), this, SLOT(setOnOffGain()));
+        disconnect(groundAscendingGain, SIGNAL(editingFinished()), this, SLOT(setGroundAscendingGain()));
+        disconnect(groundDescendingGain, SIGNAL(editingFinished()), this, SLOT(setGroundDescendingGain()));
+        disconnect(footPlantedGain, SIGNAL(editingFinished()), this, SLOT(setFootPlantedGain()));
+        disconnect(footRaisedGain, SIGNAL(editingFinished()), this, SLOT(setFootRaisedGain()));
+        disconnect(footUnlockGain, SIGNAL(editingFinished()), this, SLOT(setFootUnlockGain()));
+        disconnect(worldFromModelFeedbackGain, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelFeedbackGain()));
+        disconnect(errorUpDownBias, SIGNAL(editingFinished()), this, SLOT(setErrorUpDownBias()));
+        disconnect(alignWorldFromModelGain, SIGNAL(editingFinished()), this, SLOT(setAlignWorldFromModelGain()));
+        disconnect(hipOrientationGain, SIGNAL(editingFinished()), this, SLOT(setHipOrientationGain()));
+        disconnect(maxKneeAngleDifference, SIGNAL(editingFinished()), this, SLOT(setMaxKneeAngleDifference()));
+        disconnect(ankleOrientationGain, SIGNAL(editingFinished()), this, SLOT(setAnkleOrientationGain()));
+        disconnect(errorOutTranslation, SIGNAL(editingFinished()), this, SLOT(setErrorOutTranslation()));
+        disconnect(alignWithGroundRotation, SIGNAL(editingFinished()), this, SLOT(setAlignWithGroundRotation()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(legUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+        disconnect(legUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    }
 }
 
 void FootIkControlsModifierUI::addLeg(){
-    if (bsData){
-        bsData->legs.append(hkbFootIkControlsModifier::hkLeg());
-        bsData->setIsFileChanged(true);
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::addRange(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->addLeg(), loadDynamicTableRows() : LogFile::writeToLog("FootIkControlsModifierUI::addFoot(): The data is nullptr!!");
 }
 
 void FootIkControlsModifierUI::removeLeg(int index){
-    if (bsData){
-        if (!bsData->legs.isEmpty()){
-            if (index < bsData->legs.size() && index >= 0){
-                bsData->legs.removeAt(index);
-            }else{
-                WARNING_MESSAGE("FootIkControlsModifierUI::removeExpression(): Invalid row index selected!!");
-                return;
-            }
-            bsData->setIsFileChanged(true);
-            loadDynamicTableRows();
-        }else{
-            WARNING_MESSAGE("FootIkControlsModifierUI::removeExpression(): Ranges is empty!!");
-            return;
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::removeExpression(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->removeLeg(index), loadDynamicTableRows() : LogFile::writeToLog("FootIkControlsModifierUI::removeFoot(): The data is nullptr!!");
 }
 
 void FootIkControlsModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
     if (data){
         if (data->getSignature() == HKB_FOOT_IK_CONTROLS_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbFootIkControlsModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            onOffGain->setValue(bsData->gains.onOffGain);
-            groundAscendingGain->setValue(bsData->gains.groundAscendingGain);
-            groundDescendingGain->setValue(bsData->gains.groundDescendingGain);
-            footPlantedGain->setValue(bsData->gains.footPlantedGain);
-            footRaisedGain->setValue(bsData->gains.footRaisedGain);
-            footUnlockGain->setValue(bsData->gains.footUnlockGain);
-            worldFromModelFeedbackGain->setValue(bsData->gains.worldFromModelFeedbackGain);
-            errorUpDownBias->setValue(bsData->gains.errorUpDownBias);
-            alignWorldFromModelGain->setValue(bsData->gains.alignWorldFromModelGain);
-            hipOrientationGain->setValue(bsData->gains.hipOrientationGain);
-            maxKneeAngleDifference->setValue(bsData->gains.maxKneeAngleDifference);
-            ankleOrientationGain->setValue(bsData->gains.ankleOrientationGain);
-            errorOutTranslation->setValue(bsData->errorOutTranslation);
-            alignWithGroundRotation->setValue(bsData->alignWithGroundRotation);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(ON_OFF_GAIN_ROW, BINDING_COLUMN, varBind, "onOffGain");
-                loadBinding(GROUND_ASCENDING_GAIN_ROW, BINDING_COLUMN, varBind, "groundAscendingGain");
-                loadBinding(GROUND_DESCENDING_GAIN_ROW, BINDING_COLUMN, varBind, "groundDescendingGain");
-                loadBinding(FOOT_PLANTED_GAIN_ROW, BINDING_COLUMN, varBind, "footPlantedGain");
-                loadBinding(FOOT_RAISED_GAIN_ROW, BINDING_COLUMN, varBind, "footRaisedGain");
-                loadBinding(FOOT_UNLOCK_GAIN_ROW, BINDING_COLUMN, varBind, "footUnlockGain");
-                loadBinding(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, BINDING_COLUMN, varBind, "worldFromModelFeedbackGain");
-                loadBinding(ERROR_UP_DOWN_BIAS_ROW, BINDING_COLUMN, varBind, "errorUpDownBias");
-                loadBinding(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, BINDING_COLUMN, varBind, "alignWorldFromModelGain");
-                loadBinding(HIP_ORIENTATION_GAIN_ROW, BINDING_COLUMN, varBind, "hipOrientationGain");
-                loadBinding(MAX_KNEE_ANGLE_DIFFERENCE_ROW, BINDING_COLUMN, varBind, "maxKneeAngleDifference");
-                loadBinding(ANKLE_ORIENTATION_GAIN_ROW, BINDING_COLUMN, varBind, "ankleOrientationGain");
-                loadBinding(ERROR_OUT_TRANSLATION_ROW, BINDING_COLUMN, varBind, "errorOutTranslation");
-                loadBinding(ALIGN_WITH_GROUND_ROTATION, BINDING_COLUMN, varBind, "alignWithGroundRotation");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ON_OFF_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(GROUND_ASCENDING_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(GROUND_DESCENDING_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(FOOT_PLANTED_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(FOOT_RAISED_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(FOOT_UNLOCK_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ERROR_UP_DOWN_BIAS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(HIP_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(MAX_KNEE_ANGLE_DIFFERENCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ANKLE_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ERROR_OUT_TRANSLATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ALIGN_WITH_GROUND_ROTATION, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            onOffGain->setValue(bsData->getOnOffGain());
+            groundAscendingGain->setValue(bsData->getGroundAscendingGain());
+            groundDescendingGain->setValue(bsData->getGroundDescendingGain());
+            footPlantedGain->setValue(bsData->getFootPlantedGain());
+            footRaisedGain->setValue(bsData->getFootRaisedGain());
+            footUnlockGain->setValue(bsData->getFootUnlockGain());
+            worldFromModelFeedbackGain->setValue(bsData->getWorldFromModelFeedbackGain());
+            errorUpDownBias->setValue(bsData->getErrorUpDownBias());
+            alignWorldFromModelGain->setValue(bsData->getAlignWorldFromModelGain());
+            hipOrientationGain->setValue(bsData->getHipOrientationGain());
+            maxKneeAngleDifference->setValue(bsData->getMaxKneeAngleDifference());
+            ankleOrientationGain->setValue(bsData->getAnkleOrientationGain());
+            errorOutTranslation->setValue(bsData->getErrorOutTranslation());
+            alignWithGroundRotation->setValue(bsData->getAlignWithGroundRotation());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(ON_OFF_GAIN_ROW, BINDING_COLUMN, varBind, "onOffGain", table, bsData);
+            UIHelper::loadBinding(GROUND_ASCENDING_GAIN_ROW, BINDING_COLUMN, varBind, "groundAscendingGain", table, bsData);
+            UIHelper::loadBinding(GROUND_DESCENDING_GAIN_ROW, BINDING_COLUMN, varBind, "groundDescendingGain", table, bsData);
+            UIHelper::loadBinding(FOOT_PLANTED_GAIN_ROW, BINDING_COLUMN, varBind, "footPlantedGain", table, bsData);
+            UIHelper::loadBinding(FOOT_RAISED_GAIN_ROW, BINDING_COLUMN, varBind, "footRaisedGain", table, bsData);
+            UIHelper::loadBinding(FOOT_UNLOCK_GAIN_ROW, BINDING_COLUMN, varBind, "footUnlockGain", table, bsData);
+            UIHelper::loadBinding(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, BINDING_COLUMN, varBind, "worldFromModelFeedbackGain", table, bsData);
+            UIHelper::loadBinding(ERROR_UP_DOWN_BIAS_ROW, BINDING_COLUMN, varBind, "errorUpDownBias", table, bsData);
+            UIHelper::loadBinding(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, BINDING_COLUMN, varBind, "alignWorldFromModelGain", table, bsData);
+            UIHelper::loadBinding(HIP_ORIENTATION_GAIN_ROW, BINDING_COLUMN, varBind, "hipOrientationGain", table, bsData);
+            UIHelper::loadBinding(MAX_KNEE_ANGLE_DIFFERENCE_ROW, BINDING_COLUMN, varBind, "maxKneeAngleDifference", table, bsData);
+            UIHelper::loadBinding(ANKLE_ORIENTATION_GAIN_ROW, BINDING_COLUMN, varBind, "ankleOrientationGain", table, bsData);
+            UIHelper::loadBinding(ERROR_OUT_TRANSLATION_ROW, BINDING_COLUMN, varBind, "errorOutTranslation", table, bsData);
+            UIHelper::loadBinding(ALIGN_WITH_GROUND_ROTATION, BINDING_COLUMN, varBind, "alignWithGroundRotation", table, bsData);
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("FootIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void FootIkControlsModifierUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_LEG_ROW + bsData->getNumberOfLegs() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
+        auto temp = ADD_LEG_ROW + bsData->getNumberOfLegs() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
         for (auto i = ADD_LEG_ROW + 1, j = 0; j < bsData->getNumberOfLegs(); i++, j++){
-            setRowItems(i, "Leg "+QString::number(j), "hkLeg", "Remove", "Edit", "Double click to remove this Leg", "Double click to edit this Leg");
+            UIHelper::setRowItems(i, "Leg "+QString::number(j), "hkLeg", "Remove", "Edit", "Double click to remove this Leg", "Double click to edit this Leg", table);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
-}
-
-void FootIkControlsModifierUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
-    }
-}
-
-bool FootIkControlsModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void FootIkControlsModifierUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case ON_OFF_GAIN_ROW:
-            if (table->item(ON_OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "onOffGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ON_OFF_GAIN_ROW, "onOffGain", VARIABLE_TYPE_REAL); break;
         case GROUND_ASCENDING_GAIN_ROW:
-            if (table->item(GROUND_ASCENDING_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "groundAscendingGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(GROUND_ASCENDING_GAIN_ROW, "groundAscendingGain", VARIABLE_TYPE_REAL); break;
         case GROUND_DESCENDING_GAIN_ROW:
-            if (table->item(GROUND_DESCENDING_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "groundDescendingGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(GROUND_DESCENDING_GAIN_ROW, "groundDescendingGain", VARIABLE_TYPE_REAL); break;
         case FOOT_PLANTED_GAIN_ROW:
-            if (table->item(FOOT_PLANTED_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "footPlantedGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(FOOT_PLANTED_GAIN_ROW, "footPlantedGain", VARIABLE_TYPE_REAL); break;
         case FOOT_RAISED_GAIN_ROW:
-            if (table->item(FOOT_RAISED_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "footRaisedGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(FOOT_RAISED_GAIN_ROW, "footRaisedGain", VARIABLE_TYPE_REAL); break;
         case FOOT_UNLOCK_GAIN_ROW:
-            if (table->item(FOOT_UNLOCK_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "footUnlockGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(FOOT_UNLOCK_GAIN_ROW, "footUnlockGain", VARIABLE_TYPE_REAL); break;
         case WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW:
-            if (table->item(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "worldFromModelFeedbackGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, "worldFromModelFeedbackGain", VARIABLE_TYPE_REAL); break;
         case ERROR_UP_DOWN_BIAS_ROW:
-            if (table->item(ERROR_UP_DOWN_BIAS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "errorUpDownBias", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ERROR_UP_DOWN_BIAS_ROW, "errorUpDownBias", VARIABLE_TYPE_REAL); break;
         case ALIGN_WORLD_FROM_MODEL_GAIN_ROW:
-            if (table->item(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "alignWorldFromModelGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, "alignWorldFromModelGain", VARIABLE_TYPE_REAL); break;
         case HIP_ORIENTATION_GAIN_ROW:
-            if (table->item(HIP_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hipOrientationGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(HIP_ORIENTATION_GAIN_ROW, "hipOrientationGain", VARIABLE_TYPE_REAL); break;
         case MAX_KNEE_ANGLE_DIFFERENCE_ROW:
-            if (table->item(MAX_KNEE_ANGLE_DIFFERENCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "maxKneeAngleDifference", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MAX_KNEE_ANGLE_DIFFERENCE_ROW, "maxKneeAngleDifference", VARIABLE_TYPE_REAL); break;
         case ANKLE_ORIENTATION_GAIN_ROW:
-            if (table->item(ANKLE_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "ankleOrientationGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ANKLE_ORIENTATION_GAIN_ROW, "ankleOrientationGain", VARIABLE_TYPE_REAL); break;
         case ERROR_OUT_TRANSLATION_ROW:
-            if (table->item(ERROR_OUT_TRANSLATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "errorOutTranslation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(ERROR_OUT_TRANSLATION_ROW, "errorOutTranslation", VARIABLE_TYPE_VECTOR4); break;
         case ALIGN_WITH_GROUND_ROTATION:
-            if (table->item(ALIGN_WITH_GROUND_ROTATION, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "errorOutTranslation", VARIABLE_TYPE_QUATERNION, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(ALIGN_WITH_GROUND_ROTATION, "alignWithGroundRotation", VARIABLE_TYPE_QUATERNION); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -476,285 +317,122 @@ void FootIkControlsModifierUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void FootIkControlsModifierUI::setName(){
+void FootIkControlsModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void FootIkControlsModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("FootIkControlsModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setonOffGain(){
-    if (bsData){
-        if (bsData->gains.onOffGain != onOffGain->value()){
-            bsData->gains.onOffGain = onOffGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setonOffGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setOnOffGain(){
+    (bsData) ? bsData->setOnOffGain(onOffGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setOnOffGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setfootPlantedGain(){
-    if (bsData){
-        if (bsData->gains.footPlantedGain != footPlantedGain->value()){
-            bsData->gains.footPlantedGain = footPlantedGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setfootPlantedGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setFootPlantedGain(){
+    (bsData) ? bsData->setFootPlantedGain(footPlantedGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setFootPlantedGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setfootRaisedGain(){
-    if (bsData){
-        if (bsData->gains.footRaisedGain != footRaisedGain->value()){
-            bsData->gains.footRaisedGain = footRaisedGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setfootRaisedGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setFootRaisedGain(){
+    (bsData) ? bsData->setFootRaisedGain(footRaisedGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setFootRaisedGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setfootUnlockGain(){
-    if (bsData){
-        if (bsData->gains.footUnlockGain != footUnlockGain->value()){
-            bsData->gains.footUnlockGain = footUnlockGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setfootUnlockGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setFootUnlockGain(){
+    (bsData) ? bsData->setFootUnlockGain(footUnlockGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setFootUnlockGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setgroundAscendingGain(){
-    if (bsData){
-        if (bsData->gains.groundAscendingGain != groundAscendingGain->value()){
-            bsData->gains.groundAscendingGain = groundAscendingGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setgroundAscendingGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setGroundAscendingGain(){
+    (bsData) ? bsData->setGroundAscendingGain(groundAscendingGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setGroundAscendingGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setgroundDescendingGain(){
-    if (bsData){
-        if (bsData->gains.groundDescendingGain != groundDescendingGain->value()){
-            bsData->gains.groundDescendingGain = groundDescendingGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setgroundDescendingGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setGroundDescendingGain(){
+    (bsData) ? bsData->setGroundDescendingGain(groundDescendingGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setGroundDescendingGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setworldFromModelFeedbackGain(){
-    if (bsData){
-        if (bsData->gains.worldFromModelFeedbackGain != worldFromModelFeedbackGain->value()){
-            bsData->gains.worldFromModelFeedbackGain = worldFromModelFeedbackGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setworldFromModelFeedbackGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setWorldFromModelFeedbackGain(){
+    (bsData) ? bsData->setWorldFromModelFeedbackGain(worldFromModelFeedbackGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setWorldFromModelFeedbackGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::seterrorUpDownBias(){
-    if (bsData){
-        if (bsData->gains.errorUpDownBias != errorUpDownBias->value()){
-            bsData->gains.errorUpDownBias = errorUpDownBias->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::seterrorUpDownBias(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setErrorUpDownBias(){
+    (bsData) ? bsData->setErrorUpDownBias(errorUpDownBias->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setErrorUpDownBias(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setalignWorldFromModelGain(){
-    if (bsData){
-        if (bsData->gains.alignWorldFromModelGain != alignWorldFromModelGain->value()){
-            bsData->gains.alignWorldFromModelGain = alignWorldFromModelGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setalignWorldFromModelGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setAlignWorldFromModelGain(){
+    (bsData) ? bsData->setAlignWorldFromModelGain(alignWorldFromModelGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setAlignWorldFromModelGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::sethipOrientationGain(){
-    if (bsData){
-        if (bsData->gains.hipOrientationGain != hipOrientationGain->value()){
-            bsData->gains.hipOrientationGain = hipOrientationGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::sethipOrientationGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setHipOrientationGain(){
+    (bsData) ? bsData->setHipOrientationGain(hipOrientationGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setHipOrientationGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setmaxKneeAngleDifference(){
-    if (bsData){
-        if (bsData->gains.maxKneeAngleDifference != maxKneeAngleDifference->value()){
-            bsData->gains.maxKneeAngleDifference = maxKneeAngleDifference->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setmaxKneeAngleDifference(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setMaxKneeAngleDifference(){
+    (bsData) ? bsData->setMaxKneeAngleDifference(maxKneeAngleDifference->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setMaxKneeAngleDifference(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setankleOrientationGain(){
-    if (bsData){
-        if (bsData->gains.ankleOrientationGain != ankleOrientationGain->value()){
-            bsData->gains.ankleOrientationGain = ankleOrientationGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setankleOrientationGain(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setAnkleOrientationGain(){
+    (bsData) ? bsData->setAnkleOrientationGain(ankleOrientationGain->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setAnkleOrientationGain(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::seterrorOutTranslation(){
-    if (bsData){
-        if (bsData->errorOutTranslation != errorOutTranslation->value()){
-            bsData->errorOutTranslation = errorOutTranslation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::seterrorOutTranslation(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setErrorOutTranslation(){
+    (bsData) ? bsData->setErrorOutTranslation(errorOutTranslation->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setErrorOutTranslation(): The 'bsData' pointer is nullptr!!");
 }
 
-void FootIkControlsModifierUI::setalignWithGroundRotation(){
-    if (bsData){
-        if (bsData->alignWithGroundRotation != alignWithGroundRotation->value()){
-            bsData->alignWithGroundRotation = alignWithGroundRotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setalignWithGroundRotation(): The data is nullptr!!");
-    }
+void FootIkControlsModifierUI::setAlignWithGroundRotation(){
+    (bsData) ? bsData->setAlignWithGroundRotation(alignWithGroundRotation->value()) : LogFile::writeToLog("FootIkControlsModifierUI::setAlignWithGroundRotation(): The 'bsData' pointer is nullptr!!");
 }
 
 void FootIkControlsModifierUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
+    auto checkisproperty = [&](int row, const QString & fieldname){
+        bool properties;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+        selectTableToView(properties, fieldname);
+    };
     if (bsData){
         if (row < ADD_LEG_ROW && row >= 0){
             if (column == BINDING_COLUMN){
                 switch (row){
                 case ENABLE_ROW:
-                    if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "enable");
-                    break;
+                    checkisproperty(ENABLE_ROW, "enable"); break;
                 case ON_OFF_GAIN_ROW:
-                    if (table->item(ON_OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "onOffGain");
-                    break;
+                    checkisproperty(ON_OFF_GAIN_ROW, "onOffGain"); break;
                 case GROUND_ASCENDING_GAIN_ROW:
-                    if (table->item(GROUND_ASCENDING_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "groundAscendingGain");
-                    break;
+                    checkisproperty(GROUND_ASCENDING_GAIN_ROW, "groundAscendingGain"); break;
                 case GROUND_DESCENDING_GAIN_ROW:
-                    if (table->item(GROUND_DESCENDING_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "groundDescendingGain");
-                    break;
+                    checkisproperty(GROUND_DESCENDING_GAIN_ROW, "groundDescendingGain"); break;
                 case FOOT_PLANTED_GAIN_ROW:
-                    if (table->item(FOOT_PLANTED_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "footPlantedGain");
-                    break;
+                    checkisproperty(FOOT_PLANTED_GAIN_ROW, "footPlantedGain"); break;
                 case FOOT_RAISED_GAIN_ROW:
-                    if (table->item(FOOT_RAISED_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "footRaisedGain");
-                    break;
+                    checkisproperty(FOOT_RAISED_GAIN_ROW, "footRaisedGain"); break;
                 case FOOT_UNLOCK_GAIN_ROW:
-                    if (table->item(FOOT_UNLOCK_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "footUnlockGain");
-                    break;
+                    checkisproperty(FOOT_UNLOCK_GAIN_ROW, "footUnlockGain"); break;
                 case WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW:
-                    if (table->item(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "worldFromModelFeedbackGain");
-                    break;
+                    checkisproperty(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, "worldFromModelFeedbackGain"); break;
                 case ERROR_UP_DOWN_BIAS_ROW:
-                    if (table->item(ERROR_UP_DOWN_BIAS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "errorUpDownBias");
-                    break;
+                    checkisproperty(ERROR_UP_DOWN_BIAS_ROW, "errorUpDownBias"); break;
                 case ALIGN_WORLD_FROM_MODEL_GAIN_ROW:
-                    if (table->item(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "alignWorldFromModelGain");
-                    break;
+                    checkisproperty(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, "alignWorldFromModelGain"); break;
                 case HIP_ORIENTATION_GAIN_ROW:
-                    if (table->item(HIP_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "hipOrientationGain");
-                    break;
+                    checkisproperty(HIP_ORIENTATION_GAIN_ROW, "hipOrientationGain"); break;
                 case MAX_KNEE_ANGLE_DIFFERENCE_ROW:
-                    if (table->item(MAX_KNEE_ANGLE_DIFFERENCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "maxKneeAngleDifference");
-                    break;
+                    checkisproperty(MAX_KNEE_ANGLE_DIFFERENCE_ROW, "maxKneeAngleDifference"); break;
                 case ANKLE_ORIENTATION_GAIN_ROW:
-                    if (table->item(ANKLE_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "ankleOrientationGain");
-                    break;
+                    checkisproperty(ANKLE_ORIENTATION_GAIN_ROW, "ankleOrientationGain"); break;
                 case ERROR_OUT_TRANSLATION_ROW:
-                    if (table->item(ERROR_OUT_TRANSLATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "errorOutTranslation");
-                    break;
+                    checkisproperty(ERROR_OUT_TRANSLATION_ROW, "errorOutTranslation"); break;
                 case ALIGN_WITH_GROUND_ROTATION:
-                    if (table->item(ALIGN_WITH_GROUND_ROTATION, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "alignWithGroundRotation");
-                    break;
+                    checkisproperty(ALIGN_WITH_GROUND_ROTATION, "alignWithGroundRotation"); break;
                 }
             }
         }else if (row == ADD_LEG_ROW && column == NAME_COLUMN){
             addLeg();
         }else if (row > ADD_LEG_ROW && row < ADD_LEG_ROW + bsData->getNumberOfLegs() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfLegs() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     legUI->loadData(((BehaviorFile *)(bsData->getParentFile())), &bsData->legs[result], bsData, result);
@@ -765,22 +443,20 @@ void FootIkControlsModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!");
+                LogFile::writeToLog("FootIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void FootIkControlsModifierUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     case CHILD_WIDGET:
-        legUI->setBindingVariable(index, name);
-        break;
+        legUI->setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("FootIkControlsModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -798,32 +474,7 @@ void FootIkControlsModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
-    }
-}
-
-void FootIkControlsModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -843,87 +494,41 @@ void FootIkControlsModifierUI::selectTableToView(bool viewproperties, const QStr
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void FootIkControlsModifierUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("FootIkControlsModifierUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            bind = bsData->getVariableBindingSetData();
+            auto bind = bsData->getVariableBindingSetData();
             if (bind){
-                bindIndex = bind->getVariableIndexOfBinding("enable");
-                if (bindIndex == index){
-                    table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("onOffGain");
-                if (bindIndex == index){
-                    table->item(ON_OFF_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("groundAscendingGain");
-                if (bindIndex == index){
-                    table->item(GROUND_ASCENDING_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("groundDescendingGain");
-                if (bindIndex == index){
-                    table->item(GROUND_DESCENDING_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("footPlantedGain");
-                if (bindIndex == index){
-                    table->item(FOOT_PLANTED_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("footRaisedGain");
-                if (bindIndex == index){
-                    table->item(FOOT_RAISED_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("footUnlockGain");
-                if (bindIndex == index){
-                    table->item(FOOT_UNLOCK_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("worldFromModelFeedbackGain");
-                if (bindIndex == index){
-                    table->item(WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("errorUpDownBias");
-                if (bindIndex == index){
-                    table->item(ERROR_UP_DOWN_BIAS_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("alignWorldFromModelGain");
-                if (bindIndex == index){
-                    table->item(ALIGN_WORLD_FROM_MODEL_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("hipOrientationGain");
-                if (bindIndex == index){
-                    table->item(HIP_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("maxKneeAngleDifference");
-                if (bindIndex == index){
-                    table->item(MAX_KNEE_ANGLE_DIFFERENCE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("ankleOrientationGain");
-                if (bindIndex == index){
-                    table->item(ANKLE_ORIENTATION_GAIN_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("errorOutTranslation");
-                if (bindIndex == index){
-                    table->item(ERROR_OUT_TRANSLATION_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("alignWithGroundRotation");
-                if (bindIndex == index){
-                    table->item(ALIGN_WITH_GROUND_ROTATION, BINDING_COLUMN)->setText(name);
-                }
+                auto setname = [&](const QString & fieldname, int row){
+                    auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                    (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+                };
+                setname("enable", ENABLE_ROW);
+                setname("onOffGain", ON_OFF_GAIN_ROW);
+                setname("groundAscendingGain", GROUND_ASCENDING_GAIN_ROW);
+                setname("groundDescendingGain", GROUND_DESCENDING_GAIN_ROW);
+                setname("footPlantedGain", FOOT_PLANTED_GAIN_ROW);
+                setname("footRaisedGain", FOOT_RAISED_GAIN_ROW);
+                setname("footUnlockGain", FOOT_UNLOCK_GAIN_ROW);
+                setname("worldFromModelFeedbackGain", WORLD_FROM_MODEL_FEEDBACK_GAIN_ROW);
+                setname("errorUpDownBias", ERROR_UP_DOWN_BIAS_ROW);
+                setname("alignWorldFromModelGain", ALIGN_WORLD_FROM_MODEL_GAIN_ROW);
+                setname("hipOrientationGain", HIP_ORIENTATION_GAIN_ROW);
+                setname("maxKneeAngleDifference", MAX_KNEE_ANGLE_DIFFERENCE_ROW);
+                setname("ankleOrientationGain", ANKLE_ORIENTATION_GAIN_ROW);
+                setname("errorOutTranslation", ERROR_OUT_TRANSLATION_ROW);
+                setname("alignWithGroundRotation", ALIGN_WITH_GROUND_ROTATION);
             }
         }else{
             legUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("FootIkControlsModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

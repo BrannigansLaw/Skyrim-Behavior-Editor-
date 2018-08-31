@@ -25,7 +25,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList ModifierListUI::types = {
+const QStringList ModifierListUI::types = {
     "hkbModifierList",
     "hkbTwistModifier",
     "hkbEventDrivenModifier",
@@ -79,7 +79,7 @@ QStringList ModifierListUI::types = {
     "hkbHandIKControlsModifier"
 };
 
-QStringList ModifierListUI::headerLabels = {
+const QStringList ModifierListUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -121,89 +121,56 @@ ModifierListUI::ModifierListUI()
     table->setItem(ADD_MODIFIER_ROW, VALUE_COLUMN, new TableWidgetItem("Change Selected Modifier", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to change the selected modifier"));
     topLyt->addWidget(table, 1, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ModifierListUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
-}
-
-void ModifierListUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
+void ModifierListUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
+    }
 }
 
 void ModifierListUI::loadData(HkxObject *data){
-    disconnectSignals();
-    hkbVariableBindingSet *varBind = nullptr;
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_MODIFIER_LIST){
             bsData = static_cast<hkbModifierList *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ModifierListUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("ModifierListUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::loadData(): The data passed to the UI is nullptr!!!");
+        LogFile::writeToLog("ModifierListUI::loadData(): The data passed to the UI is nullptr!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void ModifierListUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_MODIFIER_ROW + bsData->modifiers.size() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
-        hkbModifier *child = nullptr;
+        auto temp = ADD_MODIFIER_ROW + bsData->modifiers.size() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
         for (auto i = ADD_MODIFIER_ROW + 1, j = 0; j < bsData->modifiers.size(); i++, j++){
-            child = static_cast<hkbModifier *>(bsData->modifiers.at(j).data());
+            auto child = bsData->getModifierAt(j);
             if (child){
-                setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this modifier", VIEW_MODIFIERS_TABLE_TIP);
+                UIHelper::setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this modifier", VIEW_MODIFIERS_TABLE_TIP, table);
             }else{
-                CRITICAL_ERROR_MESSAGE("ModifierListUI::loadData(): Null state found!!!");
+                LogFile::writeToLog("ModifierListUI::loadData(): Null state found!!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::loadDynamicTableRows(): The data is nullptr!!");
-    }
-    //table->setSortingEnabled(true);
-}
-
-void ModifierListUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name, Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::white), QBrush(Qt::black), DRAG_DROP_N_SWAP));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
+        LogFile::writeToLog("ModifierListUI::loadDynamicTableRows(): The data is nullptr!!");
     }
 }
 
@@ -219,120 +186,49 @@ void ModifierListUI::connectToTables(GenericTableWidget *modifiers, GenericTable
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("ModifierListUI::connectToTables(): One or more arguments are nullptr!!");
     }
-}
-
-bool ModifierListUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("ModifierListUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("ModifierListUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void ModifierListUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
-        switch (row){
-        case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void ModifierListUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("ModifierListUI::loadBinding(): The variable binding set is nullptr!!");
+        auto isProperty = false;
+        auto row = table->currentRow();
+        if (row == ENABLE_ROW){
+            (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, "enable", VARIABLE_TYPE_BOOL, isProperty, table, bsData);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::variableRenamed(const QString &name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("ModifierListUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
-        bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto bindIndex = bind->getVariableIndexOfBinding("enable");
+            (bindIndex == index) ? table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name) : NULL;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::modifierRenamed(const QString &name, int index){
-    int modifierIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
+    auto modifierIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
     if (bsData){
         if (modifierIndex >= 0 && modifierIndex < bsData->modifiers.size()){
             index--;
-            if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifiers.at(modifierIndex))){
+            if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->getModifierAt(modifierIndex))){
                 table->item(table->currentRow(), VALUE_COLUMN)->setText(name);
             }
         }else{
             WARNING_MESSAGE("ModifierListUI::generatorRenamed(): Invalid modifier index selected!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -356,65 +252,50 @@ void ModifierListUI::selectTableToView(bool viewproperties, const QString &path)
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
-void ModifierListUI::setName(){
+void ModifierListUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::setName(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("ModifierListUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void ModifierListUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
     if (bsData){
         if (row < ADD_MODIFIER_ROW && row >= 0){
-            if (column == BINDING_COLUMN){
-                switch (row){
-                case ENABLE_ROW:
-                    if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "enable");
-                    break;
-                }
+            auto properties = false;
+            if (column == BINDING_COLUMN && row == ENABLE_ROW){
+                (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+                selectTableToView(properties, "enable");
             }
         }else if (row == ADD_MODIFIER_ROW && column == NAME_COLUMN){
             addModifier();
-        }else if (row > ADD_MODIFIER_ROW && row < ADD_MODIFIER_ROW + bsData->modifiers.size() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
-            if (bsData->modifiers.size() > result && result >= 0){
+        }else if (row > ADD_MODIFIER_ROW && row < ADD_MODIFIER_ROW + bsData->getNumberOfModifiers() + 1){
+            auto result = row - BASE_NUMBER_OF_ROWS;
+            if (bsData->getNumberOfModifiers() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifiers.at(result)) + 1, QString(), QStringList());
+                    emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->getModifierAt(result)) + 1, QString(), QStringList());
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the modifier \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
                         removeModifier(result);
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("ModifierListUI::viewSelectedChild(): Invalid index of child to view!!");
+                LogFile::writeToLog("ModifierListUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -435,52 +316,26 @@ void ModifierListUI::swapGeneratorIndices(int index1, int index2){
             WARNING_MESSAGE("ModifierListUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::swapGeneratorIndices(): The data is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::setModifier(int index, const QString &name){
-    DataIconManager *ptr = nullptr;
-    int modifierIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
+    auto modifierIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
     if (bsData){
-        if (behaviorView){
-            if (modifierIndex >= 0 && modifierIndex < bsData->modifiers.size()){
-                ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index - 1);
-                if (ptr){
-                    if (name != ptr->getName()){
-                        CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                        return;
-                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifiers.at(modifierIndex).data()), modifierIndex, ptr, false)){
-                        WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                        return;
-                    }
-                }else{
-                    if (behaviorView->getSelectedItem()){
-                        behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->modifiers.at(modifierIndex).data())), modifierIndex);
-                    }else{
-                        CRITICAL_ERROR_MESSAGE("ModifierListUI::setModifier(): The selected icon is nullptr!!");
-                        return;
-                    }
-                }
-                behaviorView->removeModifierData();
-                table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                bsData->setIsFileChanged(true);
-                loadDynamicTableRows();
-            }else{
-                CRITICAL_ERROR_MESSAGE("ModifierListUI::setModifier(): Invalid modifier index selected!!");
-            }
+        if (modifierIndex >= 0 && modifierIndex < bsData->getNumberOfModifiers()){
+            UIHelper::setModifier(index, name, bsData, bsData->getModifierAt(modifierIndex), NULL_SIGNATURE, HkxObject::TYPE_MODIFIER, table, behaviorView, modifierIndex, VALUE_COLUMN);
         }else{
-            CRITICAL_ERROR_MESSAGE("ModifierListUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
+            LogFile::writeToLog("ModifierListUI::setModifier(): Invalid modifier index selected!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::setModifier(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::setModifier(): The 'bsData' pointer is nullptr!!");
     }
 }
 
 void ModifierListUI::addModifier(){
-    QString text;
     if (bsData && behaviorView){
-        text = typeSelectorCB->currentText();
+        auto text = typeSelectorCB->currentText();
         if (text == "hkbModifierList"){
             behaviorView->appendModifierList();
         }else if (text == "hkbTwistModifier"){
@@ -584,24 +439,24 @@ void ModifierListUI::addModifier(){
         }else if (text == "hkbHandIKControlsModifier"){
             behaviorView->appendHandIKControlsModifier();
         }else{
-            CRITICAL_ERROR_MESSAGE("ModifierListUI::addModifier(): Invalid type!!");
+            LogFile::writeToLog("ModifierListUI::addModifier(): Invalid type!!");
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::addModifier(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::addModifier(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::removeModifier(int index){
     if (bsData && behaviorView){
-        if (index < bsData->modifiers.size() && index >= 0){
-            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(bsData->modifiers.at(index).data()), index);//Reorderchildren?
+        if (index < bsData->getNumberOfModifiers() && index >= 0){
+            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(bsData->getModifierAt(index)), index);
             behaviorView->removeObjects();
         }else{
             WARNING_MESSAGE("ModifierListUI::removeModifier(): Invalid index of generator to remove!!");
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("ModifierListUI::removeModifier(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("ModifierListUI::removeModifier(): The data or behaviorView is nullptr!!");
     }
 }

@@ -19,45 +19,44 @@ class hkbVariableBindingSet;
 class ExpressionDataArrayUI;
 class QGroupBox;
 
-class EvaluateExpressionModifierUI: public QStackedWidget
+class EvaluateExpressionModifierUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     EvaluateExpressionModifierUI();
-    virtual ~EvaluateExpressionModifierUI(){}
+    EvaluateExpressionModifierUI& operator=(const EvaluateExpressionModifierUI&) = delete;
+    EvaluateExpressionModifierUI(const EvaluateExpressionModifierUI &) = delete;
+    ~EvaluateExpressionModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
+    void variableRenamed(const QString & name, int index);
+    void eventRenamed(const QString & name, int index);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void modifierNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setEnable();
     void viewSelectedChild(int row, int column);
     void variableTableElementSelected(int index, const QString &name);
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
     void addExpression();
     void removeExpression(int index);
-    void eventRenamed(const QString & name, int index);
     void loadDynamicTableRows();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
-    void variableRenamed(const QString & name, int index);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        MAIN_WIDGET,
+        CHILD_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     hkbEvaluateExpressionModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

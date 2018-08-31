@@ -35,6 +35,7 @@ public:
     QString getRagdollName() const;
     int getNumberOfAnimations() const;
 private:
+    void setVariableNameAt(int index, const QString & name);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();

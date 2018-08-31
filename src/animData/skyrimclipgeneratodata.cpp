@@ -51,9 +51,9 @@ bool SkyrimClipGeneratoData::read(QFile *file, ulong &lineCount){
     QByteArray line;
     QList <QByteArray> list;
     bool ok = false;
-    uint index = 0;
-    uint size = 0;
-    qreal value = 0;
+    auto index = 0U;
+    auto size = 0U;
+    auto value = 0.0;
     if (!chopLine(file, line, lineCount)){
         return false;
     }

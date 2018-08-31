@@ -16,15 +16,15 @@ protected:
     void unselect();
     void setIconSelected();
 private:
-    static QRectF button;
-    static QRectF textRec;
-    static QFont font;
-    static QBrush brush;
-    static QBrush buttonBrush;
-    static QLineF vert;
-    static QLineF horiz;
-    static QRectF ellipse;
-    static QRectF square;
+    static const QRectF button;
+    static const QRectF textRec;
+    static const QFont font;
+    static const QBrush brush;
+    static const QBrush buttonBrush;
+    static const QLineF vert;
+    static const QLineF horiz;
+    static const QRectF ellipse;
+    static const QRectF square;
     QPen pen;
     QPolygonF polygon;
     QPolygonF arrowHead;

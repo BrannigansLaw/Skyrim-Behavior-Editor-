@@ -369,11 +369,6 @@ void GenericTableWidget::itemSelected(){
         if (table->item(row, 0)){
             name = table->item(row, 0)->text();
         }
-#ifdef QT_DEBUG
-        if (row == 0){
-            WARNING_MESSAGE("GenericTableWidget::itemSelected(): \nSomething was cleared!!");
-        }
-#endif
         lastSelectedRow = row;
         emit elementSelected(row, name);
         hide();
@@ -386,21 +381,11 @@ void GenericTableWidget::itemSelectedAt(int row, int ){
         if (table->item(row, 0)){
             name = table->item(row, 0)->text();
         }
-#ifdef QT_DEBUG
-        if (row == 0){
-            WARNING_MESSAGE("GenericTableWidget::itemSelected(): \nSomething was cleared!!");
-        }
-#endif
         lastSelectedRow = row;
         emit elementSelected(row, name);
         hide();
     }
 }
-
-/*void GenericTableWidget::setTypes(const QStringList & typeNames){
-    typeSelector->clear();
-    typeSelector->addItems(typeNames);
-}*/
 
 namespace UIHelper{
 
@@ -418,9 +403,9 @@ void setBinding(int index, int row, int column, const QString & variableName, co
     };
     if (bsData){
         auto varBind = bsData->getVariableBindingSetData();
-        if (index == 0){
+        if (!index){
             varBind->removeBinding(path);
-            if (varBind->getNumberOfBindings() == 0){
+            if (!varBind->getNumberOfBindings()){
                 static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr();
                 static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
             }

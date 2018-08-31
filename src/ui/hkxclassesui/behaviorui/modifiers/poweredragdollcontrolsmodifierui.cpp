@@ -36,7 +36,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList PoweredRagdollControlsModifierUI::headerLabels = {
+const QStringList PoweredRagdollControlsModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -125,48 +125,49 @@ PoweredRagdollControlsModifierUI::PoweredRagdollControlsModifierUI()
     addWidget(groupBox);
     addWidget(boneIndexUI);
     addWidget(boneWeightsUI);
+    toggleSignals(true);
 }
 
-void PoweredRagdollControlsModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(maxForce, SIGNAL(editingFinished()), this, SLOT(setMaxForce()), Qt::UniqueConnection);
-    connect(tau, SIGNAL(editingFinished()), this, SLOT(setTau()), Qt::UniqueConnection);
-    connect(damping, SIGNAL(editingFinished()), this, SLOT(setDamping()), Qt::UniqueConnection);
-    connect(proportionalRecoveryVelocity, SIGNAL(released()), this, SLOT(setProportionalRecoveryVelocity()), Qt::UniqueConnection);
-    connect(constantRecoveryVelocity, SIGNAL(released()), this, SLOT(setConstantRecoveryVelocity()), Qt::UniqueConnection);
-    connect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()), Qt::UniqueConnection);
-    connect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()), Qt::UniqueConnection);
-    connect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()), Qt::UniqueConnection);
-    connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
-    connect(bones, SIGNAL(pressed()), this, SLOT(viewBones()), Qt::UniqueConnection);
-    connect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)), Qt::UniqueConnection);
-    connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(boneWeights, SIGNAL(pressed()), this, SLOT(viewBoneWeights()), Qt::UniqueConnection);
-    connect(boneWeights, SIGNAL(enabled(bool)), this, SLOT(toggleBoneWeights(bool)), Qt::UniqueConnection);
-    connect(boneWeightsUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void PoweredRagdollControlsModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(maxForce, SIGNAL(editingFinished()), this, SLOT(setMaxForce()));
-    disconnect(tau, SIGNAL(editingFinished()), this, SLOT(setTau()));
-    disconnect(damping, SIGNAL(editingFinished()), this, SLOT(setDamping()));
-    disconnect(proportionalRecoveryVelocity, SIGNAL(released()), this, SLOT(setProportionalRecoveryVelocity()));
-    disconnect(constantRecoveryVelocity, SIGNAL(released()), this, SLOT(setConstantRecoveryVelocity()));
-    disconnect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()));
-    disconnect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()));
-    disconnect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()));
-    disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
-    disconnect(bones, SIGNAL(pressed()), this, SLOT(viewBones()));
-    disconnect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)));
-    disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(boneWeights, SIGNAL(pressed()), this, SLOT(viewBoneWeights()));
-    disconnect(boneWeights, SIGNAL(enabled(bool)), this, SLOT(toggleBoneWeights(bool)));
-    disconnect(boneWeightsUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void PoweredRagdollControlsModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(maxForce, SIGNAL(editingFinished()), this, SLOT(setMaxForce()), Qt::UniqueConnection);
+        connect(tau, SIGNAL(editingFinished()), this, SLOT(setTau()), Qt::UniqueConnection);
+        connect(damping, SIGNAL(editingFinished()), this, SLOT(setDamping()), Qt::UniqueConnection);
+        connect(proportionalRecoveryVelocity, SIGNAL(released()), this, SLOT(setProportionalRecoveryVelocity()), Qt::UniqueConnection);
+        connect(constantRecoveryVelocity, SIGNAL(released()), this, SLOT(setConstantRecoveryVelocity()), Qt::UniqueConnection);
+        connect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()), Qt::UniqueConnection);
+        connect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()), Qt::UniqueConnection);
+        connect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()), Qt::UniqueConnection);
+        connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
+        connect(bones, SIGNAL(pressed()), this, SLOT(viewBones()), Qt::UniqueConnection);
+        connect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)), Qt::UniqueConnection);
+        connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(boneWeights, SIGNAL(pressed()), this, SLOT(viewBoneWeights()), Qt::UniqueConnection);
+        connect(boneWeights, SIGNAL(enabled(bool)), this, SLOT(toggleBoneWeights(bool)), Qt::UniqueConnection);
+        connect(boneWeightsUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(maxForce, SIGNAL(editingFinished()), this, SLOT(setMaxForce()));
+        disconnect(tau, SIGNAL(editingFinished()), this, SLOT(setTau()));
+        disconnect(damping, SIGNAL(editingFinished()), this, SLOT(setDamping()));
+        disconnect(proportionalRecoveryVelocity, SIGNAL(released()), this, SLOT(setProportionalRecoveryVelocity()));
+        disconnect(constantRecoveryVelocity, SIGNAL(released()), this, SLOT(setConstantRecoveryVelocity()));
+        disconnect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()));
+        disconnect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()));
+        disconnect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()));
+        disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
+        disconnect(bones, SIGNAL(pressed()), this, SLOT(viewBones()));
+        disconnect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)));
+        disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(boneWeights, SIGNAL(pressed()), this, SLOT(viewBoneWeights()));
+        disconnect(boneWeights, SIGNAL(enabled(bool)), this, SLOT(toggleBoneWeights(bool)));
+        disconnect(boneWeightsUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void PoweredRagdollControlsModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *ragdollBones){
@@ -181,325 +182,185 @@ void PoweredRagdollControlsModifierUI::connectToTables(GenericTableWidget *varia
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
-    disconnectSignals();
     if (data){
         if (data->getSignature() == HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER){
-            QStringList boneNames("None");
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbPoweredRagdollControlsModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            maxForce->setValue(bsData->maxForce);
-            tau->setValue(bsData->tau);
-            damping->setValue(bsData->damping);
-            proportionalRecoveryVelocity->setValue(bsData->proportionalRecoveryVelocity);
-            constantRecoveryVelocity->setValue(bsData->constantRecoveryVelocity);
-            if (bsData->bones.data()){
-                bones->setChecked(true);
-                bones->setText("Edit");
-            }else{
-                bones->setChecked(false);
-                bones->setText("nullptr");
-            }
-            if (poseMatchingBone0->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
-                poseMatchingBone0->insertItems(0, boneNames);
-            }
-            poseMatchingBone0->setCurrentIndex(bsData->poseMatchingBone0 + 1);
-            if (poseMatchingBone1->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
-                poseMatchingBone1->insertItems(0, boneNames);
-            }
-            poseMatchingBone1->setCurrentIndex(bsData->poseMatchingBone1 + 1);
-            if (poseMatchingBone2->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
-                poseMatchingBone2->insertItems(0, boneNames);
-            }
-            poseMatchingBone2->setCurrentIndex(bsData->poseMatchingBone2 + 1);
-            if (mode->count() == 0){
-                mode->insertItems(0, bsData->Mode);
-            }
-            mode->setCurrentIndex(bsData->Mode.indexOf(bsData->mode));
-            if (bsData->boneWeights.data()){
-                boneWeights->setChecked(true);
-                boneWeights->setText("Edit");
-            }else{
-                boneWeights->setChecked(false);
-                boneWeights->setText("nullptr");
-            }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(MAX_FORCE_ROW, BINDING_COLUMN, varBind, "maxForce");
-                loadBinding(TAU_ROW, BINDING_COLUMN, varBind, "tau");
-                loadBinding(DAMPING_ROW, BINDING_COLUMN, varBind, "damping");
-                loadBinding(PROPERTIONAL_RECOVERY_VELOCITY_ROW, BINDING_COLUMN, varBind, "proportionalRecoveryVelocity");
-                loadBinding(CONSTANT_RECOVERY_VELOCITY_ROW, BINDING_COLUMN, varBind, "constantRecoveryVelocity");
-                loadBinding(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN, varBind, "poseMatchingBone0");
-                loadBinding(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN, varBind, "poseMatchingBone1");
-                loadBinding(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN, varBind, "poseMatchingBone2");
-                loadBinding(BONE_WEIGHTS_ROW, BINDING_COLUMN, varBind, "boneWeights");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(MAX_FORCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TAU_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DAMPING_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(PROPERTIONAL_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CONSTANT_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            maxForce->setValue(bsData->getMaxForce());
+            tau->setValue(bsData->getTau());
+            damping->setValue(bsData->getDamping());
+            proportionalRecoveryVelocity->setValue(bsData->getProportionalRecoveryVelocity());
+            constantRecoveryVelocity->setValue(bsData->getConstantRecoveryVelocity());
+            (bsData->getBones()) ? bones->setChecked(true), bones->setText("Edit") : bones->setChecked(false), bones->setText("nullptr");
+            auto loadbones = [&](ComboBox *combobox, int indextoset){
+                if (!combobox->count()){
+                    auto boneNames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(poseMatchingBone0, bsData->getPoseMatchingBone0() + 1);
+            loadbones(poseMatchingBone1, bsData->getPoseMatchingBone1() + 1);
+            loadbones(poseMatchingBone2, bsData->getPoseMatchingBone2() + 1);
+            (!mode->count()) ? mode->insertItems(0, bsData->Mode) : NULL;
+            mode->setCurrentIndex(bsData->Mode.indexOf(bsData->getMode()));
+            (bsData->getBoneWeights()) ? boneWeights->setChecked(true), boneWeights->setText("Edit") : boneWeights->setChecked(false), boneWeights->setText("nullptr");
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(MAX_FORCE_ROW, BINDING_COLUMN, varBind, "maxForce", table, bsData);
+            UIHelper::loadBinding(TAU_ROW, BINDING_COLUMN, varBind, "tau", table, bsData);
+            UIHelper::loadBinding(DAMPING_ROW, BINDING_COLUMN, varBind, "damping", table, bsData);
+            UIHelper::loadBinding(PROPERTIONAL_RECOVERY_VELOCITY_ROW, BINDING_COLUMN, varBind, "proportionalRecoveryVelocity", table, bsData);
+            UIHelper::loadBinding(CONSTANT_RECOVERY_VELOCITY_ROW, BINDING_COLUMN, varBind, "constantRecoveryVelocity", table, bsData);
+            UIHelper::loadBinding(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN, varBind, "poseMatchingBone0", table, bsData);
+            UIHelper::loadBinding(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN, varBind, "poseMatchingBone1", table, bsData);
+            UIHelper::loadBinding(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN, varBind, "poseMatchingBone2", table, bsData);
+            UIHelper::loadBinding(BONE_WEIGHTS_ROW, BINDING_COLUMN, varBind, "boneWeights", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void PoweredRagdollControlsModifierUI::setName(){
+void PoweredRagdollControlsModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("PoweredRagdollControlsModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setMaxForce(){
-    if (bsData){
-        if (bsData->maxForce != maxForce->value()){
-            bsData->maxForce = maxForce->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setmaxForce(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMaxForce(maxForce->value()) : LogFile::writeToLog("PoweredRagdollControlsModifierUI::setMaxForce(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setTau(){
-    if (bsData){
-        if (bsData->tau != tau->value()){
-            bsData->tau = tau->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::settau(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTau(tau->value()) : LogFile::writeToLog("PoweredRagdollControlsModifierUI::setTau(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setDamping(){
-    if (bsData){
-        if (bsData->damping != damping->value()){
-            bsData->damping = damping->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setdamping(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDamping(damping->value()) : LogFile::writeToLog("PoweredRagdollControlsModifierUI::setDamping(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setProportionalRecoveryVelocity(){
-    if (bsData){
-        if (bsData->proportionalRecoveryVelocity != proportionalRecoveryVelocity->value()){
-            bsData->proportionalRecoveryVelocity = proportionalRecoveryVelocity->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setproportionalRecoveryVelocity(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setProportionalRecoveryVelocity(proportionalRecoveryVelocity->value()) : LogFile::writeToLog("PoweredRagdollControlsModifierUI::setProportionalRecoveryVelocity(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setConstantRecoveryVelocity(){
-    if (bsData){
-        if (bsData->constantRecoveryVelocity != constantRecoveryVelocity->value()){
-            bsData->constantRecoveryVelocity = constantRecoveryVelocity->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setconstantRecoveryVelocity(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setConstantRecoveryVelocity(constantRecoveryVelocity->value()) : LogFile::writeToLog("PoweredRagdollControlsModifierUI::setConstantRecoveryVelocity(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setPoseMatchingBone0(int index){
-    if (bsData){
-        bsData->poseMatchingBone0 = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setPoseMatchingBone0(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPoseMatchingBone0(index - 1) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setPoseMatchingBone0(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setPoseMatchingBone1(int index){
-    if (bsData){
-        bsData->poseMatchingBone1 = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setPoseMatchingBone1(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPoseMatchingBone1(index - 1) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setPoseMatchingBone1(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setPoseMatchingBone2(int index){
-    if (bsData){
-        bsData->poseMatchingBone2 = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setPoseMatchingBone2(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPoseMatchingBone2(index - 1) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setPoseMatchingBone2(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::setMode(int index){
-    if (bsData){
-        bsData->mode = bsData->Mode.at(index);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setMode(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMode(index) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setMode(): The 'bsData' pointer is nullptr!!");
 }
 
 void PoweredRagdollControlsModifierUI::toggleBones(bool enable){
     if (bsData){
         if (!enable){
-            bsData->bones = HkxSharedPtr();
+            bsData->setBones(nullptr);
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-        }else if (!bsData->bones.data()){
-            hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
-            //bsData->getParentFile()->addObjectToFile(indices, -1);
-            bsData->bones = HkxSharedPtr(indices);
-            //bones->setText(indices->getName());
+        }else if (!bsData->getBones()){
+            bsData->setBones(new hkbBoneIndexArray(bsData->getParentFile()));
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::toggleBones(): The data is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::toggleBones(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::viewBones(){
     if (bsData){
-        boneIndexUI->loadData(bsData->bones.data());
+        boneIndexUI->loadData(bsData->getBones());
         setCurrentIndex(BONE_INDEX_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::viewBones(): The data is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::viewBones(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
     if (bsData){
         if (!enable){
-            bsData->boneWeights = HkxSharedPtr();
+            bsData->setBoneWeights(nullptr);
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-        }else if (enable && !bsData->boneWeights.data()){
-            bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
+        }else if (enable && !bsData->getBoneWeights()){
+            bsData->setBoneWeights(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
             boneWeights->setText("Edit");
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::toggleBoneWeights(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorChildUI::toggleBoneWeights(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::viewBoneWeights(){
     if (bsData){
-        boneWeightsUI->loadData(bsData->boneWeights.data());
+        boneWeightsUI->loadData(bsData->getBoneWeights());
         setCurrentIndex(BONE_WEIGHT_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::viewBoneWeights(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorChildUI::viewBoneWeights(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case MAX_FORCE_ROW:
-                if (table->item(MAX_FORCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "maxForce");
-                break;
+                checkisproperty(MAX_FORCE_ROW, "maxForce"); break;
             case TAU_ROW:
-                if (table->item(TAU_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "tau");
-                break;
+                checkisproperty(TAU_ROW, "tau"); break;
             case DAMPING_ROW:
-                if (table->item(DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "damping");
-                break;
+                checkisproperty(DAMPING_ROW, "damping"); break;
             case PROPERTIONAL_RECOVERY_VELOCITY_ROW:
-                if (table->item(PROPERTIONAL_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "proportionalRecoveryVelocity");
-                break;
+                checkisproperty(PROPERTIONAL_RECOVERY_VELOCITY_ROW, "proportionalRecoveryVelocity"); break;
             case CONSTANT_RECOVERY_VELOCITY_ROW:
-                if (table->item(CONSTANT_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "constantRecoveryVelocity");
-                break;
+                checkisproperty(CONSTANT_RECOVERY_VELOCITY_ROW, "constantRecoveryVelocity"); break;
             case POSE_MATCHING_BONE_0_ROW:
-                if (table->item(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "poseMatchingBone0");
-                break;
+                checkisproperty(POSE_MATCHING_BONE_0_ROW, "poseMatchingBone0"); break;
             case POSE_MATCHING_BONE_1_ROW:
-                if (table->item(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "poseMatchingBone1");
-                break;
+                checkisproperty(POSE_MATCHING_BONE_1_ROW, "poseMatchingBone1"); break;
             case POSE_MATCHING_BONE_2_ROW:
-                if (table->item(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "poseMatchingBone2");
-                break;
+                checkisproperty(POSE_MATCHING_BONE_2_ROW, "poseMatchingBone2"); break;
             case BONE_WEIGHTS_ROW:
-                if (table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "boneWeights");
-                break;
-            default:
-                return;
+                checkisproperty(BONE_WEIGHTS_ROW, "boneWeights"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -519,192 +380,70 @@ void PoweredRagdollControlsModifierUI::selectTableToView(bool viewisProperty, co
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("maxForce");
-            if (bindIndex == index){
-                table->item(MAX_FORCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("tau");
-            if (bindIndex == index){
-                table->item(TAU_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("damping");
-            if (bindIndex == index){
-                table->item(DAMPING_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("proportionalRecoveryVelocity");
-            if (bindIndex == index){
-                table->item(PROPERTIONAL_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("constantRecoveryVelocity");
-            if (bindIndex == index){
-                table->item(CONSTANT_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("poseMatchingBone0");
-            if (bindIndex == index){
-                table->item(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("poseMatchingBone1");
-            if (bindIndex == index){
-                table->item(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("poseMatchingBone2");
-            if (bindIndex == index){
-                table->item(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("boneWeights");
-            if (bindIndex == index){
-                table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("maxForce", MAX_FORCE_ROW);
+            setname("tau", TAU_ROW);
+            setname("damping", DAMPING_ROW);
+            setname("proportionalRecoveryVelocity", PROPERTIONAL_RECOVERY_VELOCITY_ROW);
+            setname("constantRecoveryVelocity", CONSTANT_RECOVERY_VELOCITY_ROW);
+            setname("poseMatchingBone0", POSE_MATCHING_BONE_0_ROW);
+            setname("poseMatchingBone1", POSE_MATCHING_BONE_1_ROW);
+            setname("poseMatchingBone2", POSE_MATCHING_BONE_2_ROW);
+            setname("boneWeights", BONE_WEIGHTS_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool PoweredRagdollControlsModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void PoweredRagdollControlsModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case MAX_FORCE_ROW:
-            if (table->item(MAX_FORCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "maxForce", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MAX_FORCE_ROW, "maxForce", VARIABLE_TYPE_REAL); break;
         case TAU_ROW:
-            if (table->item(TAU_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "tau", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(TAU_ROW, "tau", VARIABLE_TYPE_REAL); break;
         case DAMPING_ROW:
-            if (table->item(DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "damping", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(DAMPING_ROW, "damping", VARIABLE_TYPE_REAL); break;
         case PROPERTIONAL_RECOVERY_VELOCITY_ROW:
-            if (table->item(PROPERTIONAL_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "proportionalRecoveryVelocity", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(PROPERTIONAL_RECOVERY_VELOCITY_ROW, "proportionalRecoveryVelocity", VARIABLE_TYPE_REAL); break;
         case CONSTANT_RECOVERY_VELOCITY_ROW:
-            if (table->item(CONSTANT_RECOVERY_VELOCITY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "constantRecoveryVelocity", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(CONSTANT_RECOVERY_VELOCITY_ROW, "constantRecoveryVelocity", VARIABLE_TYPE_REAL); break;
         case POSE_MATCHING_BONE_0_ROW:
-            if (table->item(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "poseMatchingBone0", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(POSE_MATCHING_BONE_0_ROW, "poseMatchingBone0", VARIABLE_TYPE_INT32); break;
         case POSE_MATCHING_BONE_1_ROW:
-            if (table->item(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "poseMatchingBone1", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(POSE_MATCHING_BONE_1_ROW, "poseMatchingBone1", VARIABLE_TYPE_INT32); break;
         case POSE_MATCHING_BONE_2_ROW:
-            if (table->item(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "poseMatchingBone2", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(POSE_MATCHING_BONE_2_ROW, "poseMatchingBone2", VARIABLE_TYPE_INT32); break;
         case BONE_WEIGHTS_ROW:
-            if (table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "boneWeights", VARIABLE_TYPE_POINTER, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(BONE_WEIGHTS_ROW, "boneWeights", VARIABLE_TYPE_POINTER); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
 void PoweredRagdollControlsModifierUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
-}
-
-void PoweredRagdollControlsModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadBinding(): The data is nullptr!!");
-    }
 }

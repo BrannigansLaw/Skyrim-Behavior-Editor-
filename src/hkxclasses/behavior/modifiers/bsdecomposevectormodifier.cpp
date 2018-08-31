@@ -104,6 +104,71 @@ bool BSDecomposeVectorModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal BSDecomposeVectorModifier::getW() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return w;
+}
+
+void BSDecomposeVectorModifier::setW(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != w) ? w = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'w' was not set!");
+}
+
+qreal BSDecomposeVectorModifier::getZ() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return z;
+}
+
+void BSDecomposeVectorModifier::setZ(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != z) ? z = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'z' was not set!");
+}
+
+qreal BSDecomposeVectorModifier::getY() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return y;
+}
+
+void BSDecomposeVectorModifier::setY(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != y) ? y = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'y' was not set!");
+}
+
+qreal BSDecomposeVectorModifier::getX() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return x;
+}
+
+void BSDecomposeVectorModifier::setX(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != x) ? x = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'x' was not set!");
+}
+
+hkQuadVariable BSDecomposeVectorModifier::getVector() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return vector;
+}
+
+void BSDecomposeVectorModifier::setVector(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != vector) ? vector = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'vector' was not set!");
+}
+
+bool BSDecomposeVectorModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSDecomposeVectorModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSDecomposeVectorModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSDecomposeVectorModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -119,7 +184,7 @@ void BSDecomposeVectorModifier::unlink(){
 QString BSDecomposeVectorModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

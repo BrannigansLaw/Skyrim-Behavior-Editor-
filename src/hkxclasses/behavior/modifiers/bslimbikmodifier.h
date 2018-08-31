@@ -15,6 +15,21 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    qreal getLimitAngleDegrees() const;
+    void setLimitAngleDegrees(const qreal &value);
+    int getStartBoneIndex() const;
+    void setStartBoneIndex(int value);
+    int getEndBoneIndex() const;
+    void setEndBoneIndex(int value);
+    qreal getGain() const;
+    void setGain(const qreal &value);
+    qreal getBoneRadius() const;
+    void setBoneRadius(const qreal &value);
+    qreal getCastOffset() const;
+    void setCastOffset(const qreal &value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

@@ -16,12 +16,16 @@ class TableWidget;
 class hkbVariableBindingSet;
 class QuadVariableWidget;
 
-class LegUI: public QGroupBox
+class LegUI final: public QGroupBox
 {
     Q_OBJECT
     friend class FootIkControlsModifierUI;
 public:
     LegUI();
+    LegUI& operator=(const LegUI&) = delete;
+    LegUI(const LegUI &) = delete;
+    ~LegUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, hkbFootIkControlsModifier::hkLeg *leg, hkbFootIkControlsModifier *par, int index);
 signals:
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -37,16 +41,13 @@ private slots:
     void setIsPlantedMS();
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void toggleSignals(bool toggleconnections);
     void setBindingVariable(int index, const QString & name);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void selectTableToView(bool viewproperties, const QString & path);
     void eventRenamed(const QString & name, int index);
     void variableRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbFootIkControlsModifier::hkLeg *bsData;
     hkbFootIkControlsModifier *parent;

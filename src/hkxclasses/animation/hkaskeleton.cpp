@@ -206,11 +206,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < parentIndices.size(); i++, j++){
             bonesS.append(QString::number(parentIndices.at(i), char('f'), 6));
-            if (j % 16 == 0){
-                bonesS.append("\n");
-            }else{
-                bonesS.append(" ");
-            }
+            (!(j % 16)) ? bonesS.append("\n") : bonesS.append(" ");
         }
         if (parentIndices.size() > 0){
             if (bonesS.endsWith(" \0")){
@@ -237,11 +233,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < referenceFloats.size(); i++, j++){
             bonesS.append(QString::number(referenceFloats.at(i), char('f'), 6));
-            if (j % 16 == 0){
-                bonesS.append("\n");
-            }else{
-                bonesS.append(" ");
-            }
+            (!(j % 16)) ? bonesS.append("\n") : bonesS.append(" ");
         }
         if (referenceFloats.size() > 0){
             if (bonesS.endsWith(" \0")){

@@ -52,7 +52,7 @@ qreal hkbBlenderGeneratorChild::getWorldFromModelWeight() const{
 
 void hkbBlenderGeneratorChild::setWorldFromModelWeight(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != worldFromModelWeight) ? worldFromModelWeight = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'worldFromModelWeight' was not set!");
+    (value != worldFromModelWeight) ? worldFromModelWeight = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'worldFromModelWeight' was not set!");
 }
 
 qreal hkbBlenderGeneratorChild::getWeight() const{
@@ -62,7 +62,7 @@ qreal hkbBlenderGeneratorChild::getWeight() const{
 
 void hkbBlenderGeneratorChild::setWeight(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != weight) ? weight = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'weight' was not set!");
+    (value != weight) ? weight = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'weight' was not set!");
 }
 
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long & index){
@@ -243,8 +243,8 @@ hkbBoneWeightArray *hkbBlenderGeneratorChild::getBoneWeightsData() const{
 QString hkbBlenderGeneratorChild::getGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(generator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(generator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
@@ -269,7 +269,7 @@ bool hkbBlenderGeneratorChild::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbBlenderGeneratorChild::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         generator = HkxSharedPtr();
         return true;
     }
@@ -315,7 +315,7 @@ void hkbBlenderGeneratorChild::unlink(){
 QString hkbBlenderGeneratorChild::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
         QString sigstring;
         if (sig != NULL_SIGNATURE)

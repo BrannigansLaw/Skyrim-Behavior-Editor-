@@ -203,12 +203,12 @@ QString hkbBehaviorGraphStringData::getCharacterPropertyNameAt(int index) const{
 
 void hkbBehaviorGraphStringData::setVariableNameAt(int index, const QString &name){
     std::lock_guard <std::mutex> guard(mutex);
-    (variableNames.size() > index && index > -1) ? variableNames.replace(index, name) : NULL;
+    (variableNames.size() > index && index > -1) ? variableNames.replace(index, name), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'setVariableNameAt' failed!");
 }
 
 void hkbBehaviorGraphStringData::setEventNameAt(int index, const QString &name){
     std::lock_guard <std::mutex> guard(mutex);
-    (eventNames.size() > index && index > -1) ? eventNames.replace(index, name) : NULL;
+    (eventNames.size() > index && index > -1) ? eventNames.replace(index, name), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'setEventNameAt' failed!");
 }
 
 bool hkbBehaviorGraphStringData::removeEventNameAt(int index){
@@ -216,6 +216,7 @@ bool hkbBehaviorGraphStringData::removeEventNameAt(int index){
     bool wasremoved = false;
     if (index >= 0 && index < eventNames.size()){
         eventNames.removeAt(index);
+        setIsFileChanged(true);
         wasremoved = true;
     }
     return wasremoved;
@@ -223,7 +224,7 @@ bool hkbBehaviorGraphStringData::removeEventNameAt(int index){
 
 void hkbBehaviorGraphStringData::removeVariableNameAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index >= 0 && index < variableNames.size()) ? variableNames.removeAt(index) : NULL;
+    (index >= 0 && index < variableNames.size()) ? variableNames.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'removeVariableNameAt' failed!");
 }
 
 int hkbBehaviorGraphStringData::getCharacterPropertyIndex(const QString &name) const{
@@ -259,7 +260,7 @@ int hkbBehaviorGraphStringData::addCharacterPropertyName(const QString &name, bo
     }else{
         characterPropertyNames.append(name);
         index = characterPropertyNames.size() - 1;
-        (wasadded) ? *wasadded = false : NULL;
+        (wasadded) ? *wasadded = false : setIsFileChanged(true);
     }
     return index;
 }
@@ -273,7 +274,7 @@ int hkbBehaviorGraphStringData::addEventName(const QString &name, bool * wasadde
     }else{
         eventNames.append(name);
         index = eventNames.size() - 1;
-        (wasadded) ? *wasadded = false : NULL;
+        (wasadded) ? *wasadded = false : setIsFileChanged(true);
     }
     return index;
 }
@@ -287,7 +288,7 @@ bool hkbBehaviorGraphStringData::addVariableName(const QString &name, bool * was
     }else{
         variableNames.append(name);
         index = variableNames.size() - 1;
-        (wasadded) ? *wasadded = false : NULL;
+        (wasadded) ? *wasadded = false : setIsFileChanged(true);
     }
     return index;
 }
@@ -299,7 +300,7 @@ bool hkbBehaviorGraphStringData::link(){
 QString hkbBehaviorGraphStringData::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkstring = [&](const QStringList & list, const QString & fieldname){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i) == ""){

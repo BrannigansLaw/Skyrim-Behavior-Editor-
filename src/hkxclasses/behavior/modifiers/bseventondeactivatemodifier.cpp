@@ -2,6 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSEventOnDeactivateModifier::refCount = 0;
 
@@ -169,6 +170,41 @@ bool BSEventOnDeactivateModifier::merge(HkxObject *recessiveObject){ //TO DO: Ma
     }
 }
 
+hkbStringEventPayload *BSEventOnDeactivateModifier::getEventPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(event.payload.data());
+}
+
+void BSEventOnDeactivateModifier::setEventPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(event.payload.data())) ? event.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'event.payload' was not set!");
+}
+
+int BSEventOnDeactivateModifier::getEventID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return event.id;
+}
+
+void BSEventOnDeactivateModifier::setEventID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != event.id && event.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? event.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'event.id' was not set!");
+}
+
+bool BSEventOnDeactivateModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSEventOnDeactivateModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSEventOnDeactivateModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSEventOnDeactivateModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -194,7 +230,7 @@ void BSEventOnDeactivateModifier::unlink(){
 QString BSEventOnDeactivateModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");

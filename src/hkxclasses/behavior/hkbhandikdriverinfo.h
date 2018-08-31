@@ -15,6 +15,9 @@ public:
 public:
     static const QString getClassname();
 private:
+    int getNumberOfHands() const;
+    QString getFadeInOutCurve() const;
+    void setFadeInOutCurve(int index);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();

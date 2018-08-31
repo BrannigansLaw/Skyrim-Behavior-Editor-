@@ -2,6 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSEventEveryNEventsModifier::refCount = 0;
 
@@ -228,6 +229,91 @@ bool BSEventEveryNEventsModifier::merge(HkxObject *recessiveObject){ //TO DO: Ma
     return false;
 }
 
+bool BSEventEveryNEventsModifier::getRandomizeNumberOfEvents() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return randomizeNumberOfEvents;
+}
+
+void BSEventEveryNEventsModifier::setRandomizeNumberOfEvents(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != randomizeNumberOfEvents) ? randomizeNumberOfEvents = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'randomizeNumberOfEvents' was not set!");
+}
+
+int BSEventEveryNEventsModifier::getMinimumNumberOfEventsBeforeSend() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return minimumNumberOfEventsBeforeSend;
+}
+
+void BSEventEveryNEventsModifier::setMinimumNumberOfEventsBeforeSend(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != minimumNumberOfEventsBeforeSend) ? minimumNumberOfEventsBeforeSend = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'minimumNumberOfEventsBeforeSend' was not set!");
+}
+
+int BSEventEveryNEventsModifier::getNumberOfEventsBeforeSend() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return numberOfEventsBeforeSend;
+}
+
+void BSEventEveryNEventsModifier::setNumberOfEventsBeforeSend(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != numberOfEventsBeforeSend) ? numberOfEventsBeforeSend = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'numberOfEventsBeforeSend' was not set!");
+}
+
+int BSEventEveryNEventsModifier::getEventToSendID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToSend.id;
+}
+
+void BSEventEveryNEventsModifier::setEventToSendID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != eventToSend.id && eventToSend.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? eventToSend.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend.id' was not set!");
+}
+
+void BSEventEveryNEventsModifier::setEventToSendPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(eventToSend.payload.data())) ? eventToSend.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToSend.payload' was not set!");
+}
+
+hkbStringEventPayload *BSEventEveryNEventsModifier::getEventToSendPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(eventToSend.payload.data());
+}
+
+void BSEventEveryNEventsModifier::setEventToCheckForPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(eventToCheckFor.payload.data())) ? eventToCheckFor.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToCheckFor.payload' was not set!");
+}
+
+int BSEventEveryNEventsModifier::getEventToCheckForID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToCheckFor.id;
+}
+
+void BSEventEveryNEventsModifier::setEventToCheckForID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != eventToCheckFor.id && eventToCheckFor.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? eventToCheckFor.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eventToCheckFor.id' was not set!");
+}
+
+hkbStringEventPayload *BSEventEveryNEventsModifier::getEventToCheckForPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(eventToCheckFor.payload.data());
+}
+
+bool BSEventEveryNEventsModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSEventEveryNEventsModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSEventEveryNEventsModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 
 bool BSEventEveryNEventsModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
@@ -261,7 +347,7 @@ void BSEventEveryNEventsModifier::unlink(){
 QString BSEventEveryNEventsModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkevents = [&](int & id, HkxSharedPtr & payload, const QString & fieldname){
         if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;

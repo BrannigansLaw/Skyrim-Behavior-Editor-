@@ -16,21 +16,27 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class DoubleSpinBox;
 
-class DelayedModifierUI: public QGroupBox
+class DelayedModifierUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     DelayedModifierUI();
-    virtual ~DelayedModifierUI(){}
+    DelayedModifierUI& operator=(const DelayedModifierUI&) = delete;
+    DelayedModifierUI(const DelayedModifierUI &) = delete;
+    ~DelayedModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *variables, GenericTableWidget *properties);
+    void variableRenamed(const QString & name, int index);
+    void modifierRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewModifiers(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void modifierNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setEnable();
     void setDelaySeconds();
     void setDurationSeconds();
@@ -39,17 +45,10 @@ private slots:
     void viewSelected(int row, int column);
     void setModifier(int index, const QString & name);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *variables, GenericTableWidget *properties);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
-    void variableRenamed(const QString & name, int index);
-    void modifierRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbDelayedModifier *bsData;
     QGridLayout *topLyt;

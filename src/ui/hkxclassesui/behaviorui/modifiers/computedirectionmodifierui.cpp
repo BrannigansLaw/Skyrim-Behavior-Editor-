@@ -32,7 +32,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList ComputeDirectionModifierUI::headerLabels = {
+const QStringList ComputeDirectionModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -115,40 +115,41 @@ ComputeDirectionModifierUI::ComputeDirectionModifierUI()
     table->setCellWidget(COMPUTED_OUTPUT_ROW, VALUE_COLUMN, computedOutput);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void ComputeDirectionModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(pointIn, SIGNAL(editingFinished()), this, SLOT(setPointIn()), Qt::UniqueConnection);
-    connect(pointOut, SIGNAL(editingFinished()), this, SLOT(setPointOut()), Qt::UniqueConnection);
-    connect(groundAngleOut, SIGNAL(editingFinished()), this, SLOT(setGroundAngleOut()), Qt::UniqueConnection);
-    connect(upAngleOut, SIGNAL(editingFinished()), this, SLOT(setUpAngleOut()), Qt::UniqueConnection);
-    connect(verticalOffset, SIGNAL(editingFinished()), this, SLOT(setVerticalOffset()), Qt::UniqueConnection);
-    connect(reverseGroundAngle, SIGNAL(released()), this, SLOT(setReverseGroundAngle()), Qt::UniqueConnection);
-    connect(reverseUpAngle, SIGNAL(released()), this, SLOT(setReverseUpAngle()), Qt::UniqueConnection);
-    connect(projectPoint, SIGNAL(released()), this, SLOT(setProjectPoint()), Qt::UniqueConnection);
-    connect(normalizePoint, SIGNAL(released()), this, SLOT(setNormalizePoint()), Qt::UniqueConnection);
-    connect(computeOnlyOnce, SIGNAL(released()), this, SLOT(setComputeOnlyOnce()), Qt::UniqueConnection);
-    connect(computedOutput, SIGNAL(released()), this, SLOT(setComputedOutput()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void ComputeDirectionModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(pointIn, SIGNAL(editingFinished()), this, SLOT(setPointIn()));
-    disconnect(pointOut, SIGNAL(editingFinished()), this, SLOT(setPointOut()));
-    disconnect(groundAngleOut, SIGNAL(editingFinished()), this, SLOT(setGroundAngleOut()));
-    disconnect(upAngleOut, SIGNAL(editingFinished()), this, SLOT(setUpAngleOut()));
-    disconnect(verticalOffset, SIGNAL(editingFinished()), this, SLOT(setVerticalOffset()));
-    disconnect(reverseGroundAngle, SIGNAL(released()), this, SLOT(setReverseGroundAngle()));
-    disconnect(reverseUpAngle, SIGNAL(released()), this, SLOT(setReverseUpAngle()));
-    disconnect(projectPoint, SIGNAL(released()), this, SLOT(setProjectPoint()));
-    disconnect(normalizePoint, SIGNAL(released()), this, SLOT(setNormalizePoint()));
-    disconnect(computeOnlyOnce, SIGNAL(released()), this, SLOT(setComputeOnlyOnce()));
-    disconnect(computedOutput, SIGNAL(released()), this, SLOT(setComputedOutput()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void ComputeDirectionModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(pointIn, SIGNAL(editingFinished()), this, SLOT(setPointIn()), Qt::UniqueConnection);
+        connect(pointOut, SIGNAL(editingFinished()), this, SLOT(setPointOut()), Qt::UniqueConnection);
+        connect(groundAngleOut, SIGNAL(editingFinished()), this, SLOT(setGroundAngleOut()), Qt::UniqueConnection);
+        connect(upAngleOut, SIGNAL(editingFinished()), this, SLOT(setUpAngleOut()), Qt::UniqueConnection);
+        connect(verticalOffset, SIGNAL(editingFinished()), this, SLOT(setVerticalOffset()), Qt::UniqueConnection);
+        connect(reverseGroundAngle, SIGNAL(released()), this, SLOT(setReverseGroundAngle()), Qt::UniqueConnection);
+        connect(reverseUpAngle, SIGNAL(released()), this, SLOT(setReverseUpAngle()), Qt::UniqueConnection);
+        connect(projectPoint, SIGNAL(released()), this, SLOT(setProjectPoint()), Qt::UniqueConnection);
+        connect(normalizePoint, SIGNAL(released()), this, SLOT(setNormalizePoint()), Qt::UniqueConnection);
+        connect(computeOnlyOnce, SIGNAL(released()), this, SLOT(setComputeOnlyOnce()), Qt::UniqueConnection);
+        connect(computedOutput, SIGNAL(released()), this, SLOT(setComputedOutput()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(pointIn, SIGNAL(editingFinished()), this, SLOT(setPointIn()));
+        disconnect(pointOut, SIGNAL(editingFinished()), this, SLOT(setPointOut()));
+        disconnect(groundAngleOut, SIGNAL(editingFinished()), this, SLOT(setGroundAngleOut()));
+        disconnect(upAngleOut, SIGNAL(editingFinished()), this, SLOT(setUpAngleOut()));
+        disconnect(verticalOffset, SIGNAL(editingFinished()), this, SLOT(setVerticalOffset()));
+        disconnect(reverseGroundAngle, SIGNAL(released()), this, SLOT(setReverseGroundAngle()));
+        disconnect(reverseUpAngle, SIGNAL(released()), this, SLOT(setReverseUpAngle()));
+        disconnect(projectPoint, SIGNAL(released()), this, SLOT(setProjectPoint()));
+        disconnect(normalizePoint, SIGNAL(released()), this, SLOT(setNormalizePoint()));
+        disconnect(computeOnlyOnce, SIGNAL(released()), this, SLOT(setComputeOnlyOnce()));
+        disconnect(computedOutput, SIGNAL(released()), this, SLOT(setComputedOutput()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void ComputeDirectionModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -160,280 +161,145 @@ void ComputeDirectionModifierUI::connectToTables(GenericTableWidget *variables, 
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void ComputeDirectionModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_COMPUTE_DIRECTION_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbComputeDirectionModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            pointIn->setValue(bsData->pointIn);
-            pointOut->setValue(bsData->pointOut);
-            groundAngleOut->setValue(bsData->groundAngleOut);
-            upAngleOut->setValue(bsData->upAngleOut);
-            verticalOffset->setValue(bsData->verticalOffset);
-            reverseGroundAngle->setChecked(bsData->reverseGroundAngle);
-            reverseUpAngle->setChecked(bsData->reverseUpAngle);
-            projectPoint->setChecked(bsData->projectPoint);
-            normalizePoint->setChecked(bsData->normalizePoint);
-            computeOnlyOnce->setChecked(bsData->computeOnlyOnce);
-            computedOutput->setChecked(bsData->computedOutput);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(POINT_IN_ROW, BINDING_COLUMN, varBind, "pointIn");
-                loadBinding(POINT_OUT_ROW, BINDING_COLUMN, varBind, "pointOut");
-                loadBinding(GROUND_ANGLE_OUT_ROW, BINDING_COLUMN, varBind, "groundAngleOut");
-                loadBinding(UP_ANGLE_OUT_ROW, BINDING_COLUMN, varBind, "upAngleOut");
-                loadBinding(VERTICAL_OFFSET_ROW, BINDING_COLUMN, varBind, "verticalOffset");
-                loadBinding(REVERSE_GROUND_ANGLE_ROW, BINDING_COLUMN, varBind, "reverseGroundAngle");
-                loadBinding(REVERSE_UP_ANGLE_ROW, BINDING_COLUMN, varBind, "reverseUpAngle");
-                loadBinding(PROJECT_POINT_ROW, BINDING_COLUMN, varBind, "projectPoint");
-                loadBinding(NORMALIZE_POINT_ROW, BINDING_COLUMN, varBind, "normalizePoint");
-                loadBinding(COMPUTE_ONLY_ONCE_ROW, BINDING_COLUMN, varBind, "computeOnlyOnce");
-                loadBinding(COMPUTED_OUTPUT_ROW, BINDING_COLUMN, varBind, "computedOutput");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POINT_IN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(POINT_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(GROUND_ANGLE_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(UP_ANGLE_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VERTICAL_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(REVERSE_GROUND_ANGLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(REVERSE_UP_ANGLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(PROJECT_POINT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(NORMALIZE_POINT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(COMPUTE_ONLY_ONCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(COMPUTED_OUTPUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            pointIn->setValue(bsData->getPointIn());
+            pointOut->setValue(bsData->getPointOut());
+            groundAngleOut->setValue(bsData->getGroundAngleOut());
+            upAngleOut->setValue(bsData->getUpAngleOut());
+            verticalOffset->setValue(bsData->getVerticalOffset());
+            reverseGroundAngle->setChecked(bsData->getReverseGroundAngle());
+            reverseUpAngle->setChecked(bsData->getReverseUpAngle());
+            projectPoint->setChecked(bsData->getProjectPoint());
+            normalizePoint->setChecked(bsData->getNormalizePoint());
+            computeOnlyOnce->setChecked(bsData->getComputeOnlyOnce());
+            computedOutput->setChecked(bsData->getComputedOutput());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(POINT_IN_ROW, BINDING_COLUMN, varBind, "pointIn", table, bsData);
+            UIHelper::loadBinding(POINT_OUT_ROW, BINDING_COLUMN, varBind, "pointOut", table, bsData);
+            UIHelper::loadBinding(GROUND_ANGLE_OUT_ROW, BINDING_COLUMN, varBind, "groundAngleOut", table, bsData);
+            UIHelper::loadBinding(UP_ANGLE_OUT_ROW, BINDING_COLUMN, varBind, "upAngleOut", table, bsData);
+            UIHelper::loadBinding(VERTICAL_OFFSET_ROW, BINDING_COLUMN, varBind, "verticalOffset", table, bsData);
+            UIHelper::loadBinding(REVERSE_GROUND_ANGLE_ROW, BINDING_COLUMN, varBind, "reverseGroundAngle", table, bsData);
+            UIHelper::loadBinding(REVERSE_UP_ANGLE_ROW, BINDING_COLUMN, varBind, "reverseUpAngle", table, bsData);
+            UIHelper::loadBinding(PROJECT_POINT_ROW, BINDING_COLUMN, varBind, "projectPoint", table, bsData);
+            UIHelper::loadBinding(NORMALIZE_POINT_ROW, BINDING_COLUMN, varBind, "normalizePoint", table, bsData);
+            UIHelper::loadBinding(COMPUTE_ONLY_ONCE_ROW, BINDING_COLUMN, varBind, "computeOnlyOnce", table, bsData);
+            UIHelper::loadBinding(COMPUTED_OUTPUT_ROW, BINDING_COLUMN, varBind, "computedOutput", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("ComputeDirectionModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ComputeDirectionModifierUI::setName(){
+void ComputeDirectionModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void ComputeDirectionModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setPointIn(){
-    if (bsData){
-        if (bsData->pointIn != pointIn->value()){
-            bsData->pointIn = pointIn->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setPointIn(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPointIn(pointIn->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setPointIn(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setPointOut(){
-    if (bsData){
-        if (bsData->pointOut != pointOut->value()){
-            bsData->pointOut = pointOut->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setPointOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPointOut(pointOut->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setPointOut(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setGroundAngleOut(){
-    if (bsData){
-        if (bsData->groundAngleOut != groundAngleOut->value()){
-            bsData->groundAngleOut = groundAngleOut->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setGroundAngleOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setGroundAngleOut(groundAngleOut->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setGroundAngleOut(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setUpAngleOut(){
-    if (bsData){
-        if (bsData->upAngleOut != upAngleOut->value()){
-            bsData->upAngleOut = upAngleOut->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setUpAngleOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setUpAngleOut(upAngleOut->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setUpAngleOut(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setVerticalOffset(){
-    if (bsData){
-        if (bsData->verticalOffset != verticalOffset->value()){
-            bsData->verticalOffset = verticalOffset->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setVerticalOffset(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVerticalOffset(verticalOffset->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setVerticalOffset(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setReverseGroundAngle(){
-    if (bsData){
-        bsData->reverseGroundAngle = reverseGroundAngle->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setReverseGroundAngle(reverseGroundAngle->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setReverseUpAngle(){
-    if (bsData){
-        bsData->reverseUpAngle = reverseUpAngle->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setReverseUpAngle(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setReverseUpAngle(reverseUpAngle->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setReverseUpAngle(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setProjectPoint(){
-    if (bsData){
-        bsData->projectPoint = projectPoint->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setProjectPoint(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setProjectPoint(projectPoint->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setProjectPoint(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setNormalizePoint(){
-    if (bsData){
-        bsData->normalizePoint = normalizePoint->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setNormalizePoint(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setNormalizePoint(normalizePoint->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setNormalizePoint(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setComputeOnlyOnce(){
-    if (bsData){
-        bsData->computeOnlyOnce = computeOnlyOnce->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setComputeOnlyOnce(computeOnlyOnce->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::setComputedOutput(){
-    if (bsData){
-        bsData->computedOutput = computedOutput->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setComputedOutput(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setComputedOutput(computedOutput->isChecked()) : LogFile::writeToLog("ComputeDirectionModifierUI::setComputedOutput(): The data is nullptr!!");
 }
 
 void ComputeDirectionModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case POINT_IN_ROW:
-                if (table->item(POINT_IN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "pointIn");
-                break;
+                checkisproperty(POINT_IN_ROW, "pointIn"); break;
             case POINT_OUT_ROW:
-                if (table->item(POINT_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "pointOut");
-                break;
+                checkisproperty(POINT_OUT_ROW, "pointOut"); break;
             case GROUND_ANGLE_OUT_ROW:
-                if (table->item(GROUND_ANGLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "groundAngleOut");
-                break;
+                checkisproperty(GROUND_ANGLE_OUT_ROW, "groundAngleOut"); break;
             case UP_ANGLE_OUT_ROW:
-                if (table->item(UP_ANGLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "upAngleOut");
-                break;
+                checkisproperty(UP_ANGLE_OUT_ROW, "upAngleOut"); break;
             case VERTICAL_OFFSET_ROW:
-                if (table->item(VERTICAL_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "verticalOffset");
-                break;
+                checkisproperty(VERTICAL_OFFSET_ROW, "verticalOffset"); break;
             case REVERSE_GROUND_ANGLE_ROW:
-                if (table->item(REVERSE_GROUND_ANGLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "reverseGroundAngle");
-                break;
+                checkisproperty(REVERSE_GROUND_ANGLE_ROW, "reverseGroundAngle"); break;
             case REVERSE_UP_ANGLE_ROW:
-                if (table->item(REVERSE_UP_ANGLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "reverseUpAngle");
-                break;
+                checkisproperty(REVERSE_UP_ANGLE_ROW, "reverseUpAngle"); break;
             case PROJECT_POINT_ROW:
-                if (table->item(PROJECT_POINT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "projectPoint");
-                break;
+                checkisproperty(PROJECT_POINT_ROW, "projectPoint"); break;
             case NORMALIZE_POINT_ROW:
-                if (table->item(NORMALIZE_POINT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "normalizePoint");
-                break;
+                checkisproperty(NORMALIZE_POINT_ROW, "normalizePoint"); break;
             case COMPUTE_ONLY_ONCE_ROW:
-                if (table->item(COMPUTE_ONLY_ONCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "computeOnlyOnce");
-                break;
+                checkisproperty(COMPUTE_ONLY_ONCE_ROW, "computeOnlyOnce"); break;
             case COMPUTED_OUTPUT_ROW:
-                if (table->item(COMPUTED_OUTPUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "computedOutput");
-                break;
-            default:
-                return;
+                checkisproperty(COMPUTED_OUTPUT_ROW, "computedOutput"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -453,208 +319,72 @@ void ComputeDirectionModifierUI::selectTableToView(bool viewisProperty, const QS
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void ComputeDirectionModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("pointIn");
-            if (bindIndex == index){
-                table->item(POINT_IN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("pointOut");
-            if (bindIndex == index){
-                table->item(POINT_OUT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("groundAngleOut");
-            if (bindIndex == index){
-                table->item(GROUND_ANGLE_OUT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("upAngleOut");
-            if (bindIndex == index){
-                table->item(UP_ANGLE_OUT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("verticalOffset");
-            if (bindIndex == index){
-                table->item(VERTICAL_OFFSET_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("reverseGroundAngle");
-            if (bindIndex == index){
-                table->item(REVERSE_GROUND_ANGLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("reverseUpAngle");
-            if (bindIndex == index){
-                table->item(REVERSE_UP_ANGLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("projectPoint");
-            if (bindIndex == index){
-                table->item(PROJECT_POINT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("normalizePoint");
-            if (bindIndex == index){
-                table->item(NORMALIZE_POINT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("computeOnlyOnce");
-            if (bindIndex == index){
-                table->item(COMPUTE_ONLY_ONCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("computedOutput");
-            if (bindIndex == index){
-                table->item(COMPUTED_OUTPUT_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("pointIn", POINT_IN_ROW);
+            setname("pointOut", POINT_OUT_ROW);
+            setname("groundAngleOut", GROUND_ANGLE_OUT_ROW);
+            setname("upAngleOut", UP_ANGLE_OUT_ROW);
+            setname("verticalOffset", VERTICAL_OFFSET_ROW);
+            setname("reverseGroundAngle", REVERSE_GROUND_ANGLE_ROW);
+            setname("reverseUpAngle", REVERSE_UP_ANGLE_ROW);
+            setname("projectPoint", PROJECT_POINT_ROW);
+            setname("normalizePoint", NORMALIZE_POINT_ROW);
+            setname("computeOnlyOnce", COMPUTE_ONLY_ONCE_ROW);
+            setname("computedOutput", COMPUTED_OUTPUT_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool ComputeDirectionModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void ComputeDirectionModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case POINT_IN_ROW:
-            if (table->item(POINT_IN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "pointIn", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(POINT_IN_ROW, "pointIn", VARIABLE_TYPE_VECTOR4); break;
         case POINT_OUT_ROW:
-            if (table->item(POINT_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "pointOut", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(POINT_OUT_ROW, "pointOut", VARIABLE_TYPE_VECTOR4); break;
         case GROUND_ANGLE_OUT_ROW:
-            if (table->item(GROUND_ANGLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "groundAngleOut", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(GROUND_ANGLE_OUT_ROW, "groundAngleOut", VARIABLE_TYPE_REAL); break;
         case UP_ANGLE_OUT_ROW:
-            if (table->item(UP_ANGLE_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "upAngleOut", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(UP_ANGLE_OUT_ROW, "upAngleOut", VARIABLE_TYPE_REAL); break;
         case VERTICAL_OFFSET_ROW:
-            if (table->item(VERTICAL_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "verticalOffset", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(VERTICAL_OFFSET_ROW, "verticalOffset", VARIABLE_TYPE_REAL); break;
         case REVERSE_GROUND_ANGLE_ROW:
-            if (table->item(REVERSE_GROUND_ANGLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "reverseGroundAngle", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(REVERSE_GROUND_ANGLE_ROW, "reverseGroundAngle", VARIABLE_TYPE_BOOL); break;
         case REVERSE_UP_ANGLE_ROW:
-            if (table->item(REVERSE_UP_ANGLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "reverseUpAngle", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(REVERSE_UP_ANGLE_ROW, "reverseUpAngle", VARIABLE_TYPE_BOOL); break;
         case PROJECT_POINT_ROW:
-            if (table->item(PROJECT_POINT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "projectPoint", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(PROJECT_POINT_ROW, "projectPoint", VARIABLE_TYPE_BOOL); break;
         case NORMALIZE_POINT_ROW:
-            if (table->item(NORMALIZE_POINT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "normalizePoint", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(NORMALIZE_POINT_ROW, "normalizePoint", VARIABLE_TYPE_BOOL); break;
         case COMPUTE_ONLY_ONCE_ROW:
-            if (table->item(COMPUTE_ONLY_ONCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "computeOnlyOnce", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(COMPUTE_ONLY_ONCE_ROW, "computeOnlyOnce", VARIABLE_TYPE_BOOL); break;
         case COMPUTED_OUTPUT_ROW:
-            if (table->item(COMPUTED_OUTPUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "computedOutput", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void ComputeDirectionModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(COMPUTED_OUTPUT_ROW, "computedOutput", VARIABLE_TYPE_BOOL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("ComputeDirectionModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

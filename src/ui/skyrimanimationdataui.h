@@ -44,7 +44,7 @@ private:
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
 private:
     enum ACTIVE_WIDGET{
-        MAIN_WIDGET = 0,
+        MAIN_WIDGET,
         TRANSLATION_WIDGET = 1,
         ROTATION_WIDGET = 2
     };

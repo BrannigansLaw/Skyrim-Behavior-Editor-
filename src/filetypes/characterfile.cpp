@@ -277,7 +277,7 @@ bool CharacterFile::parse(){
     HkxSignature signature;
     QByteArray value;
     auto ref = 0;
-    auto appendnread = [&](HkxObject *obj, const QString & nameoftype){
+    auto appendread = [&](HkxObject *obj, const QString & nameoftype){
         (!appendAndReadData(index, obj)) ? LogFile::writeToLog("CharacterFile: parse(): Failed to read a "+nameoftype+" object! Ref: "+QString::number(ref)) : NULL;
     };
     if (getReader().parse()){
@@ -292,21 +292,21 @@ bool CharacterFile::parse(){
                     (!ok) ? LogFile::writeToLog("CharacterFile: parse() failed! The object signature string contained invalid characters and failed to convert to an integer!") : NULL;
                     switch (signature){
                     case HKB_BONE_WEIGHT_ARRAY:
-                        appendnread(new hkbBoneWeightArray(this, ref), "HKB_BONE_WEIGHT_ARRAY"); break;
+                        appendread(new hkbBoneWeightArray(this, ref), "HKB_BONE_WEIGHT_ARRAY"); break;
                     case HKB_FOOT_IK_DRIVER_INFO:
-                        appendnread(new hkbFootIkDriverInfo(this, ref), "HKB_FOOT_IK_DRIVER_INFO"); break;
+                        appendread(new hkbFootIkDriverInfo(this, ref), "HKB_FOOT_IK_DRIVER_INFO"); break;
                     case HKB_HAND_IK_DRIVER_INFO:
-                        appendnread(new hkbHandIkDriverInfo(this, ref), "HKB_HAND_IK_DRIVER_INFO"); break;
+                        appendread(new hkbHandIkDriverInfo(this, ref), "HKB_HAND_IK_DRIVER_INFO"); break;
                     case HKB_MIRRORED_SKELETON_INFO:
-                        appendnread(new hkbMirroredSkeletonInfo(this, ref), "HKB_MIRRORED_SKELETON_INFO"); break;
+                        appendread(new hkbMirroredSkeletonInfo(this, ref), "HKB_HAND_IK_DRIVER_INFO"); break;
                     case HKB_VARIABLE_VALUE_SET:
-                        appendnread(new hkbVariableValueSet(this, ref), "HKB_VARIABLE_VALUE_SET"); break;
+                        appendread(new hkbVariableValueSet(this, ref), "HKB_VARIABLE_VALUE_SET"); break;
                     case HKB_CHARACTER_DATA:
-                        appendnread(new hkbCharacterData(this, ref), "HKB_CHARACTER_DATA"); break;
+                        appendread(new hkbCharacterData(this, ref), "HKB_CHARACTER_DATA"); break;
                     case HKB_CHARACTER_STRING_DATA:
-                        appendnread(new hkbCharacterStringData(this, ref), "HKB_CHARACTER_STRING_DATA"); break;
+                        appendread(new hkbCharacterStringData(this, ref), "HKB_CHARACTER_STRING_DATA"); break;
                     case HK_ROOT_LEVEL_CONTAINER:
-                        appendnread(new hkRootLevelContainer(this, ref), "HK_ROOT_LEVEL_CONTAINER"); break;
+                        appendread(new hkRootLevelContainer(this, ref), "HK_ROOT_LEVEL_CONTAINER"); break;
                     default:
                         LogFile::writeToLog(fileName()+": Unknown signature detected! Unknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+" Unknown object signature is: "+QString::number(signature, 16));
                     }
@@ -315,9 +315,7 @@ bool CharacterFile::parse(){
         }
         closeFile();
         getReader().clear();
-        if (link()){
-            ok = true;
-        }
+        (link()) ? ok = true : NULL;
     }else{
         LogFile::writeToLog(fileName()+": failed to parse!!!");
     }

@@ -40,11 +40,61 @@ bool hkbEventDrivenModifier::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbEventDrivenModifier::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         modifier = HkxSharedPtr();
         return true;
     }
     return false;
+}
+
+bool hkbEventDrivenModifier::getActiveByDefault() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return activeByDefault;
+}
+
+void hkbEventDrivenModifier::setActiveByDefault(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != activeByDefault) ? activeByDefault = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'activeByDefault' was not set!");
+}
+
+int hkbEventDrivenModifier::getDeactivateEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return deactivateEventId;
+}
+
+void hkbEventDrivenModifier::setDeactivateEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != deactivateEventId && deactivateEventId < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? deactivateEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'deactivateEventId' was not set!");
+}
+
+int hkbEventDrivenModifier::getActivateEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return activateEventId;
+}
+
+void hkbEventDrivenModifier::setActivateEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != activateEventId && activateEventId < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? activateEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'activateEventId' was not set!");
+}
+
+hkbModifier *hkbEventDrivenModifier::getModifier() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbModifier *>(modifier.data());
+}
+
+bool hkbEventDrivenModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbEventDrivenModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbEventDrivenModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 bool hkbEventDrivenModifier::hasChildren() const{
@@ -221,7 +271,7 @@ void hkbEventDrivenModifier::unlink(){
 QString hkbEventDrivenModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

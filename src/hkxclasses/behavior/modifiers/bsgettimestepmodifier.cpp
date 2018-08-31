@@ -85,6 +85,31 @@ bool BSGetTimeStepModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal BSGetTimeStepModifier::getTimeStep() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return timeStep;
+}
+
+void BSGetTimeStepModifier::setTimeStep(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != timeStep) ? timeStep = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'timeStep' was not set!");
+}
+
+bool BSGetTimeStepModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSGetTimeStepModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSGetTimeStepModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSGetTimeStepModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -101,7 +126,7 @@ void BSGetTimeStepModifier::unlink(){
 QString BSGetTimeStepModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");

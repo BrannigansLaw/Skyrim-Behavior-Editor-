@@ -26,7 +26,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSLimbIKModifierUI::headerLabels = {
+const QStringList BSLimbIKModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -84,30 +84,31 @@ BSLimbIKModifierUI::BSLimbIKModifierUI()
     table->setCellWidget(CAST_OFFSET_ROW, VALUE_COLUMN, castOffset);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSLimbIKModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()), Qt::UniqueConnection);
-    connect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)), Qt::UniqueConnection);
-    connect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)), Qt::UniqueConnection);
-    connect(gain, SIGNAL(editingFinished()), this, SLOT(setGain()), Qt::UniqueConnection);
-    connect(boneRadius, SIGNAL(editingFinished()), this, SLOT(setBoneRadius()), Qt::UniqueConnection);
-    connect(castOffset, SIGNAL(editingFinished()), this, SLOT(setCastOffset()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSLimbIKModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()));
-    disconnect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)));
-    disconnect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)));
-    disconnect(gain, SIGNAL(editingFinished()), this, SLOT(setGain()));
-    disconnect(boneRadius, SIGNAL(editingFinished()), this, SLOT(setBoneRadius()));
-    disconnect(castOffset, SIGNAL(editingFinished()), this, SLOT(setCastOffset()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSLimbIKModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()), Qt::UniqueConnection);
+        connect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)), Qt::UniqueConnection);
+        connect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)), Qt::UniqueConnection);
+        connect(gain, SIGNAL(editingFinished()), this, SLOT(setGain()), Qt::UniqueConnection);
+        connect(boneRadius, SIGNAL(editingFinished()), this, SLOT(setBoneRadius()), Qt::UniqueConnection);
+        connect(castOffset, SIGNAL(editingFinished()), this, SLOT(setCastOffset()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()));
+        disconnect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)));
+        disconnect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)));
+        disconnect(gain, SIGNAL(editingFinished()), this, SLOT(setGain()));
+        disconnect(boneRadius, SIGNAL(editingFinished()), this, SLOT(setBoneRadius()));
+        disconnect(castOffset, SIGNAL(editingFinished()), this, SLOT(setCastOffset()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSLimbIKModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -119,198 +120,112 @@ void BSLimbIKModifierUI::connectToTables(GenericTableWidget *variables, GenericT
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSLimbIKModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_LIMB_IK_MODIFIER){
-            QStringList boneNames;
-            boneNames.append("None");
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<BSLimbIKModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            limitAngleDegrees->setValue(bsData->limitAngleDegrees);
-            if (startBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                startBoneIndex->insertItems(0, boneNames);
-            }
-            startBoneIndex->setCurrentIndex(bsData->startBoneIndex + 1);
-            if (endBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                endBoneIndex->insertItems(0, boneNames);
-            }
-            endBoneIndex->setCurrentIndex(bsData->endBoneIndex + 1);
-            gain->setValue(bsData->gain);
-            boneRadius->setValue(bsData->boneRadius);
-            castOffset->setValue(bsData->castOffset);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees");
-                loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex");
-                loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex");
-                loadBinding(GAIN_ROW, BINDING_COLUMN, varBind, "gain");
-                loadBinding(BONE_RADIUS_ROW, BINDING_COLUMN, varBind, "boneRadius");
-                loadBinding(CAST_OFFSET_ROW, BINDING_COLUMN, varBind, "castOffset");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            limitAngleDegrees->setValue(bsData->getLimitAngleDegrees());
+            auto loadbones = [&](ComboBox *combobox, int indextoset){
+                if (!combobox->count()){
+                    auto boneNames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(startBoneIndex, bsData->getStartBoneIndex() + 1);
+            loadbones(endBoneIndex, bsData->getEndBoneIndex() + 1);
+            gain->setValue(bsData->getGain());
+            boneRadius->setValue(bsData->getBoneRadius());
+            castOffset->setValue(bsData->getCastOffset());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees", table, bsData);
+            UIHelper::loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex", table, bsData);
+            UIHelper::loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex", table, bsData);
+            UIHelper::loadBinding(GAIN_ROW, BINDING_COLUMN, varBind, "gain", table, bsData);
+            UIHelper::loadBinding(BONE_RADIUS_ROW, BINDING_COLUMN, varBind, "boneRadius", table, bsData);
+            UIHelper::loadBinding(CAST_OFFSET_ROW, BINDING_COLUMN, varBind, "castOffset", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSLimbIKModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSLimbIKModifierUI::setName(){
+void BSLimbIKModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSLimbIKModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSLimbIKModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::setLimitAngleDegrees(){
-    if (bsData){
-        if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
-            bsData->limitAngleDegrees = limitAngleDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setLimitAngleDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleDegrees(limitAngleDegrees->value()) : LogFile::writeToLog("BSLimbIKModifierUI::setLimitAngleDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::setStartBoneIndex(int index){
-    if (bsData){
-        bsData->startBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setStartBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setStartBoneIndex(index - 1) : LogFile::writeToLog("BSLimbIKModifierUI::setStartBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::setEndBoneIndex(int index){
-    if (bsData){
-        bsData->endBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setEndBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEndBoneIndex(index - 1) : LogFile::writeToLog("BSLimbIKModifierUI::setEndBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::setGain(){
-    if (bsData){
-        if (bsData->gain != gain->value()){
-            bsData->gain = gain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setGain(gain->value()) : LogFile::writeToLog("BSLimbIKModifierUI::setGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::setBoneRadius(){
-    if (bsData){
-        if (bsData->boneRadius != boneRadius->value()){
-            bsData->boneRadius = boneRadius->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setBoneRadius(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBoneRadius(boneRadius->value()) : LogFile::writeToLog("BSLimbIKModifierUI::setBoneRadius(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::setCastOffset(){
-    if (bsData){
-        if (bsData->castOffset != castOffset->value()){
-            bsData->castOffset = castOffset->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setCastOffset(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCastOffset(castOffset->value()) : LogFile::writeToLog("BSLimbIKModifierUI::setCastOffset(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLimbIKModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case LIMIT_ANGLE_DEGREES_ROW:
-                if (table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitAngleDegrees");
-                break;
+                checkisproperty(LIMIT_ANGLE_DEGREES_ROW, "limitAngleDegrees"); break;
             case START_BONE_INDEX_ROW:
-                if (table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "startBoneIndex");
-                break;
+                checkisproperty(START_BONE_INDEX_ROW, "startBoneIndex"); break;
             case END_BONE_INDEX_ROW:
-                if (table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "endBoneIndex");
-                break;
+                checkisproperty(END_BONE_INDEX_ROW, "endBoneIndex"); break;
             case GAIN_ROW:
-                if (table->item(GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "gain");
-                break;
+                checkisproperty(GAIN_ROW, "gain"); break;
             case BONE_RADIUS_ROW:
-                if (table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "boneRadius");
-                break;
+                checkisproperty(BONE_RADIUS_ROW, "boneRadius"); break;
             case CAST_OFFSET_ROW:
-                if (table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "castOffset");
-                break;
-            default:
-                return;
+                checkisproperty(CAST_OFFSET_ROW, "castOffset"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -330,158 +245,57 @@ void BSLimbIKModifierUI::selectTableToView(bool viewisProperty, const QString & 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSLimbIKModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleDegrees");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("startBoneIndex");
-            if (bindIndex == index){
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("endBoneIndex");
-            if (bindIndex == index){
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("gain");
-            if (bindIndex == index){
-                table->item(GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("boneRadius");
-            if (bindIndex == index){
-                table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("castOffset");
-            if (bindIndex == index){
-                table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("limitAngleDegrees", LIMIT_ANGLE_DEGREES_ROW);
+            setname("startBoneIndex", START_BONE_INDEX_ROW);
+            setname("endBoneIndex", END_BONE_INDEX_ROW);
+            setname("gain", GAIN_ROW);
+            setname("boneRadius", BONE_RADIUS_ROW);
+            setname("castOffset", CAST_OFFSET_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSLimbIKModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSLimbIKModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case LIMIT_ANGLE_DEGREES_ROW:
-            if (table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_DEGREES_ROW, "limitAngleDegrees", VARIABLE_TYPE_REAL); break;
         case START_BONE_INDEX_ROW:
-            if (table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "startBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(START_BONE_INDEX_ROW, "startBoneIndex", VARIABLE_TYPE_INT32); break;
         case END_BONE_INDEX_ROW:
-            if (table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "endBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(END_BONE_INDEX_ROW, "endBoneIndex", VARIABLE_TYPE_INT32); break;
         case GAIN_ROW:
-            if (table->item(GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "gain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(GAIN_ROW, "gain", VARIABLE_TYPE_REAL); break;
         case BONE_RADIUS_ROW:
-            if (table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "boneRadius", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(BONE_RADIUS_ROW, "boneRadius", VARIABLE_TYPE_REAL); break;
         case CAST_OFFSET_ROW:
-            if (table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "castOffset", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSLimbIKModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(CAST_OFFSET_ROW, "castOffset", VARIABLE_TYPE_REAL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLimbIKModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSLimbIKModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

@@ -13,12 +13,15 @@ class QGridLayout;
 class QLabel;
 class QCheckBox;
 
-class BoneWeightArrayUI: public QGroupBox
+class BoneWeightArrayUI final: public QGroupBox
 {
     Q_OBJECT
 public:
     BoneWeightArrayUI();
-    virtual ~BoneWeightArrayUI(){}
+    BoneWeightArrayUI& operator=(const BoneWeightArrayUI&) = delete;
+    BoneWeightArrayUI(const BoneWeightArrayUI &) = delete;
+    ~BoneWeightArrayUI() = default;
+public:
     void loadData(HkxObject *data, bool isRagdoll = false);
 signals:
     void returnToParent();
@@ -27,7 +30,7 @@ private slots:
     void loadBoneWeight(int row, int);
     void invert();
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     hkbBoneWeightArray *bsData;
     QGridLayout *topLyt;
     QPushButton *returnPB;

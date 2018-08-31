@@ -27,7 +27,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSDistTriggerModifierUI::headerLabels = {
+const QStringList BSDistTriggerModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -79,26 +79,27 @@ BSDistTriggerModifierUI::BSDistTriggerModifierUI()
     table->setCellWidget(TRIGGER_EVENT_PAYLOAD_ROW, VALUE_COLUMN, triggerEventPayload);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSDistTriggerModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
-    connect(distance, SIGNAL(editingFinished()), this, SLOT(setDistance()), Qt::UniqueConnection);
-    connect(distanceTrigger, SIGNAL(editingFinished()), this, SLOT(setDistanceTrigger()), Qt::UniqueConnection);
-    connect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSDistTriggerModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
-    disconnect(distance, SIGNAL(editingFinished()), this, SLOT(setDistance()));
-    disconnect(distanceTrigger, SIGNAL(editingFinished()), this, SLOT(setDistanceTrigger()));
-    disconnect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSDistTriggerModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
+        connect(distance, SIGNAL(editingFinished()), this, SLOT(setDistance()), Qt::UniqueConnection);
+        connect(distanceTrigger, SIGNAL(editingFinished()), this, SLOT(setDistanceTrigger()), Qt::UniqueConnection);
+        connect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
+        disconnect(distance, SIGNAL(editingFinished()), this, SLOT(setDistance()));
+        disconnect(distanceTrigger, SIGNAL(editingFinished()), this, SLOT(setDistanceTrigger()));
+        disconnect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSDistTriggerModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
@@ -113,179 +114,114 @@ void BSDistTriggerModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSDistTriggerModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_DIST_TRIGGER_MODIFER){
             bsData = static_cast<BSDistTriggerModifier *>(data);
-            hkbVariableBindingSet *varBind = nullptr;
-            hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->triggerEvent.payload.data());
+            auto payload = static_cast<hkbStringEventPayload *>(bsData->getTriggerEventPayload());
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            targetPosition->setValue(bsData->targetPosition);
-            distance->setValue(bsData->distance);
-            distanceTrigger->setValue(bsData->distanceTrigger);
-            QString text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->triggerEvent.id);
-            if (text != ""){
-                table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(text);
-            }else{
-                table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
-            }
-            if (payload){
-                triggerEventPayload->setText(payload->getData());
-            }else{
-                triggerEventPayload->setText("");
-            }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition");
-                loadBinding(DISTANCE_ROW, BINDING_COLUMN, varBind, "distance");
-                loadBinding(DISTANCE_TRIGGER_ROW, BINDING_COLUMN, varBind, "distanceTrigger");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DISTANCE_TRIGGER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            targetPosition->setValue(bsData->getTargetPosition());
+            distance->setValue(bsData->getDistance());
+            distanceTrigger->setValue(bsData->getDistanceTrigger());
+            auto text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getTriggerEventID());
+            (text != "") ? table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(text) : table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
+            (payload) ? triggerEventPayload->setText(payload->getData()) : triggerEventPayload->setText("");
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition", table, bsData);
+            UIHelper::loadBinding(DISTANCE_ROW, BINDING_COLUMN, varBind, "distance", table, bsData);
+            UIHelper::loadBinding(DISTANCE_TRIGGER_ROW, BINDING_COLUMN, varBind, "distanceTrigger", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSDistTriggerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSDistTriggerModifierUI::setName(){
+void BSDistTriggerModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSDistTriggerModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSDistTriggerModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void BSDistTriggerModifierUI::setTargetPosition(){
-    if (bsData){
-        if (bsData->targetPosition != targetPosition->value()){
-            bsData->targetPosition = targetPosition->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::settargetPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetPosition(targetPosition->value()) : LogFile::writeToLog("BSDistTriggerModifierUI::setTargetPosition(): The data is nullptr!!");
 }
 
 void BSDistTriggerModifierUI::setDistance(){
-    if (bsData){
-        if (bsData->distance != distance->value()){
-            bsData->distance = distance->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setdistance(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDistance(distance->value()) : LogFile::writeToLog("BSDistTriggerModifierUI::setDistance(): The data is nullptr!!");
 }
 
 void BSDistTriggerModifierUI::setDistanceTrigger(){
-    if (bsData){
-        if (bsData->distanceTrigger != distanceTrigger->value()){
-            bsData->distanceTrigger = distanceTrigger->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setdistanceTrigger(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDistanceTrigger(distanceTrigger->value()) : LogFile::writeToLog("BSDistTriggerModifierUI::setDistanceTrigger(): The data is nullptr!!");
 }
 
 void BSDistTriggerModifierUI::setTriggerEventId(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->triggerEvent.id != index){
-            bsData->triggerEvent.id = index;
-            table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setTriggerEventID(index - 1);
+        table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setTriggerEventId(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::setTriggerEventId(): The data is nullptr!!");
     }
 }
 
 void BSDistTriggerModifierUI::setTriggerEventPayload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->triggerEvent.payload.data());
+        auto payload = bsData->getTriggerEventPayload();
         if (triggerEventPayload->text() != ""){
             if (payload){
-                payload->getData() = triggerEventPayload->text();
+                payload->setData(triggerEventPayload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), triggerEventPayload->text());
-                bsData->triggerEvent.payload = HkxSharedPtr(payload);
+                bsData->setTriggerEventPayload(payload);
             }
         }else{
-            bsData->triggerEvent.payload = HkxSharedPtr();
+            bsData->setTriggerEventPayload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is nullptr!!");
     }
 }
 
 void BSDistTriggerModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case TARGET_POSITION_ROW:
-                if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetPosition");
-                break;
+                checkisproperty(TARGET_POSITION_ROW, "targetPosition"); break;
             case DISTANCE_ROW:
-                if (table->item(DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "distance");
-                break;
+                checkisproperty(DISTANCE_ROW, "distance"); break;
             case DISTANCE_TRIGGER_ROW:
-                if (table->item(DISTANCE_TRIGGER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "distanceTrigger");
-                break;
-            default:
-                return;
+                checkisproperty(DISTANCE_TRIGGER_ROW, "distanceTrigger"); break;
             }
         }else if (column == VALUE_COLUMN && row == TRIGGER_EVENT_ID_ROW){
-            emit viewEvents(bsData->triggerEvent.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getTriggerEventID() + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -305,140 +241,57 @@ void BSDistTriggerModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSDistTriggerModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        if (index == bsData->triggerEvent.id){
-            table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->getTriggerEventID()) ? table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void BSDistTriggerModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetPosition");
-            if (bindIndex == index){
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("distance");
-            if (bindIndex == index){
-                table->item(DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("distanceTrigger");
-            if (bindIndex == index){
-                table->item(DISTANCE_TRIGGER_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("targetPosition", TARGET_POSITION_ROW);
+            setname("distance", DISTANCE_ROW);
+            setname("distanceTrigger", DISTANCE_TRIGGER_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSDistTriggerModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSDistTriggerModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case TARGET_POSITION_ROW:
-            if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_POSITION_ROW, "targetPosition", VARIABLE_TYPE_VECTOR4); break;
         case DISTANCE_ROW:
-            if (table->item(DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "distance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(DISTANCE_ROW, "distance", VARIABLE_TYPE_REAL); break;
         case DISTANCE_TRIGGER_ROW:
-            if (table->item(DISTANCE_TRIGGER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "distanceTrigger", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSDistTriggerModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(DISTANCE_TRIGGER_ROW, "distanceTrigger", VARIABLE_TYPE_REAL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDistTriggerModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
-

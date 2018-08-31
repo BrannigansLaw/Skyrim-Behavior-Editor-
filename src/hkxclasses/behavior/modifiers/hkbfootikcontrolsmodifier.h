@@ -16,20 +16,6 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
-    bool readData(const HkxXmlReader & reader, long & index);
-    bool link();
-    void unlink();
-    QString evaluateDataValidity();
-    bool write(HkxXMLWriter *writer);
-    int getNumberOfLegs()const;
-    bool isEventReferenced(int eventindex) const;
-    void updateEventIndices(int eventindex);
-    void mergeEventIndex(int oldindex, int newindex);
-    void fixMergedEventIndices(BehaviorFile *dominantfile);
-    void updateReferences(long &ref);
-    QVector <HkxObject *> getChildrenOtherTypes() const;
-    bool merge(HkxObject *recessiveObject);
-private:
     struct hkControlData{
         hkControlData()
             : onOffGain(0),
@@ -79,6 +65,53 @@ private:
         bool hitSomething;
         bool isPlantedMS;
     };
+private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    qreal getOnOffGain() const;
+    void setOnOffGain(const qreal &value);
+    qreal getGroundAscendingGain() const;
+    void setGroundAscendingGain(const qreal &value);
+    qreal getGroundDescendingGain() const;
+    void setGroundDescendingGain(const qreal &value);
+    qreal getFootPlantedGain() const;
+    void setFootPlantedGain(const qreal &value);
+    qreal getFootRaisedGain() const;
+    void setFootRaisedGain(const qreal &value);
+    qreal getFootUnlockGain() const;
+    void setFootUnlockGain(const qreal &value);
+    qreal getWorldFromModelFeedbackGain() const;
+    void setWorldFromModelFeedbackGain(const qreal &value);
+    qreal getErrorUpDownBias() const;
+    void setErrorUpDownBias(const qreal &value);
+    qreal getAlignWorldFromModelGain() const;
+    void setAlignWorldFromModelGain(const qreal &value);
+    qreal getHipOrientationGain() const;
+    void setHipOrientationGain(const qreal &value);
+    qreal getMaxKneeAngleDifference() const;
+    void setMaxKneeAngleDifference(const qreal &value);
+    qreal getAnkleOrientationGain() const;
+    void setAnkleOrientationGain(const qreal &value);
+    hkQuadVariable getErrorOutTranslation() const;
+    void setErrorOutTranslation(const hkQuadVariable &value);
+    hkQuadVariable getAlignWithGroundRotation() const;
+    void setAlignWithGroundRotation(const hkQuadVariable &value);
+    void addLeg(hkLeg leg = hkLeg());
+    void removeLeg(int index);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    void unlink();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
+    int getNumberOfLegs() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
+    bool merge(HkxObject *recessiveObject);
 private:
     static uint refCount;
     static const QString classname;

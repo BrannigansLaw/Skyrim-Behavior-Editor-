@@ -17,12 +17,16 @@ class hkbVariableBindingSet;
 class QuadVariableWidget;
 class ComboBox;
 
-class KeyframeInfoUI: public QGroupBox
+class KeyframeInfoUI final: public QGroupBox
 {
     Q_OBJECT
     friend class KeyframeBonesModifierUI;
 public:
     KeyframeInfoUI();
+    KeyframeInfoUI& operator=(const KeyframeInfoUI&) = delete;
+    KeyframeInfoUI(const KeyframeInfoUI &) = delete;
+    ~KeyframeInfoUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier::hkKeyframeInfo *key, hkbKeyframeBonesModifier *par, int index);
 signals:
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -35,15 +39,12 @@ private slots:
     void setIsValid();
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void toggleSignals(bool toggleconnections);
     void setBindingVariable(int index, const QString & name);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void selectTableToView(bool viewproperties, const QString & path);
     void variableRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbKeyframeBonesModifier::hkKeyframeInfo *bsData;
     hkbKeyframeBonesModifier *parent;

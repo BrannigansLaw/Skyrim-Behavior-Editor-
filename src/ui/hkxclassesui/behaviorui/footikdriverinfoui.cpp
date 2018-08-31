@@ -15,11 +15,8 @@
 #include <QSpinBox>
 
 #define BASE_NUMBER_OF_ROWS 11
-/*
- * FootIkDriverInfoUI
- */
 
-QStringList FootIkDriverInfoUI::headerLabels1 = {
+const QStringList FootIkDriverInfoUI::headerLabels1 = {
     "Name",
     "Type",
     "Value"
@@ -105,151 +102,131 @@ FootIkDriverInfoUI::FootIkDriverInfoUI()
 }
 
 void FootIkDriverInfoUI::loadData(HkxObject *data){
-    if (data && data->getSignature() == HKB_FOOT_IK_DRIVER_INFO){
-        bsData = static_cast<hkbFootIkDriverInfo *>(data);
-        raycastDistanceUp->setValue(bsData->raycastDistanceUp);
-        raycastDistanceDown->setValue(bsData->raycastDistanceDown);
-        originalGroundHeightMS->setValue(bsData->originalGroundHeightMS);
-        verticalOffset->setValue(bsData->verticalOffset);
-        collisionFilterInfo->setValue(bsData->collisionFilterInfo);
-        forwardAlignFraction->setValue(bsData->forwardAlignFraction);
-        sidewaysAlignFraction->setValue(bsData->sidewaysAlignFraction);
-        sidewaysSampleWidth->setValue(bsData->sidewaysSampleWidth);
-        lockFeetWhenPlanted->setChecked(bsData->lockFeetWhenPlanted);
-        useCharacterUpVector->setChecked(bsData->useCharacterUpVector);
-        isQuadrupedNarrow->setChecked(bsData->isQuadrupedNarrow);
-        for (auto i = 0, k = 0; i < bsData->legs.size(); i++){
-            k = i + BASE_NUMBER_OF_ROWS;
-            if (k >= table->rowCount()){
-                table->setRowCount(table->rowCount() + 1);
-                table->setItem(k, 0, new QTableWidgetItem("Leg "+QString::number(i)));
-                table->setItem(k, 1, new QTableWidgetItem("hkbFootIkDriverInfoLeg"));
-                table->setItem(k, 2, new QTableWidgetItem("Edit"));
-            }else{
-                table->setRowHidden(k, false);
-                table->item(k, 0)->setText("Leg "+QString::number(i));
-                table->item(k, 1)->setText("hkbFootIkDriverInfoLeg");
+    if (data){
+        if (data->getSignature() == HKB_FOOT_IK_DRIVER_INFO){
+            bsData = static_cast<hkbFootIkDriverInfo *>(data);
+            raycastDistanceUp->setValue(bsData->getRaycastDistanceUp());
+            raycastDistanceDown->setValue(bsData->getRaycastDistanceDown());
+            originalGroundHeightMS->setValue(bsData->getOriginalGroundHeightMS());
+            verticalOffset->setValue(bsData->getVerticalOffset());
+            collisionFilterInfo->setValue(bsData->getCollisionFilterInfo());
+            forwardAlignFraction->setValue(bsData->getForwardAlignFraction());
+            sidewaysAlignFraction->setValue(bsData->getSidewaysAlignFraction());
+            sidewaysSampleWidth->setValue(bsData->getSidewaysSampleWidth());
+            lockFeetWhenPlanted->setChecked(bsData->getLockFeetWhenPlanted());
+            useCharacterUpVector->setChecked(bsData->getUseCharacterUpVector());
+            isQuadrupedNarrow->setChecked(bsData->getIsQuadrupedNarrow());
+            auto numlegs = bsData->getNumberOfLegs();
+            for (auto i = 0, k = 0; i < numlegs; i++){
+                k = i + BASE_NUMBER_OF_ROWS;
+                if (k >= table->rowCount()){
+                    table->setRowCount(table->rowCount() + 1);
+                    table->setItem(k, 0, new QTableWidgetItem("Leg "+QString::number(i)));
+                    table->setItem(k, 1, new QTableWidgetItem("hkbFootIkDriverInfoLeg"));
+                    table->setItem(k, 2, new QTableWidgetItem("Edit"));
+                }else{
+                    table->setRowHidden(k, false);
+                    table->item(k, 0)->setText("Leg "+QString::number(i));
+                    table->item(k, 1)->setText("hkbFootIkDriverInfoLeg");
+                }
+            }
+            for (auto j = numlegs + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
+                table->setRowHidden(j, true);
             }
         }
-        for (auto j = bsData->legs.size() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
-            table->setRowHidden(j, true);
-        }
+    }else{
+        LogFile::writeToLog("FootIkDriverInfoUI: The data is nullptr!!");
     }
 }
 
 void FootIkDriverInfoUI::setRaycastDistanceUp(){
-    if (bsData){
-        bsData->raycastDistanceUp = raycastDistanceUp->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setRaycastDistanceUp(raycastDistanceUp->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setRaycastDistanceUp(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setRaycastDistanceDown(){
-    if (bsData){
-        bsData->raycastDistanceDown = raycastDistanceDown->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setRaycastDistanceDown(raycastDistanceDown->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setRaycastDistanceDown(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setOriginalGroundHeightMS(){
-    if (bsData){
-        bsData->originalGroundHeightMS = originalGroundHeightMS->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setOriginalGroundHeightMS(originalGroundHeightMS->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setOriginalGroundHeightMS(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setVerticalOffset(){
-    if (bsData){
-        bsData->verticalOffset = verticalOffset->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setVerticalOffset(verticalOffset->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setVerticalOffset(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setCollisionFilterInfo(){
-    if (bsData){
-        bsData->collisionFilterInfo = collisionFilterInfo->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setCollisionFilterInfo(collisionFilterInfo->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setCollisionFilterInfo(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setForwardAlignFraction(){
-    if (bsData){
-        bsData->forwardAlignFraction = forwardAlignFraction->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setForwardAlignFraction(forwardAlignFraction->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setForwardAlignFraction(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setSidewaysAlignFraction(){
-    if (bsData){
-        bsData->sidewaysAlignFraction = sidewaysAlignFraction->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setSidewaysAlignFraction(sidewaysAlignFraction->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setSidewaysAlignFraction(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setSidewaysSampleWidth(){
-    if (bsData){
-        bsData->sidewaysSampleWidth = sidewaysSampleWidth->value();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setSidewaysSampleWidth(sidewaysSampleWidth->value()) : LogFile::writeToLog("FootIkDriverInfoUI::setSidewaysSampleWidth(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setLockFeetWhenPlanted(){
-    if (bsData){
-        bsData->lockFeetWhenPlanted = lockFeetWhenPlanted->isChecked();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setLockFeetWhenPlanted(lockFeetWhenPlanted->isChecked()) : LogFile::writeToLog("FootIkDriverInfoUI::setLockFeetWhenPlanted(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setUseCharacterUpVector(){
-    if (bsData){
-        bsData->useCharacterUpVector = useCharacterUpVector->isChecked();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setUseCharacterUpVector(useCharacterUpVector->isChecked()) : LogFile::writeToLog("FootIkDriverInfoUI::setUseCharacterUpVector(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::setIsQuadrupedNarrow(){
-    if (bsData){
-        bsData->isQuadrupedNarrow = isQuadrupedNarrow->isChecked();
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->setIsQuadrupedNarrow(isQuadrupedNarrow->isChecked()) : LogFile::writeToLog("FootIkDriverInfoUI::setIsQuadrupedNarrow(): The data is nullptr!!");
 }
 
 void FootIkDriverInfoUI::addLeg(){
     if (bsData){
         bsData->addLeg();
-        int result = BASE_NUMBER_OF_ROWS + bsData->legs.size();
-        if (result >= table->rowCount()){
-            result--;
+        auto result = BASE_NUMBER_OF_ROWS + bsData->legs.size();
+        auto numlegs = bsData->getNumberOfLegs();
+        if (result-- >= table->rowCount()){
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(result, 0, new QTableWidgetItem("Leg "+QString::number(bsData->legs.size() - 1)));
+            table->setItem(result, 0, new QTableWidgetItem("Leg "+QString::number(numlegs - 1)));
             table->setItem(result, 1, new QTableWidgetItem("hkbFootIkDriverInfoLeg"));
             table->setItem(result, 2, new QTableWidgetItem("Edit"));
         }else{
-            result--;
-            table->setRowHidden(result, false);
-            table->item(result, 0)->setText("Leg "+QString::number(bsData->legs.size() - 1));
+            table->setRowHidden(--result, false);
+            table->item(result, 0)->setText("Leg "+QString::number(numlegs - 1));
             table->item(result, 1)->setText("hkbFootIkDriverInfoLeg");
         }
-        bsData->setIsFileChanged(true);
+    }else{
+        LogFile::writeToLog("FootIkDriverInfoUI: The data is nullptr!!");
     }
 }
 
 void FootIkDriverInfoUI::removeSelectedLeg(){
     int result = table->currentRow() - BASE_NUMBER_OF_ROWS;
-    if (bsData && result < bsData->legs.size()){
-        bsData->removeLegAt(result);
-        delete table->takeItem(table->currentRow(), 0);
-        delete table->takeItem(table->currentRow(), 1);
-        delete table->takeItem(table->currentRow(), 2);
-        table->removeRow(table->currentRow());
+    if (bsData){
+        if (result < bsData->getNumberOfLegs()){
+            bsData->removeLegAt(result);
+            delete table->takeItem(table->currentRow(), 0);
+            delete table->takeItem(table->currentRow(), 1);
+            delete table->takeItem(table->currentRow(), 2);
+            table->removeRow(table->currentRow());
+        }
+    }else{
+        LogFile::writeToLog("FootIkDriverInfoUI: The data is nullptr!!");
     }
 }
 
 void FootIkDriverInfoUI::viewSelectedLeg(int row, int column){
-    int result = row - BASE_NUMBER_OF_ROWS;
-    if (bsData && bsData->legs.size() > result && column == 2){
-        legUI->loadData((hkbFootIkDriverInfoLeg *)bsData->getLegAt(result));
-        setCurrentIndex(FOOT_IK_DRIVER_INFO_LEG);
+    auto result = row - BASE_NUMBER_OF_ROWS;
+    if (bsData){
+        if (column == 2 && bsData->getNumberOfLegs() > result){
+            legUI->loadData((hkbFootIkDriverInfoLeg *)bsData->getLegAt(result));
+            setCurrentIndex(FOOT_IK_DRIVER_INFO_LEG);
+        }
+    }else{
+        LogFile::writeToLog("FootIkDriverInfoUI: The data is nullptr!!");
     }
 }
 

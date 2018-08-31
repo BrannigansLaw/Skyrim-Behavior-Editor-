@@ -35,7 +35,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList HandUI::headerLabels = {
+const QStringList HandUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -131,47 +131,47 @@ HandUI::HandUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void HandUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
-    connect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()), Qt::UniqueConnection);
-    connect(targetNormal, SIGNAL(editingFinished()), this, SLOT(setTargetNormal()), Qt::UniqueConnection);
-    connect(transformOnFraction, SIGNAL(editingFinished()), this, SLOT(setTransformOnFraction()), Qt::UniqueConnection);
-    connect(normalOnFraction, SIGNAL(editingFinished()), this, SLOT(setNormalOnFraction()), Qt::UniqueConnection);
-    connect(fadeInDuration, SIGNAL(editingFinished()), this, SLOT(setFadeInDuration()), Qt::UniqueConnection);
-    connect(fadeOutDuration, SIGNAL(editingFinished()), this, SLOT(setFadeOutDuration()), Qt::UniqueConnection);
-    connect(extrapolationTimeStep, SIGNAL(editingFinished()), this, SLOT(setExtrapolationTimeStep()), Qt::UniqueConnection);
-    connect(handleChangeSpeed, SIGNAL(editingFinished()), this, SLOT(setHandleChangeSpeed()), Qt::UniqueConnection);
-    connect(handleChangeMode, SIGNAL(currentIndexChanged(QString)), this, SLOT(setHandleChangeMode(QString)), Qt::UniqueConnection);
-    connect(fixUp, SIGNAL(released()), this, SLOT(setFixUp()), Qt::UniqueConnection);
-    connect(handIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setHandIndex(int)), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void HandUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
-    disconnect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()));
-    disconnect(targetNormal, SIGNAL(editingFinished()), this, SLOT(setTargetNormal()));
-    disconnect(transformOnFraction, SIGNAL(editingFinished()), this, SLOT(setTransformOnFraction()));
-    disconnect(normalOnFraction, SIGNAL(editingFinished()), this, SLOT(setNormalOnFraction()));
-    disconnect(fadeInDuration, SIGNAL(editingFinished()), this, SLOT(setFadeInDuration()));
-    disconnect(fadeOutDuration, SIGNAL(editingFinished()), this, SLOT(setFadeOutDuration()));
-    disconnect(extrapolationTimeStep, SIGNAL(editingFinished()), this, SLOT(setExtrapolationTimeStep()));
-    disconnect(handleChangeSpeed, SIGNAL(editingFinished()), this, SLOT(setHandleChangeSpeed()));
-    disconnect(handleChangeMode, SIGNAL(currentIndexChanged(QString)), this, SLOT(setHandleChangeMode(QString)));
-    disconnect(fixUp, SIGNAL(released()), this, SLOT(setFixUp()));
-    disconnect(handIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setHandIndex(int)));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void HandUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
+        connect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()), Qt::UniqueConnection);
+        connect(targetNormal, SIGNAL(editingFinished()), this, SLOT(setTargetNormal()), Qt::UniqueConnection);
+        connect(transformOnFraction, SIGNAL(editingFinished()), this, SLOT(setTransformOnFraction()), Qt::UniqueConnection);
+        connect(normalOnFraction, SIGNAL(editingFinished()), this, SLOT(setNormalOnFraction()), Qt::UniqueConnection);
+        connect(fadeInDuration, SIGNAL(editingFinished()), this, SLOT(setFadeInDuration()), Qt::UniqueConnection);
+        connect(fadeOutDuration, SIGNAL(editingFinished()), this, SLOT(setFadeOutDuration()), Qt::UniqueConnection);
+        connect(extrapolationTimeStep, SIGNAL(editingFinished()), this, SLOT(setExtrapolationTimeStep()), Qt::UniqueConnection);
+        connect(handleChangeSpeed, SIGNAL(editingFinished()), this, SLOT(setHandleChangeSpeed()), Qt::UniqueConnection);
+        connect(handleChangeMode, SIGNAL(currentIndexChanged(QString)), this, SLOT(setHandleChangeMode(QString)), Qt::UniqueConnection);
+        connect(fixUp, SIGNAL(released()), this, SLOT(setFixUp()), Qt::UniqueConnection);
+        connect(handIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setHandIndex(int)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
+        disconnect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()));
+        disconnect(targetNormal, SIGNAL(editingFinished()), this, SLOT(setTargetNormal()));
+        disconnect(transformOnFraction, SIGNAL(editingFinished()), this, SLOT(setTransformOnFraction()));
+        disconnect(normalOnFraction, SIGNAL(editingFinished()), this, SLOT(setNormalOnFraction()));
+        disconnect(fadeInDuration, SIGNAL(editingFinished()), this, SLOT(setFadeInDuration()));
+        disconnect(fadeOutDuration, SIGNAL(editingFinished()), this, SLOT(setFadeOutDuration()));
+        disconnect(extrapolationTimeStep, SIGNAL(editingFinished()), this, SLOT(setExtrapolationTimeStep()));
+        disconnect(handleChangeSpeed, SIGNAL(editingFinished()), this, SLOT(setHandleChangeSpeed()));
+        disconnect(handleChangeMode, SIGNAL(currentIndexChanged(QString)), this, SLOT(setHandleChangeMode(QString)));
+        disconnect(fixUp, SIGNAL(released()), this, SLOT(setFixUp()));
+        disconnect(handIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setHandIndex(int)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void HandUI::loadData(BehaviorFile *parentFile, hkbHandIkControlsModifier::hkHand *bon, hkbHandIkControlsModifier *par, int ind){
-    disconnectSignals();
+    toggleSignals(false);
     if (parentFile && bon && par && ind > -1){
         parent = par;
         bsBoneIndex = ind;
@@ -186,413 +186,208 @@ void HandUI::loadData(BehaviorFile *parentFile, hkbHandIkControlsModifier::hkHan
         fadeOutDuration->setValue(bsData->controlData.fadeOutDuration);
         extrapolationTimeStep->setValue(bsData->controlData.extrapolationTimeStep);
         handleChangeSpeed->setValue(bsData->controlData.handleChangeSpeed);
-        if (handleChangeMode->count() == 0){
+        if (!handleChangeMode->count()){
             handleChangeMode->insertItems(0, parent->HandleChangeMode);
         }
         handleChangeMode->setCurrentIndex(parent->HandleChangeMode.indexOf(bsData->controlData.handleChangeMode));
         fixUp->setChecked(bsData->controlData.fixUp);
-        QStringList boneNames("None");
-        if (handIndex->count() == 0){
-            boneNames = boneNames + file->getRigBoneNames();
+        if (!handIndex->count()){
+            auto boneNames = QStringList("None") + file->getRigBoneNames();
             handIndex->insertItems(0, boneNames);
         }
         handIndex->setCurrentIndex(bsData->handIndex + 1);
         enable->setChecked(bsData->enable);
-        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-        if (varBind){
-            loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/targetPosition");
-            loadBinding(TARGET_ROTATION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/boneIndex");
-            loadBinding(TARGET_NORMAL_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/targetNormal");
-            loadBinding(TRANSFORM_ON_FRACTION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/transformOnFraction");
-            loadBinding(NORMAL_ON_FRACTION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/normalOnFraction");
-            loadBinding(FADE_IN_DURATION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/fadeInDuration");
-            loadBinding(FADE_OUT_DURATION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration");
-            loadBinding(EXTRAPOLATION_TIME_STEP_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep");
-            loadBinding(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed");
-            loadBinding(FIXUP_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/fixUp");
-            loadBinding(HAND_INDEX_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/handIndex");
-            loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/enable");
-        }else{
-            table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(TARGET_NORMAL_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(TRANSFORM_ON_FRACTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(NORMAL_ON_FRACTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(FADE_IN_DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(FADE_OUT_DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(EXTRAPOLATION_TIME_STEP_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(FIXUP_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(HAND_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }
+        auto varBind = parent->getVariableBindingSetData();
+        UIHelper::loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/targetPosition", table, parent);
+        UIHelper::loadBinding(TARGET_ROTATION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/boneIndex", table, parent);
+        UIHelper::loadBinding(TARGET_NORMAL_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/targetNormal", table, parent);
+        UIHelper::loadBinding(TRANSFORM_ON_FRACTION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/transformOnFraction", table, parent);
+        UIHelper::loadBinding(NORMAL_ON_FRACTION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/normalOnFraction", table, parent);
+        UIHelper::loadBinding(FADE_IN_DURATION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/fadeInDuration", table, parent);
+        UIHelper::loadBinding(FADE_OUT_DURATION_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration", table, parent);
+        UIHelper::loadBinding(EXTRAPOLATION_TIME_STEP_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep", table, parent);
+        UIHelper::loadBinding(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed", table, parent);
+        UIHelper::loadBinding(FIXUP_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/fixUp", table, parent);
+        UIHelper::loadBinding(HAND_INDEX_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/handIndex", table, parent);
+        UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "hands:"+QString::number(bsBoneIndex)+"/enable", table, parent);
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::loadData(): Behavior file, bind or event data is null!!!");
+        LogFile::writeToLog("HandUI::loadData(): Behavior file, parent or data is null!!!");
     }
-    connectSignals();
-}
-
-void HandUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(file)->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("HandUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-bool HandUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->getVariableBindingSet() = HkxSharedPtr();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(file);
-                parent->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->setIsChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
+    toggleSignals(true);
 }
 
 void HandUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, parent);
+        };
         switch (row){
         case TARGET_POSITION_ROW:
-            if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/targetPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_POSITION_ROW, "hands:"+QString::number(bsBoneIndex)+"/targetPosition", VARIABLE_TYPE_VECTOR4); break;
         case TARGET_ROTATION_ROW:
-            if (table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/targetRotation", VARIABLE_TYPE_QUATERNION, isProperty);
-            break;
+            checkisproperty(TARGET_ROTATION_ROW, "hands:"+QString::number(bsBoneIndex)+"/targetRotation", VARIABLE_TYPE_QUATERNION); break;
         case TARGET_NORMAL_ROW:
-            if (table->item(TARGET_NORMAL_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/targetNormal", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_NORMAL_ROW, "hands:"+QString::number(bsBoneIndex)+"/targetNormal", VARIABLE_TYPE_VECTOR4); break;
         case TRANSFORM_ON_FRACTION_ROW:
-            if (table->item(TRANSFORM_ON_FRACTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/transformOnFraction", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(TRANSFORM_ON_FRACTION_ROW, "hands:"+QString::number(bsBoneIndex)+"/transformOnFraction", VARIABLE_TYPE_REAL); break;
         case NORMAL_ON_FRACTION_ROW:
-            if (table->item(NORMAL_ON_FRACTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/normalOnFraction", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(NORMAL_ON_FRACTION_ROW, "hands:"+QString::number(bsBoneIndex)+"/normalOnFraction", VARIABLE_TYPE_REAL); break;
         case FADE_IN_DURATION_ROW:
-            if (table->item(FADE_IN_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/fadeInDuration", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(FADE_IN_DURATION_ROW, "hands:"+QString::number(bsBoneIndex)+"/fadeInDuration", VARIABLE_TYPE_REAL); break;
         case FADE_OUT_DURATION_ROW:
-            if (table->item(FADE_OUT_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(FADE_OUT_DURATION_ROW, "hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration", VARIABLE_TYPE_REAL); break;
         case EXTRAPOLATION_TIME_STEP_ROW:
-            if (table->item(EXTRAPOLATION_TIME_STEP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(EXTRAPOLATION_TIME_STEP_ROW, "hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep", VARIABLE_TYPE_REAL); break;
         case HANDLE_CHANGE_SPEED_ROW:
-            if (table->item(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(HANDLE_CHANGE_SPEED_ROW, "hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed", VARIABLE_TYPE_REAL); break;
         case FIXUP_ROW:
-            if (table->item(FIXUP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/fixUp", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(FIXUP_ROW, "hands:"+QString::number(bsBoneIndex)+"/fixUp", VARIABLE_TYPE_BOOL); break;
         case HAND_INDEX_ROW:
-            if (table->item(HAND_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/handIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(HAND_INDEX_ROW, "hands:"+QString::number(bsBoneIndex)+"/handIndex", VARIABLE_TYPE_INT32); break;
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "hands:"+QString::number(bsBoneIndex)+"/enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "hands:"+QString::number(bsBoneIndex)+"/enable", VARIABLE_TYPE_BOOL); break;
         default:
             return;
         }
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("HandUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
 void HandUI::setTargetPosition(){
     if (bsData && file){
-        if (bsData->controlData.targetPosition != targetPosition->value()){
-            bsData->controlData.targetPosition = targetPosition->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.targetPosition != targetPosition->value()) ? bsData->controlData.targetPosition = targetPosition->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::settargetPosition(): targetPosition not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::settargetPosition(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::settargetPosition(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setTargetRotation(){
     if (bsData && file){
-        if (bsData->controlData.targetRotation != targetRotation->value()){
-            bsData->controlData.targetRotation = targetRotation->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.targetRotation != targetRotation->value()) ? bsData->controlData.targetRotation = targetRotation->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::settargetRotation(): targetRotation not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::settargetRotation(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::settargetRotation(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setTargetNormal(){
     if (bsData && file){
-        if (bsData->controlData.targetNormal != targetNormal->value()){
-            bsData->controlData.targetNormal = targetNormal->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.targetNormal != targetNormal->value()) ? bsData->controlData.targetNormal = targetNormal->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::settargetNormal(): targetNormal not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::settargetNormal(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::settargetNormal(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setTransformOnFraction(){
     if (bsData && file){
-        if (bsData->controlData.transformOnFraction != transformOnFraction->value()){
-            bsData->controlData.transformOnFraction = transformOnFraction->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.transformOnFraction != transformOnFraction->value()) ? bsData->controlData.transformOnFraction = transformOnFraction->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::settransformOnFraction(): transformOnFraction not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::settransformOnFraction(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::settransformOnFraction(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setNormalOnFraction(){
     if (bsData && file){
-        if (bsData->controlData.normalOnFraction != normalOnFraction->value()){
-            bsData->controlData.normalOnFraction = normalOnFraction->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.normalOnFraction != normalOnFraction->value()) ? bsData->controlData.normalOnFraction = normalOnFraction->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::setnormalOnFraction(): normalOnFraction not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setnormalOnFraction(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::setnormalOnFraction(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setFadeInDuration(){
     if (bsData && file){
-        if (bsData->controlData.fadeInDuration != fadeInDuration->value()){
-            bsData->controlData.fadeInDuration = fadeInDuration->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.fadeInDuration != fadeInDuration->value()) ? bsData->controlData.fadeInDuration = fadeInDuration->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::setfadeInDuration(): fadeInDuration not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setFadeInDuration(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::setFadeInDuration(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setFadeOutDuration(){
     if (bsData && file){
-        if (bsData->controlData.fadeOutDuration != fadeOutDuration->value()){
-            bsData->controlData.fadeOutDuration = fadeOutDuration->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.fadeOutDuration != fadeOutDuration->value()) ? bsData->controlData.fadeOutDuration = fadeOutDuration->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::setfadeOutDuration(): fadeOutDuration not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setFadeOutDuration(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::setFadeOutDuration(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setExtrapolationTimeStep(){
     if (bsData && file){
-        if (bsData->controlData.extrapolationTimeStep != extrapolationTimeStep->value()){
-            bsData->controlData.extrapolationTimeStep = extrapolationTimeStep->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.extrapolationTimeStep != extrapolationTimeStep->value()) ? bsData->controlData.extrapolationTimeStep = extrapolationTimeStep->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::setextrapolationTimeStep(): extrapolationTimeStep not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setExtrapolationTimeStep(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::setExtrapolationTimeStep(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setHandleChangeSpeed(){
     if (bsData && file){
-        if (bsData->controlData.handleChangeSpeed != handleChangeSpeed->value()){
-            bsData->controlData.handleChangeSpeed = handleChangeSpeed->value();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.handleChangeSpeed != handleChangeSpeed->value()) ? bsData->controlData.handleChangeSpeed = handleChangeSpeed->value(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::sethandleChangeSpeed(): handleChangeSpeed not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::setHandleChangeSpeed(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setHandleChangeMode(const QString &mode){
-    if (bsData && file){
-        bsData->controlData.handleChangeMode = mode;
-        file->setIsChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!");
-    }
+    (bsData && file && bsData->controlData.handleChangeMode != mode) ? bsData->controlData.handleChangeMode = mode, file->setIsChanged(true) : LogFile::writeToLog("HandUI::setHandleChangeSpeed(): handleChangeMode was not set!!!");
 }
 
 void HandUI::setFixUp(){
     if (bsData && file){
-        if (bsData->controlData.fixUp != fixUp->isChecked()){
-            bsData->controlData.fixUp = fixUp->isChecked();
-            file->setIsChanged(true);
-        }
+        (bsData->controlData.fixUp != fixUp->isChecked()) ? bsData->controlData.fixUp = fixUp->isChecked(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::setfixUp(): fixUp not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setFixUp(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("HandUI::setFixUp(): Behavior file or data is null!!!");
     }
 }
 
 void HandUI::setHandIndex(int index){
-    if (bsData && file){
-        bsData->handIndex = index - 1;
-        file->setIsChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setindex(): Behavior file or event data is null!!!");
-    }
+    auto boneindex = --index;
+    (bsData && file && boneindex != bsData->handIndex) ? bsData->handIndex = boneindex, file->setIsChanged(true) : LogFile::writeToLog("HandUI::setindex(): handIndex was not set!!!");
 }
 
 void HandUI::setEnable(){
-    if (bsData && file){
-        bsData->enable = enable->isChecked();
-        file->setIsChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::setEnable(): Behavior file or event data is null!!!");
-    }
+    (bsData && file && bsData->enable != enable->isChecked()) ? bsData->enable = enable->isChecked(), file->setIsChanged(true) : LogFile::writeToLog("HandUI::setEnable(): Behavior file or data is null!!!");
 }
 
 void HandUI::viewSelectedChild(int row, int column){
     if (bsData){
-        bool properties = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case TARGET_POSITION_ROW:
-                if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/targetPosition");
-                break;
+                checkisproperty(TARGET_POSITION_ROW, "hands:"+QString::number(bsBoneIndex)+"/targetPosition"); break;
             case TARGET_ROTATION_ROW:
-                if (table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/targetRotation");
-                break;
+                checkisproperty(TARGET_ROTATION_ROW, "hands:"+QString::number(bsBoneIndex)+"/targetRotation"); break;
             case TARGET_NORMAL_ROW:
-                if (table->item(TARGET_NORMAL_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/targetNormal");
-                break;
+                checkisproperty(TARGET_NORMAL_ROW, "hands:"+QString::number(bsBoneIndex)+"/targetNormal"); break;
             case TRANSFORM_ON_FRACTION_ROW:
-                if (table->item(TRANSFORM_ON_FRACTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/transformOnFraction");
-                break;
+                checkisproperty(TRANSFORM_ON_FRACTION_ROW, "hands:"+QString::number(bsBoneIndex)+"/transformOnFraction"); break;
             case NORMAL_ON_FRACTION_ROW:
-                if (table->item(NORMAL_ON_FRACTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/normalOnFraction");
-                break;
+                checkisproperty(NORMAL_ON_FRACTION_ROW, "hands:"+QString::number(bsBoneIndex)+"/normalOnFraction"); break;
             case FADE_IN_DURATION_ROW:
-                if (table->item(FADE_IN_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/fadeInDuration");
-                break;
+                checkisproperty(FADE_IN_DURATION_ROW, "hands:"+QString::number(bsBoneIndex)+"/fadeInDuration"); break;
             case FADE_OUT_DURATION_ROW:
-                if (table->item(FADE_OUT_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration");
-                break;
+                checkisproperty(FADE_OUT_DURATION_ROW, "hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration"); break;
             case EXTRAPOLATION_TIME_STEP_ROW:
-                if (table->item(EXTRAPOLATION_TIME_STEP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep");
-                break;
+                checkisproperty(EXTRAPOLATION_TIME_STEP_ROW, "hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep"); break;
             case HANDLE_CHANGE_SPEED_ROW:
-                if (table->item(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed");
-                break;
+                checkisproperty(HANDLE_CHANGE_SPEED_ROW, "hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed"); break;
             case FIXUP_ROW:
-                if (table->item(FIXUP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/fixUp");
-                break;
+                checkisproperty(FIXUP_ROW, "hands:"+QString::number(bsBoneIndex)+"/fixUp"); break;
             case HAND_INDEX_ROW:
-                if (table->item(HAND_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/handIndex");
-                break;
+                checkisproperty(HAND_INDEX_ROW, "hands:"+QString::number(bsBoneIndex)+"/handIndex"); break;
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "hands:"+QString::number(bsBoneIndex)+"/enable");
-                break;
+                checkisproperty(ENABLE_ROW, "hands:"+QString::number(bsBoneIndex)+"/enable"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("HandUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -612,70 +407,33 @@ void HandUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("HandUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void HandUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("HandUI::variableRenamed(): The new variable name is the empty string!!");
-    }
-    if (bsData){
+    if (parent){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
+        auto bind = parent->getVariableBindingSetData();
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/targetPosition");
-            if (bindIndex == index){
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/targetRotation");
-            if (bindIndex == index){
-                table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/targetNormal");
-            if (bindIndex == index){
-                table->item(TARGET_NORMAL_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/transformOnFraction");
-            if (bindIndex == index){
-                table->item(TRANSFORM_ON_FRACTION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/normalOnFraction");
-            if (bindIndex == index){
-                table->item(NORMAL_ON_FRACTION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/fadeInDuration");
-            if (bindIndex == index){
-                table->item(FADE_IN_DURATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration");
-            if (bindIndex == index){
-                table->item(FADE_OUT_DURATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep");
-            if (bindIndex == index){
-                table->item(EXTRAPOLATION_TIME_STEP_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed");
-            if (bindIndex == index){
-                table->item(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/fixUp");
-            if (bindIndex == index){
-                table->item(FIXUP_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/handIndex");
-            if (bindIndex == index){
-                table->item(HAND_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("hands:"+QString::number(bsBoneIndex)+"/enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("hands:"+QString::number(bsBoneIndex)+"/targetPosition", TARGET_POSITION_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/targetRotation", TARGET_ROTATION_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/targetNormal", TARGET_NORMAL_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/transformOnFraction", TRANSFORM_ON_FRACTION_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/normalOnFraction", NORMAL_ON_FRACTION_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/fadeInDuration", FADE_IN_DURATION_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/fadeOutDuration", FADE_OUT_DURATION_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/extrapolationTimeStep", EXTRAPOLATION_TIME_STEP_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/handleChangeSpeed", HANDLE_CHANGE_SPEED_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/fixUp", FIXUP_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/handIndex", HAND_INDEX_ROW);
+            setname("hands:"+QString::number(bsBoneIndex)+"/enable", ENABLE_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("HandUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("HandUI::variableRenamed(): parent is nullptr!!");
     }
 }

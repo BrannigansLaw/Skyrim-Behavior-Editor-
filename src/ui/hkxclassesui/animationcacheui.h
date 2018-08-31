@@ -16,11 +16,14 @@ class TableWidget;
 class AnimCacheAnimSetData;
 class ProjectFile;
 
-class CacheVariableWidget: public QGroupBox
+class CacheVariableWidget final: public QGroupBox
 {
     Q_OBJECT
 public:
     CacheVariableWidget();
+    CacheVariableWidget& operator=(const CacheVariableWidget&) = delete;
+    CacheVariableWidget(const CacheVariableWidget &) = delete;
+    ~CacheVariableWidget() = default;
 signals:
     void returnToWidget();
 public:
@@ -30,8 +33,7 @@ private slots:
     void setMinimumValue(int newvalue);
     void setMaximumValue(int newvalue);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
 private:
     AnimCacheVariable *bsData;
     QVBoxLayout *lyt;
@@ -44,12 +46,16 @@ private:
     QPushButton *returnButton;
 };
 
-class CacheClipWidget: public QGroupBox
+class CacheClipWidget final: public QGroupBox
 {
     Q_OBJECT
     friend class CacheWidget;
 public:
     CacheClipWidget();
+    CacheClipWidget& operator=(const CacheClipWidget&) = delete;
+    CacheClipWidget(const CacheClipWidget &) = delete;
+    ~CacheClipWidget() = default;
+public:
     void loadData(AnimCacheClipInfo *data);
 signals:
     void returnToWidget();
@@ -60,8 +66,7 @@ private slots:
     void removeClipGenerator();
     void setClipGeneratorAt(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
 private:
     AnimCacheClipInfo *bsData;
     QVBoxLayout *lyt;
@@ -76,12 +81,15 @@ private:
     QPushButton *returnButton;
 };
 
-class CacheWidget: public QStackedWidget
+class CacheWidget final: public QStackedWidget
 {
-    friend class AnimationCacheUI;
     Q_OBJECT
+    friend class AnimationCacheUI;
 public:
     CacheWidget();
+    CacheWidget& operator=(const CacheWidget&) = delete;
+    CacheWidget(const CacheWidget &) = delete;
+    ~CacheWidget() = default;
 signals:
     void returnToMainWidget();
 private slots:
@@ -100,11 +108,10 @@ private slots:
     void viewClipGenerator(int row, int column);
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
+        MAIN_WIDGET,
         VARIABLE_WIDGET,
         CLIP_WIDGET
     };
@@ -133,11 +140,15 @@ private:
     QPushButton *returnButton;
 };
 
-class AnimationCacheUI: public QStackedWidget
+class AnimationCacheUI final: public QStackedWidget
 {
     Q_OBJECT
 public:
     AnimationCacheUI();
+    AnimationCacheUI& operator=(const AnimationCacheUI&) = delete;
+    AnimationCacheUI(const AnimationCacheUI &) = delete;
+    ~AnimationCacheUI() = default;
+public:
     void loadData(ProjectFile *project);
 private slots:
     void viewSelectedFile(int row, int column);
@@ -145,11 +156,10 @@ private slots:
     void removeCacheFile();
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
+        MAIN_WIDGET,
         CACHE_WIDGET
     };
 private:

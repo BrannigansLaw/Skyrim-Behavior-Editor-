@@ -27,7 +27,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSPassByTargetTriggerModifierUI::headerLabels = {
+const QStringList BSPassByTargetTriggerModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -79,27 +79,28 @@ BSPassByTargetTriggerModifierUI::BSPassByTargetTriggerModifierUI()
     table->setCellWidget(TRIGGER_EVENT_PAYLOAD_ROW, VALUE_COLUMN, triggerEventPayload);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSPassByTargetTriggerModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
-    connect(radius, SIGNAL(editingFinished()), this, SLOT(setRadius()), Qt::UniqueConnection);
-    connect(movementDirection, SIGNAL(editingFinished()), this, SLOT(setMovementDirection()), Qt::UniqueConnection);
-    connect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setResetAlarm()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSPassByTargetTriggerModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
-    disconnect(radius, SIGNAL(editingFinished()), this, SLOT(setRadius()));
-    disconnect(movementDirection, SIGNAL(editingFinished()), this, SLOT(setMovementDirection()));
-    disconnect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSPassByTargetTriggerModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
+        connect(radius, SIGNAL(editingFinished()), this, SLOT(setRadius()), Qt::UniqueConnection);
+        connect(movementDirection, SIGNAL(editingFinished()), this, SLOT(setMovementDirection()), Qt::UniqueConnection);
+        connect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setResetAlarm()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
+        disconnect(radius, SIGNAL(editingFinished()), this, SLOT(setRadius()));
+        disconnect(movementDirection, SIGNAL(editingFinished()), this, SLOT(setMovementDirection()));
+        disconnect(triggerEventPayload, SIGNAL(editingFinished()), this, SLOT(setTriggerEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSPassByTargetTriggerModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
@@ -114,180 +115,114 @@ void BSPassByTargetTriggerModifierUI::connectToTables(GenericTableWidget *variab
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSPassByTargetTriggerModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_PASS_BY_TARGET_TRIGGER_MODIFIER){
             bsData = static_cast<BSPassByTargetTriggerModifier *>(data);
-            hkbVariableBindingSet *varBind = nullptr;
-            hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->triggerEvent.payload.data());
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            targetPosition->setValue(bsData->targetPosition);
-            radius->setValue(bsData->radius);
-            movementDirection->setValue(bsData->movementDirection);
-            QString text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->triggerEvent.id);
-            if (text != ""){
-                table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(text);
-            }else{
-                table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
-            }
-            if (payload){
-                triggerEventPayload->setText(payload->getData());
-            }else{
-                triggerEventPayload->setText("");
-            }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition");
-                loadBinding(RADIUS_ROW, BINDING_COLUMN, varBind, "radius");
-                loadBinding(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN, varBind, "movementDirection");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(RADIUS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            targetPosition->setValue(bsData->getTargetPosition());
+            radius->setValue(bsData->getRadius());
+            movementDirection->setValue(bsData->getMovementDirection());
+            auto text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getTriggerEventID());
+            (text != "") ? table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(text) : table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
+            auto payload = bsData->getTriggerEventPayload();
+            (payload) ? triggerEventPayload->setText(payload->getData()) : triggerEventPayload->setText("");
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition", table, bsData);
+            UIHelper::loadBinding(RADIUS_ROW, BINDING_COLUMN, varBind, "radius", table, bsData);
+            UIHelper::loadBinding(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN, varBind, "movementDirection", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSPassByTargetTriggerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSPassByTargetTriggerModifierUI::setName(){
+void BSPassByTargetTriggerModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSPassByTargetTriggerModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSPassByTargetTriggerModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void BSPassByTargetTriggerModifierUI::setTargetPosition(){
-    if (bsData){
-        if (bsData->targetPosition != targetPosition->value()){
-            bsData->targetPosition = targetPosition->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::settargetPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetPosition(targetPosition->value()) : LogFile::writeToLog("BSPassByTargetTriggerModifierUI::setTargetPosition(): The data is nullptr!!");
 }
 
 void BSPassByTargetTriggerModifierUI::setRadius(){
-    if (bsData){
-        if (bsData->radius != radius->value()){
-            bsData->radius = radius->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setradius(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRadius(radius->value()) : LogFile::writeToLog("BSPassByTargetTriggerModifierUI::setRadius(): The data is nullptr!!");
 }
 
 void BSPassByTargetTriggerModifierUI::setMovementDirection(){
-    if (bsData){
-        if (bsData->movementDirection != movementDirection->value()){
-            bsData->movementDirection = movementDirection->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setmovementDirection(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMovementDirection(movementDirection->value()) : LogFile::writeToLog("BSPassByTargetTriggerModifierUI::setMovementDirection(): The data is nullptr!!");
 }
 
 void BSPassByTargetTriggerModifierUI::setTriggerEventId(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->triggerEvent.id != index){
-            bsData->triggerEvent.id = index;
-            table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setTriggerEventID(index - 1);
+        table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::settriggerEventId(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::setTriggerEventId(): The data is nullptr!!");
     }
 }
 
 void BSPassByTargetTriggerModifierUI::setTriggerEventPayload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->triggerEvent.payload.data());
+        auto payload = bsData->getTriggerEventPayload();
         if (triggerEventPayload->text() != ""){
             if (payload){
-                payload->getData() = triggerEventPayload->text();
+                payload->setData(triggerEventPayload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), triggerEventPayload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->triggerEvent.payload = HkxSharedPtr(payload);
+                bsData->setTriggerEventPayload(payload);
             }
         }else{
-            bsData->triggerEvent.payload = HkxSharedPtr();
+            bsData->setTriggerEventPayload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::settriggerEventPayload(): The data is nullptr!!");
+        LogFile::writeToLog("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is nullptr!!");
     }
 }
 
 void BSPassByTargetTriggerModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case TARGET_POSITION_ROW:
-                if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetPosition");
-                break;
+                checkisproperty(TARGET_POSITION_ROW, "targetPosition"); break;
             case RADIUS_ROW:
-                if (table->item(RADIUS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "radius");
-                break;
+                checkisproperty(RADIUS_ROW, "radius"); break;
             case MOVEMENT_DIRECTION_ROW:
-                if (table->item(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "movementDirection");
-                break;
-            default:
-                return;
+                checkisproperty(MOVEMENT_DIRECTION_ROW, "movementDirection"); break;
             }
         }else if (column == VALUE_COLUMN && row == TRIGGER_EVENT_ID_ROW){
-            emit viewEvents(bsData->triggerEvent.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getTriggerEventID() + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -307,140 +242,57 @@ void BSPassByTargetTriggerModifierUI::selectTableToView(bool viewisProperty, con
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSPassByTargetTriggerModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        if (index == bsData->triggerEvent.id){
-            table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->getTriggerEventID()) ? table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void BSPassByTargetTriggerModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetPosition");
-            if (bindIndex == index){
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("radius");
-            if (bindIndex == index){
-                table->item(RADIUS_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("movementDirection");
-            if (bindIndex == index){
-                table->item(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("targetPosition", TARGET_POSITION_ROW);
+            setname("radius", RADIUS_ROW);
+            setname("movementDirection", MOVEMENT_DIRECTION_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSPassByTargetTriggerModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSPassByTargetTriggerModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case TARGET_POSITION_ROW:
-            if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_POSITION_ROW, "targetPosition", VARIABLE_TYPE_VECTOR4); break;
         case RADIUS_ROW:
-            if (table->item(RADIUS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "radius", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(RADIUS_ROW, "radius", VARIABLE_TYPE_REAL); break;
         case MOVEMENT_DIRECTION_ROW:
-            if (table->item(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "movementDirection", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSPassByTargetTriggerModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(MOVEMENT_DIRECTION_ROW, "movementDirection", VARIABLE_TYPE_VECTOR4); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSPassByTargetTriggerModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSPassByTargetTriggerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
-

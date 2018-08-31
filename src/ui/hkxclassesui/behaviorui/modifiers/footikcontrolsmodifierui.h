@@ -21,58 +21,57 @@ class QGroupBox;
 class LegUI;
 class QuadVariableWidget;
 
-class FootIkControlsModifierUI: public QStackedWidget
+class FootIkControlsModifierUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     FootIkControlsModifierUI();
-    virtual ~FootIkControlsModifierUI(){}
+    FootIkControlsModifierUI& operator=(const FootIkControlsModifierUI&) = delete;
+    FootIkControlsModifierUI(const FootIkControlsModifierUI &) = delete;
+    ~FootIkControlsModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void variableRenamed(const QString & name, int index);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void modifierNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setEnable();
-    void setonOffGain();
-    void setgroundAscendingGain();
-    void setgroundDescendingGain();
-    void setfootPlantedGain();
-    void setfootRaisedGain();
-    void setfootUnlockGain();
-    void setworldFromModelFeedbackGain();
-    void seterrorUpDownBias();
-    void setalignWorldFromModelGain();
-    void sethipOrientationGain();
-    void setmaxKneeAngleDifference();
-    void setankleOrientationGain();
-    void seterrorOutTranslation();
-    void setalignWithGroundRotation();
+    void setOnOffGain();
+    void setGroundAscendingGain();
+    void setGroundDescendingGain();
+    void setFootPlantedGain();
+    void setFootRaisedGain();
+    void setFootUnlockGain();
+    void setWorldFromModelFeedbackGain();
+    void setErrorUpDownBias();
+    void setAlignWorldFromModelGain();
+    void setHipOrientationGain();
+    void setMaxKneeAngleDifference();
+    void setAnkleOrientationGain();
+    void setErrorOutTranslation();
+    void setAlignWithGroundRotation();
     void viewSelectedChild(int row, int column);
     void variableTableElementSelected(int index, const QString &name);
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
     void addLeg();
     void removeLeg(int index);
     void loadDynamicTableRows();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
-    void variableRenamed(const QString & name, int index);
+    void toggleSignals(bool toggleconnections);
+    void setBindingVariable(int index, const QString & name);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        MAIN_WIDGET,
+        CHILD_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     hkbFootIkControlsModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

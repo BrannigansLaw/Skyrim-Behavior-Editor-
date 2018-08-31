@@ -38,7 +38,7 @@ bool BSiStateTaggingGenerator::insertObjectAt(int , DataIconManager *obj){
 
 bool BSiStateTaggingGenerator::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         pDefaultGenerator = HkxSharedPtr();
         return true;
     }
@@ -47,17 +47,17 @@ bool BSiStateTaggingGenerator::removeObjectAt(int index){
 
 void BSiStateTaggingGenerator::setIPriority(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != iPriority) ? iPriority = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'iPriority' was not set!");
+    (value != iPriority) ? iPriority = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'iPriority' was not set!");
 }
 
 void BSiStateTaggingGenerator::setIStateToSetAs(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != iStateToSetAs) ? iStateToSetAs = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'iStateToSetAs' was not set!");
+    (value != iStateToSetAs) ? iStateToSetAs = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'iStateToSetAs' was not set!");
 }
 
 void BSiStateTaggingGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 int BSiStateTaggingGenerator::getIPriority() const{
@@ -73,8 +73,8 @@ int BSiStateTaggingGenerator::getIStateToSetAs() const{
 QString BSiStateTaggingGenerator::getDefaultGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
@@ -196,7 +196,7 @@ void BSiStateTaggingGenerator::unlink(){
 QString BSiStateTaggingGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

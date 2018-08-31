@@ -32,7 +32,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList EventsFromRangeModifierUI::headerLabels = {
+const QStringList EventsFromRangeModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -79,207 +79,116 @@ EventsFromRangeModifierUI::EventsFromRangeModifierUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(rangeUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void EventsFromRangeModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(inputValue, SIGNAL(editingFinished()), this, SLOT(setInputValue()), Qt::UniqueConnection);
-    connect(lowerBound, SIGNAL(editingFinished()), this, SLOT(setLowerBound()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
-    //connect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    //connect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-}
-
-void EventsFromRangeModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(inputValue, SIGNAL(editingFinished()), this, SLOT(setInputValue()));
-    disconnect(lowerBound, SIGNAL(editingFinished()), this, SLOT(setLowerBound()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    //disconnect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    //disconnect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
-    disconnect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+void EventsFromRangeModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(inputValue, SIGNAL(editingFinished()), this, SLOT(setInputValue()), Qt::UniqueConnection);
+        connect(lowerBound, SIGNAL(editingFinished()), this, SLOT(setLowerBound()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+        //connect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        //connect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(inputValue, SIGNAL(editingFinished()), this, SLOT(setInputValue()));
+        disconnect(lowerBound, SIGNAL(editingFinished()), this, SLOT(setLowerBound()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(rangeUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+        //disconnect(rangeUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        //disconnect(rangeUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+        disconnect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    }
 }
 
 void EventsFromRangeModifierUI::addRange(){
-    hkbEventRangeDataArray *exps = nullptr;
     if (bsData){
-        exps = static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data());
-        if (!exps){
-            exps = new hkbEventRangeDataArray(bsData->getParentFile(), -1);
-            bsData->eventRanges = HkxSharedPtr(exps);
-        }
-        exps->addEventData();
-        bsData->setIsFileChanged(true);
+        auto exps = bsData->getEventRanges();
+        (!exps) ? bsData->setEventRanges(new hkbEventRangeDataArray(bsData->getParentFile())) : NULL;
+        exps->addEventRange();
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::addExpression(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::addExpression(): The data is nullptr!!");
     }
 }
 
 void EventsFromRangeModifierUI::removeRange(int index){
-    hkbEventRangeDataArray *exps = nullptr;
     if (bsData){
-        exps = static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data());
+        auto exps = bsData->getEventRanges();
         if (exps){
-            if (index < exps->eventData.size() && index >= 0){
-                exps->removeEventData(index);
-            }else{
-                WARNING_MESSAGE("EventsFromRangeModifierUI::removeRange(): Invalid row index selected!!");
-                return;
-            }
-            bsData->setIsFileChanged(true);
+            exps->removeEventRange(index);
             loadDynamicTableRows();
         }else{
-            WARNING_MESSAGE("EventsFromRangeModifierUI::removeRange(): Event data is nullptr!!");
-            return;
+            LogFile::writeToLog("EventsFromRangeModifierUI::removeExpression(): Event data is nullptr!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::removeRange(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::removeRange(): The data is nullptr!!");
     }
 }
 
 void EventsFromRangeModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
-    hkbVariableBindingSet *varBind = nullptr;
     if (data){
         if (data->getSignature() == HKB_EVENTS_FROM_RANGE_MODIFIER){
             bsData = static_cast<hkbEventsFromRangeModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            inputValue->setValue(bsData->inputValue);
-            lowerBound->setValue(bsData->lowerBound);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(INPUT_VALUE_ROW, BINDING_COLUMN, varBind, "inputValue");
-                loadBinding(LOWER_BOUND_ROW, BINDING_COLUMN, varBind, "lowerBound");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(INPUT_VALUE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LOWER_BOUND_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            inputValue->setValue(bsData->getInputValue());
+            lowerBound->setValue(bsData->getLowerBound());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(INPUT_VALUE_ROW, BINDING_COLUMN, varBind, "inputValue", table, bsData);
+            UIHelper::loadBinding(LOWER_BOUND_ROW, BINDING_COLUMN, varBind, "lowerBound", table, bsData);
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("EventsFromRangeModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void EventsFromRangeModifierUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_RANGE_ROW + bsData->getNumberOfRanges() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
-        hkbEventRangeDataArray *exps = static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data());
+        auto temp = ADD_RANGE_ROW + bsData->getNumberOfRanges() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
+        auto exps = bsData->getEventRanges();
         if (exps){
-            QString eventName;
             for (auto i = ADD_RANGE_ROW + 1, j = 0; j < bsData->getNumberOfRanges(); i++, j++){
-                eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(exps->eventData.at(j).event.id);
-                setRowItems(i, eventName, exps->getClassname(), "Remove", "Edit", "Double click to remove this Event Range", "Double click to edit this Event Range");
+                auto eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(exps->getEventRangeIdAt(j));
+                UIHelper::setRowItems(i, eventName, exps->getClassname(), "Remove", "Edit", "Double click to remove this Event Range", "Double click to edit this Event Range", table);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
-}
-
-void EventsFromRangeModifierUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
-    }
-}
-
-bool EventsFromRangeModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void EventsFromRangeModifierUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case INPUT_VALUE_ROW:
-            if (table->item(INPUT_VALUE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "inputValue", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(INPUT_VALUE_ROW, "inputValue", VARIABLE_TYPE_REAL); break;
         case LOWER_BOUND_ROW:
-            if (table->item(LOWER_BOUND_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "lowerBound", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(LOWER_BOUND_ROW, "lowerBound", VARIABLE_TYPE_REAL); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -288,85 +197,53 @@ void EventsFromRangeModifierUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void EventsFromRangeModifierUI::setName(){
+void EventsFromRangeModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void EventsFromRangeModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("EventsFromRangeModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void EventsFromRangeModifierUI::setInputValue(){
-    if (bsData){
-        if (bsData->inputValue != inputValue->value()){
-            bsData->inputValue = inputValue->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setInputValue(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setInputValue(inputValue->value()) : LogFile::writeToLog("EventsFromRangeModifierUI::setInputValue(): The 'bsData' pointer is nullptr!!");
 }
 
 void EventsFromRangeModifierUI::setLowerBound(){
-    if (bsData){
-        if (bsData->lowerBound != lowerBound->value()){
-            bsData->lowerBound = lowerBound->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setLowerBound(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLowerBound(inputValue->value()) : LogFile::writeToLog("EventsFromRangeModifierUI::setLowerBound(): The 'bsData' pointer is nullptr!!");
 }
 
-
 void EventsFromRangeModifierUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
+    auto checkisproperty = [&](int row, const QString & fieldname){
+        bool properties;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+        selectTableToView(properties, fieldname);
+    };
     if (bsData){
         if (row < ADD_RANGE_ROW && row >= 0){
             if (column == BINDING_COLUMN){
                 switch (row){
                 case ENABLE_ROW:
-                    if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "enable");
-                    break;
+                    checkisproperty(ENABLE_ROW, "enable"); break;
                 case INPUT_VALUE_ROW:
-                    if (table->item(INPUT_VALUE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "inputValue");
-                    break;
+                    checkisproperty(INPUT_VALUE_ROW, "inputValue"); break;
                 case LOWER_BOUND_ROW:
-                    if (table->item(LOWER_BOUND_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "lowerBound");
-                    break;
+                    checkisproperty(LOWER_BOUND_ROW, "lowerBound"); break;
                 }
             }
         }else if (row == ADD_RANGE_ROW && column == NAME_COLUMN){
             addRange();
         }else if (row > ADD_RANGE_ROW && row < ADD_RANGE_ROW + bsData->getNumberOfRanges() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfRanges() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    rangeUI->loadData((BehaviorFile *)(bsData->eventRanges->getParentFile()), static_cast<hkbEventRangeDataArray::hkbEventRangeData *>(&static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data())->eventData[result]), static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data()), result);
+                    rangeUI->loadData((BehaviorFile *)(bsData->getParentFile()), static_cast<hkbEventRangeDataArray::hkbEventRangeData *>(&static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data())->eventData[result]), static_cast<hkbEventRangeDataArray *>(bsData->eventRanges.data()), result);
                     setCurrentIndex(CHILD_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the expression \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
@@ -374,22 +251,20 @@ void EventsFromRangeModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::viewSelectedChild(): Invalid index of child to view!!");
+                LogFile::writeToLog("EventsFromRangeModifierUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void EventsFromRangeModifierUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     /*case CHILD_WIDGET:
-        rangeUI->setAssignmentVariableIndex(index, name);
-        break;*/
+        rangeUI->setAssignmentVariableIndex(index, name); break;*/
     default:
         WARNING_MESSAGE("EventsFromRangeModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -407,32 +282,7 @@ void EventsFromRangeModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::connectToTables(): One or more arguments are nullptr!!");
-    }
-}
-
-void EventsFromRangeModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -452,49 +302,37 @@ void EventsFromRangeModifierUI::selectTableToView(bool viewproperties, const QSt
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void EventsFromRangeModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (currentIndex() == CHILD_WIDGET){
-            rangeUI->eventRenamed(name, index);
-        }
+        (currentIndex() == CHILD_WIDGET) ? rangeUI->eventRenamed(name, index) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void EventsFromRangeModifierUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("EventsFromRangeModifierUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            bind = bsData->getVariableBindingSetData();
+            auto bind = bsData->getVariableBindingSetData();
             if (bind){
-                bindIndex = bind->getVariableIndexOfBinding("enable");
-                if (bindIndex == index){
-                    table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("inputValue");
-                if (bindIndex == index){
-                    table->item(INPUT_VALUE_ROW, BINDING_COLUMN)->setText(name);
-                }
-                bindIndex = bind->getVariableIndexOfBinding("lowerBound");
-                if (bindIndex == index){
-                    table->item(LOWER_BOUND_ROW, BINDING_COLUMN)->setText(name);
-                }
+                auto setname = [&](const QString & fieldname, int row){
+                    auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                    (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+                };
+                setname("enable", ENABLE_ROW);
+                setname("inputValue", INPUT_VALUE_ROW);
+                setname("lowerBound", LOWER_BOUND_ROW);
             }
         }else{
             //rangeUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("EventsFromRangeModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

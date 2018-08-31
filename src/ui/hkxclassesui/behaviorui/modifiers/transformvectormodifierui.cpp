@@ -29,7 +29,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList TransformVectorModifierUI::headerLabels = {
+const QStringList TransformVectorModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -97,34 +97,35 @@ TransformVectorModifierUI::TransformVectorModifierUI()
     table->setCellWidget(COMPUTE_ON_MODIFY_ROW, VALUE_COLUMN, computeOnModify);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void TransformVectorModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(rotation, SIGNAL(editingFinished()), this, SLOT(setRotation()), Qt::UniqueConnection);
-    connect(translation, SIGNAL(editingFinished()), this, SLOT(setTranslation()), Qt::UniqueConnection);
-    connect(vectorIn, SIGNAL(editingFinished()), this, SLOT(setVectorIn()), Qt::UniqueConnection);
-    connect(vectorOut, SIGNAL(editingFinished()), this, SLOT(setVectorOut()), Qt::UniqueConnection);
-    connect(rotateOnly, SIGNAL(released()), this, SLOT(setRotateOnly()), Qt::UniqueConnection);
-    connect(inverse, SIGNAL(released()), this, SLOT(setInverse()), Qt::UniqueConnection);
-    connect(computeOnActivate, SIGNAL(released()), this, SLOT(setComputeOnActivate()), Qt::UniqueConnection);
-    connect(computeOnModify, SIGNAL(released()), this, SLOT(setComputeOnModify()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void TransformVectorModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(rotation, SIGNAL(editingFinished()), this, SLOT(setRotation()));
-    disconnect(translation, SIGNAL(editingFinished()), this, SLOT(setTranslation()));
-    disconnect(vectorIn, SIGNAL(editingFinished()), this, SLOT(setVectorIn()));
-    disconnect(vectorOut, SIGNAL(editingFinished()), this, SLOT(setVectorOut()));
-    disconnect(rotateOnly, SIGNAL(released()), this, SLOT(setRotateOnly()));
-    disconnect(inverse, SIGNAL(released()), this, SLOT(setInverse()));
-    disconnect(computeOnActivate, SIGNAL(released()), this, SLOT(setComputeOnActivate()));
-    disconnect(computeOnModify, SIGNAL(released()), this, SLOT(setComputeOnModify()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void TransformVectorModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(rotation, SIGNAL(editingFinished()), this, SLOT(setRotation()), Qt::UniqueConnection);
+        connect(translation, SIGNAL(editingFinished()), this, SLOT(setTranslation()), Qt::UniqueConnection);
+        connect(vectorIn, SIGNAL(editingFinished()), this, SLOT(setVectorIn()), Qt::UniqueConnection);
+        connect(vectorOut, SIGNAL(editingFinished()), this, SLOT(setVectorOut()), Qt::UniqueConnection);
+        connect(rotateOnly, SIGNAL(released()), this, SLOT(setRotateOnly()), Qt::UniqueConnection);
+        connect(inverse, SIGNAL(released()), this, SLOT(setInverse()), Qt::UniqueConnection);
+        connect(computeOnActivate, SIGNAL(released()), this, SLOT(setComputeOnActivate()), Qt::UniqueConnection);
+        connect(computeOnModify, SIGNAL(released()), this, SLOT(setComputeOnModify()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(rotation, SIGNAL(editingFinished()), this, SLOT(setRotation()));
+        disconnect(translation, SIGNAL(editingFinished()), this, SLOT(setTranslation()));
+        disconnect(vectorIn, SIGNAL(editingFinished()), this, SLOT(setVectorIn()));
+        disconnect(vectorOut, SIGNAL(editingFinished()), this, SLOT(setVectorOut()));
+        disconnect(rotateOnly, SIGNAL(released()), this, SLOT(setRotateOnly()));
+        disconnect(inverse, SIGNAL(released()), this, SLOT(setInverse()));
+        disconnect(computeOnActivate, SIGNAL(released()), this, SLOT(setComputeOnActivate()));
+        disconnect(computeOnModify, SIGNAL(released()), this, SLOT(setComputeOnModify()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void TransformVectorModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -136,224 +137,121 @@ void TransformVectorModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void TransformVectorModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_TRANSFORM_VECTOR_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbTransformVectorModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            rotation->setValue(bsData->rotation);
-            translation->setValue(bsData->translation);
-            vectorIn->setValue(bsData->vectorIn);
-            vectorOut->setValue(bsData->vectorOut);
-            rotateOnly->setChecked(bsData->rotateOnly);
-            inverse->setChecked(bsData->inverse);
-            computeOnActivate->setChecked(bsData->computeOnActivate);
-            computeOnModify->setChecked(bsData->computeOnModify);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(ROTATION_ROW, BINDING_COLUMN, varBind, "rotation");
-                loadBinding(TRANSLATION_ROW, BINDING_COLUMN, varBind, "translation");
-                loadBinding(VECTOR_IN_ROW, BINDING_COLUMN, varBind, "vectorIn");
-                loadBinding(VECTOR_OUT_ROW, BINDING_COLUMN, varBind, "vectorOut");
-                loadBinding(ROTATE_ONLY_ROW, BINDING_COLUMN, varBind, "rotateOnly");
-                loadBinding(INVERSE_ROW, BINDING_COLUMN, varBind, "inverse");
-                loadBinding(COMPUTE_ON_ACTIVATE_ROW, BINDING_COLUMN, varBind, "computeOnActivate");
-                loadBinding(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN, varBind, "computeOnModify");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TRANSLATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VECTOR_IN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VECTOR_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ROTATE_ONLY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(INVERSE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(COMPUTE_ON_ACTIVATE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            rotation->setValue(bsData->getRotation());
+            translation->setValue(bsData->getTranslation());
+            vectorIn->setValue(bsData->getVectorIn());
+            vectorOut->setValue(bsData->getVectorOut());
+            rotateOnly->setChecked(bsData->getRotateOnly());
+            inverse->setChecked(bsData->getInverse());
+            computeOnActivate->setChecked(bsData->getComputeOnActivate());
+            computeOnModify->setChecked(bsData->getComputeOnModify());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(ROTATION_ROW, BINDING_COLUMN, varBind, "rotation", table, bsData);
+            UIHelper::loadBinding(TRANSLATION_ROW, BINDING_COLUMN, varBind, "translation", table, bsData);
+            UIHelper::loadBinding(VECTOR_IN_ROW, BINDING_COLUMN, varBind, "vectorIn", table, bsData);
+            UIHelper::loadBinding(VECTOR_OUT_ROW, BINDING_COLUMN, varBind, "vectorOut", table, bsData);
+            UIHelper::loadBinding(ROTATE_ONLY_ROW, BINDING_COLUMN, varBind, "rotateOnly", table, bsData);
+            UIHelper::loadBinding(INVERSE_ROW, BINDING_COLUMN, varBind, "inverse", table, bsData);
+            UIHelper::loadBinding(COMPUTE_ON_ACTIVATE_ROW, BINDING_COLUMN, varBind, "computeOnActivate", table, bsData);
+            UIHelper::loadBinding(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN, varBind, "computeOnModify", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("TransformVectorModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void TransformVectorModifierUI::setName(){
+void TransformVectorModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void TransformVectorModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("TransformVectorModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setRotation(){
-    if (bsData){
-        if (bsData->rotation != rotation->value()){
-            bsData->rotation = rotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setrotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRotation(rotation->value()) : LogFile::writeToLog("TransformVectorModifierUI::setRotation(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setTranslation(){
-    if (bsData){
-        if (bsData->translation != translation->value()){
-            bsData->translation = translation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::settranslation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTranslation(translation->value()) : LogFile::writeToLog("TransformVectorModifierUI::setTranslation(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setVectorIn(){
-    if (bsData){
-        if (bsData->vectorIn != vectorIn->value()){
-            bsData->vectorIn = vectorIn->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setvectorIn(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVectorIn(vectorIn->value()) : LogFile::writeToLog("TransformVectorModifierUI::setVectorIn(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setVectorOut(){
-    if (bsData){
-        if (bsData->vectorOut != vectorOut->value()){
-            bsData->vectorOut = vectorOut->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setvectorOut(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVectorOut(vectorOut->value()) : LogFile::writeToLog("TransformVectorModifierUI::setVectorOut(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setRotateOnly(){
-    if (bsData){
-        bsData->rotateOnly = rotateOnly->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setrotateOnly(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRotateOnly(rotateOnly->isChecked()) : LogFile::writeToLog("TransformVectorModifierUI::setRotateOnly(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setInverse(){
-    if (bsData){
-        bsData->inverse = inverse->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setinverse(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setInverse(inverse->isChecked()) : LogFile::writeToLog("TransformVectorModifierUI::setInverse(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setComputeOnActivate(){
-    if (bsData){
-        bsData->computeOnActivate = computeOnActivate->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setcomputeOnActivate(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setComputeOnActivate(computeOnActivate->isChecked()) : LogFile::writeToLog("TransformVectorModifierUI::setComputeOnActivate(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::setComputeOnModify(){
-    if (bsData){
-        bsData->computeOnModify = computeOnModify->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setcomputeOnModify(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setComputeOnModify(computeOnModify->isChecked()) : LogFile::writeToLog("TransformVectorModifierUI::setComputeOnModify(): The data is nullptr!!");
 }
 
 void TransformVectorModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case ROTATION_ROW:
-                if (table->item(ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "rotation");
-                break;
+                checkisproperty(ROTATION_ROW, "rotation"); break;
             case TRANSLATION_ROW:
-                if (table->item(TRANSLATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "translation");
-                break;
+                checkisproperty(TRANSLATION_ROW, "translation"); break;
             case VECTOR_IN_ROW:
-                if (table->item(VECTOR_IN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "vectorIn");
-                break;
+                checkisproperty(VECTOR_IN_ROW, "vectorIn"); break;
             case VECTOR_OUT_ROW:
-                if (table->item(VECTOR_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "vectorOut");
-                break;
+                checkisproperty(VECTOR_OUT_ROW, "vectorOut"); break;
             case ROTATE_ONLY_ROW:
-                if (table->item(ROTATE_ONLY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "rotateOnly");
-                break;
+                checkisproperty(ROTATE_ONLY_ROW, "rotateOnly"); break;
             case INVERSE_ROW:
-                if (table->item(INVERSE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "inverse");
-                break;
+                checkisproperty(INVERSE_ROW, "inverse"); break;
             case COMPUTE_ON_ACTIVATE_ROW:
-                if (table->item(COMPUTE_ON_ACTIVATE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "computeOnActivate");
-                break;
+                checkisproperty(COMPUTE_ON_ACTIVATE_ROW, "computeOnActivate"); break;
             case COMPUTE_ON_MODIFY_ROW:
-                if (table->item(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "computeOnModify");
-                break;
-            default:
-                return;
+                checkisproperty(COMPUTE_ON_MODIFY_ROW, "computeOnModify"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -373,178 +271,63 @@ void TransformVectorModifierUI::selectTableToView(bool viewisProperty, const QSt
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void TransformVectorModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("rotation");
-            if (bindIndex == index){
-                table->item(ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("translation");
-            if (bindIndex == index){
-                table->item(TRANSLATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("vectorIn");
-            if (bindIndex == index){
-                table->item(VECTOR_IN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("vectorOut");
-            if (bindIndex == index){
-                table->item(VECTOR_OUT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("rotateOnly");
-            if (bindIndex == index){
-                table->item(ROTATE_ONLY_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("inverse");
-            if (bindIndex == index){
-                table->item(INVERSE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("computeOnActivate");
-            if (bindIndex == index){
-                table->item(COMPUTE_ON_ACTIVATE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("computeOnModify");
-            if (bindIndex == index){
-                table->item(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("rotation", ROTATION_ROW);
+            setname("translation", TRANSLATION_ROW);
+            setname("vectorIn", VECTOR_IN_ROW);
+            setname("vectorOut", VECTOR_OUT_ROW);
+            setname("rotateOnly", ROTATE_ONLY_ROW);
+            setname("inverse", INVERSE_ROW);
+            setname("computeOnActivate", COMPUTE_ON_ACTIVATE_ROW);
+            setname("computeOnModify", COMPUTE_ON_MODIFY_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool TransformVectorModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void TransformVectorModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case ROTATION_ROW:
-            if (table->item(ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "rotation", VARIABLE_TYPE_QUATERNION, isProperty);
-            break;
+            checkisproperty(ROTATION_ROW, "rotation", VARIABLE_TYPE_QUATERNION); break;
         case TRANSLATION_ROW:
-            if (table->item(TRANSLATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "translation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TRANSLATION_ROW, "translation", VARIABLE_TYPE_VECTOR4); break;
         case VECTOR_IN_ROW:
-            if (table->item(VECTOR_IN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "vectorIn", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(VECTOR_IN_ROW, "vectorIn", VARIABLE_TYPE_VECTOR4); break;
         case VECTOR_OUT_ROW:
-            if (table->item(VECTOR_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "vectorOut", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(VECTOR_OUT_ROW, "vectorOut", VARIABLE_TYPE_VECTOR4); break;
         case ROTATE_ONLY_ROW:
-            if (table->item(ROTATE_ONLY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "rotateOnly", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ROTATE_ONLY_ROW, "rotateOnly", VARIABLE_TYPE_BOOL); break;
         case INVERSE_ROW:
-            if (table->item(INVERSE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "inverse", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(INVERSE_ROW, "inverse", VARIABLE_TYPE_BOOL); break;
         case COMPUTE_ON_ACTIVATE_ROW:
-            if (table->item(COMPUTE_ON_ACTIVATE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "computeOnActivate", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(COMPUTE_ON_ACTIVATE_ROW, "computeOnActivate", VARIABLE_TYPE_BOOL); break;
         case COMPUTE_ON_MODIFY_ROW:
-            if (table->item(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "computeOnModify", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void TransformVectorModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(COMPUTE_ON_MODIFY_ROW, "computeOnModify", VARIABLE_TYPE_BOOL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("TransformVectorModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

@@ -30,17 +30,6 @@
 
 #define MAX_ERROR_STRING_SIZE 200
 
-enum hkVariableType {
-    VARIABLE_TYPE_BOOL,
-    VARIABLE_TYPE_INT8,
-    VARIABLE_TYPE_INT16,
-    VARIABLE_TYPE_INT32,
-    VARIABLE_TYPE_REAL,
-    VARIABLE_TYPE_POINTER,
-    VARIABLE_TYPE_VECTOR4,
-    VARIABLE_TYPE_QUATERNION
-};
-
 enum HkxSignature: unsigned long long {
     NULL_SIGNATURE = 0x0,
     //Project
@@ -202,7 +191,7 @@ struct hkQuadVariable
         //
     }
 
-    bool operator !=(const hkQuadVariable & rhs){
+    bool operator!=(const hkQuadVariable & rhs) const{
         if (x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w){
             return true;
         }
@@ -238,7 +227,40 @@ struct hkQsTransform
     hkVector3 v3;
 };
 
+enum hkVariableType {
+    VARIABLE_TYPE_BOOL,
+    VARIABLE_TYPE_INT8,
+    VARIABLE_TYPE_INT16,
+    VARIABLE_TYPE_INT32,
+    VARIABLE_TYPE_REAL,
+    VARIABLE_TYPE_POINTER,
+    VARIABLE_TYPE_VECTOR4,
+    VARIABLE_TYPE_QUATERNION
+};
+
 namespace {
+
+QString getVariableTypeAsString(hkVariableType type){
+    switch (type){
+    case VARIABLE_TYPE_BOOL:
+        return "VARIABLE_TYPE_BOOL";
+    case VARIABLE_TYPE_INT8:
+        return "VARIABLE_TYPE_INT8";
+    case VARIABLE_TYPE_INT16:
+        return "VARIABLE_TYPE_INT16";
+    case VARIABLE_TYPE_INT32:
+        return "VARIABLE_TYPE_INT32";
+    case VARIABLE_TYPE_REAL:
+        return "VARIABLE_TYPE_REAL";
+    case VARIABLE_TYPE_POINTER:
+        return "VARIABLE_TYPE_POINTER";
+    case VARIABLE_TYPE_VECTOR4:
+        return "VARIABLE_TYPE_VECTOR4";
+    case VARIABLE_TYPE_QUATERNION:
+        return "VARIABLE_TYPE_QUATERNION";
+    }
+    return "";
+}
 
 bool chopLine(QFile * file, QByteArray & line, ulong & linecount){
     if (file){
@@ -270,7 +292,7 @@ void generateAppendStringToList(QStringList & list, QString & newname, const QCh
     for (auto i = 0, num = 0, index = 0; i < list.size() - 1; i++){
         if (list.at(i) == newname){
             index = newname.lastIndexOf(wheretoappend);
-            (index > -1) ? newname.remove(index + 1, newname.size()) : NULL;
+            (index > -1) ? newname.remove(++index, newname.size()) : NULL;
             newname.append(QString::number(num));
             (++num > 1) ? i = -1 : NULL;
         }

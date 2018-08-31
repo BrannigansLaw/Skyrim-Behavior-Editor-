@@ -24,7 +24,7 @@ class BehaviorFile;
 class CheckButtonCombo;
 class GenericTableWidget;
 
-class TransitionsUI: public QStackedWidget
+class TransitionsUI final: public QStackedWidget
 {
     Q_OBJECT
     friend class HkDataUI;
@@ -32,7 +32,10 @@ class TransitionsUI: public QStackedWidget
     friend class StateUI;
 public:
     TransitionsUI();
-    virtual ~TransitionsUI(){}
+    TransitionsUI& operator=(const TransitionsUI&) = delete;
+    TransitionsUI(const TransitionsUI &) = delete;
+    ~TransitionsUI() = default;
+public:
     void loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data, int index);
 signals:
     void transitionNameChanged(const QString & newName, int index);
@@ -63,24 +66,26 @@ private slots:
     void viewSelectedChild(int row, int column);
     void transitionEffectRenamed(const QString & name);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void eventTableElementSelected(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
     void setTriggerIntervalEnterEventId(int index, const QString &name);
     void setTriggerIntervalExitEventId(int index, const QString &name);
     void setInitiateIntervalEnterEventId(int index, const QString &name);
     void setInitiateIntervalExitEventId(int index, const QString &name);
+    void setId(int index, const QString &name, int & eventid, int row);
+    void toggleFlag(CheckBox *checkbox, const QString & flag, ComboBox *combobox = nullptr);
+    void checkInterval();
     void setEventId(int index, const QString &name);
-    void loadTableValue(int row, const QString &value);
     void eventRenamed(const QString & name, int index);
     void stateRenamed(const QString & name, int index);
 private:
     enum TransitionEffectView {
-        TRANSITION_WIDGET = 0,
-        TRANSITION_EFFECT_WIDGET = 1
+        TRANSITION_WIDGET,
+        TRANSITION_EFFECT_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbStateMachine *parentObj;
     hkbStateMachineTransitionInfoArray::HkTransition *bsData;

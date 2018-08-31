@@ -40,11 +40,61 @@ bool hkbDelayedModifier::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbDelayedModifier::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         modifier = HkxSharedPtr();
         return true;
     }
     return false;
+}
+
+qreal hkbDelayedModifier::getSecondsElapsed() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return secondsElapsed;
+}
+
+void hkbDelayedModifier::setSecondsElapsed(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != secondsElapsed) ? secondsElapsed = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'secondsElapsed' was not set!");
+}
+
+qreal hkbDelayedModifier::getDurationSeconds() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return durationSeconds;
+}
+
+void hkbDelayedModifier::setDurationSeconds(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != durationSeconds) ? durationSeconds = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'durationSeconds' was not set!");
+}
+
+qreal hkbDelayedModifier::getDelaySeconds() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return delaySeconds;
+}
+
+void hkbDelayedModifier::setDelaySeconds(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != delaySeconds) ? delaySeconds = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'delaySeconds' was not set!");
+}
+
+hkbModifier * hkbDelayedModifier::getModifier() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbModifier *>(modifier.data());
+}
+
+bool hkbDelayedModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbDelayedModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbDelayedModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 bool hkbDelayedModifier::hasChildren() const{
@@ -168,7 +218,7 @@ void hkbDelayedModifier::unlink(){
 QString hkbDelayedModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

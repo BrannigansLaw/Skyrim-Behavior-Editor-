@@ -77,7 +77,7 @@ bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, c
             stream << " "+attribs.at(j)+"=\""+attribValues.at(j)+"\"";
         }
         if (value == ""){
-            if (attribValues.last().toInt(&ok) == 0 && attribValues.size() == 2 && ok){
+            if (!attribValues.last().toInt(&ok) && attribValues.size() == 2 && ok){
                 stream << "></"+tag+">\n";
             }else{
                 if (nullValueAllowed){

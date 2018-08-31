@@ -20,6 +20,7 @@ public:
     hkbExpressionDataArray& operator=(const hkbExpressionDataArray&) = delete;
     hkbExpressionDataArray(const hkbExpressionDataArray &) = delete;
     ~hkbExpressionDataArray();
+    QString getExpressionAt(int index) const;
 private:
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();

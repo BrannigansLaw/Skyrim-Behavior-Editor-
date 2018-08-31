@@ -28,7 +28,7 @@
 #include <QSpinBox>
 #include <QStackedLayout>
 
-QStringList BehaviorVariablesUI::types = {
+const QStringList BehaviorVariablesUI::types = {
     "BOOL",
     "INT32",
     "REAL",
@@ -37,7 +37,7 @@ QStringList BehaviorVariablesUI::types = {
     "QUATERNION"
 };
 
-QStringList BehaviorVariablesUI::headerLabels = {
+const QStringList BehaviorVariablesUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -115,7 +115,6 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     connect(intSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()), Qt::UniqueConnection);
     connect(doubleSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()), Qt::UniqueConnection);
     connect(quadWidget, SIGNAL(editingFinished()), valueMapper, SLOT(map()), Qt::UniqueConnection);
-    setLayout(verLyt);
     connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()), Qt::UniqueConnection);
     connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()), Qt::UniqueConnection);
     connect(nameMapper, SIGNAL(mapped(int)), this, SLOT(renameSelectedVariable(int)), Qt::UniqueConnection);
@@ -126,6 +125,7 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     connect(returnDoublePB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
     connect(returnQuadPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
     connect(boneWeightArrayWidget, SIGNAL(returnToParent()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    setLayout(verLyt);
 }
 
 /*QSize BehaviorVariablesUI::sizeHint() const{
@@ -134,144 +134,133 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
 
 void BehaviorVariablesUI::setVariableValue(int type){
     if (loadedData){
-        int index = table->currentRow();
-        if (type == 0){
-            loadedData->setWordVariableValueAt(index, boolCB->isChecked());
-        }else if (type == 1){
-            loadedData->setWordVariableValueAt(index, intSB->value());
-        }else if (type == 2){
-            loadedData->setWordVariableValueAt(index, doubleSB->value());
-        }/*else if (type == "POINTER"){
-            loadedData->setWordVariableValueAt(index, intSB->value());
-        }*/else if (type == 3){
-            loadedData->setQuadVariableValueAt(index, quadWidget->value());
+        auto index = table->currentRow();
+        switch (type){
+        case VARIABLE_TYPE_BOOL:
+            loadedData->setWordVariableValueAt(index, boolCB->isChecked()); break;
+        case VARIABLE_TYPE_INT32:
+            loadedData->setWordVariableValueAt(index, intSB->value()); break;
+        case VARIABLE_TYPE_REAL:
+            loadedData->setWordVariableValueAt(index, doubleSB->value()); break;
+        case VARIABLE_TYPE_POINTER:
+            loadedData->setWordVariableValueAt(index, intSB->value()); break;
+        case VARIABLE_TYPE_VECTOR4:
+        case VARIABLE_TYPE_QUATERNION:
+            loadedData->setQuadVariableValueAt(index, quadWidget->value()); break;
         }
-        loadedData->setIsFileChanged(true);
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::renameSelectedVariable(int type){
     if (loadedData){
         QString newName;
-        if (type == 0){
-            newName = boolName->text();
-        }else if (type == 1){
-            newName = intName->text();
-        }else if (type == 2){
-            newName = doubleName->text();
-        }/*else if (type == "POINTER"){
-            loadedData->setWordVariableValueAt(index, intSB->value());
-        }*/else if (type == 3){
-            newName = quadName->text();
+        switch (type){
+        case VARIABLE_TYPE_BOOL:
+            newName = boolName->text(); break;
+        case VARIABLE_TYPE_INT32:
+            newName = intName->text(); break;
+        case VARIABLE_TYPE_REAL:
+            newName = doubleName->text(); break;
+        case VARIABLE_TYPE_VECTOR4:
+        case VARIABLE_TYPE_QUATERNION:
+            newName = quadName->text(); break;
         }
         table->item(table->currentRow(), 0)->setText(newName);
         loadedData->setVariableNameAt(table->currentRow(), newName);
-        loadedData->setIsFileChanged(true);
         emit variableNameChanged(newName, table->currentRow());
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::removeVariableFromTable(int row){
-    if (row < table->rowCount()){
-        table->removeRow(row);
-    }
+    (row < table->rowCount() && row >= 0) ? table->removeRow(row) : LogFile::writeToLog("BehaviorVariablesUI::removeVariableFromTable(): Invalid row to remove!!");
 }
 
 void BehaviorVariablesUI::loadVariable(CheckBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
-        int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            boolName->setText(varNames->variableNames.at(index));
-            variableWid->setChecked(varValues->wordVariableValues.at(index));
-        }
-        hideOtherVariables(0);
+        auto index = table->currentRow();
+        boolName->setText(loadedData->getVariableNameAt(index));
+        variableWid->setChecked(loadedData->getWordVariableValueAt(index));
+        hideOtherVariables(VARIABLE_TYPE_BOOL);
         connect(variableWid, SIGNAL(released()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::loadVariable(SpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
-        int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            intName->setText(varNames->variableNames.at(index));
-            variableWid->setValue(varValues->wordVariableValues.at(index));
-        }
-        hideOtherVariables(1);
+        auto index = table->currentRow();
+        intName->setText(loadedData->getVariableNameAt(index));
+        variableWid->setValue(loadedData->getWordVariableValueAt(index));
+        hideOtherVariables(VARIABLE_TYPE_INT32);
         connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::loadVariable(DoubleSpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
-        int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            doubleName->setText(varNames->variableNames.at(index));
-            variableWid->setValue(varValues->wordVariableValues.at(index));
-        }
-        hideOtherVariables(2);
+        auto index = table->currentRow();
+        doubleName->setText(loadedData->getVariableNameAt(index));
+        variableWid->setValue(loadedData->getWordVariableValueAt(index));
+        hideOtherVariables(VARIABLE_TYPE_REAL);
         connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::loadVariable(QuadVariableWidget *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        bool ok;
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
-        int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            quadName->setText(varNames->variableNames.at(index));
-            variableWid->setValue(loadedData->getQuadVariable(index, &ok));
-            if (!ok){
-                //
-            }
-        }
-        hideOtherVariables(3);
+        auto index = table->currentRow();
+        quadName->setText(loadedData->getVariableNameAt(index));
+        variableWid->setValue(loadedData->getQuadVariableValueAt(index));
+        hideOtherVariables(VARIABLE_TYPE_VECTOR4);
         connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()));
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::hideOtherVariables(int indexToView){
     for (auto i = 0; i < variableWidget->rowCount(); i++){
-        if (i == indexToView){
-            variableWidget->setRowHidden(i, false);
-        }else{
-            variableWidget->setRowHidden(i, true);
-        }
+        (i == indexToView) ? variableWidget->setRowHidden(i, false) : variableWidget->setRowHidden(i, true);
     }
 }
 
 void BehaviorVariablesUI::viewVariable(int row, int column){
-    if (column == 2 && loadedData){
-        QString type = table->item(row, 1)->text();
-        if (type == "BOOL"){
-            loadVariable(boolCB);
-        }else if (type == "INT32"){
-            loadVariable(intSB);
-        }else if (type == "REAL"){
-            loadVariable(doubleSB);
-        }else if (type == "POINTER"){
-            boneWeightArrayWidget->loadData(loadedData->getVariantVariable(row));
-            stackLyt->setCurrentIndex(BONE_WEIGHTS_WIDGET);
-            return;
-        }else if (type == "VECTOR4"){
-            loadVariable(quadWidget);
-        }else if (type == "QUATERNION"){
-            loadVariable(quadWidget);
+    if (column == 2){
+        if (loadedData){
+            auto item = table->item(row, 1);
+            auto type = item->text();
+            if (type == "BOOL"){
+                loadVariable(boolCB);
+            }else if (type == "INT32"){
+                loadVariable(intSB);
+            }else if (type == "REAL"){
+                loadVariable(doubleSB);
+            }else if (type == "VECTOR4"){
+                loadVariable(quadWidget);
+            }else if (type == "QUATERNION"){
+                loadVariable(quadWidget);
+            }else if (type == "POINTER"){
+                boneWeightArrayWidget->loadData(loadedData->getVariantVariable(row));
+                stackLyt->setCurrentIndex(BONE_WEIGHTS_WIDGET);
+                return;
+            }
+            stackLyt->setCurrentIndex(VARIABLE_WIDGET);
         }else{
-            return;
+            LogFile::writeToLog("BehaviorVariablesUI::viewVariable(): loadedData is nullptr!!");
         }
-        stackLyt->setCurrentIndex(VARIABLE_WIDGET);
     }
 }
 
@@ -280,46 +269,42 @@ void BehaviorVariablesUI::returnToTable(){
 }
 
 void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString & type){
-    int row = table->rowCount();
+    auto row = table->rowCount();
     table->setRowCount(row + 1);
     table->setItem(row, 0, new QTableWidgetItem(name));
     table->setItem(row, 1, new QTableWidgetItem(type));
     table->setItem(row, 2, new QTableWidgetItem("Edit"));
-    if (stackLyt->currentIndex() == VARIABLE_WIDGET){
-        stackLyt->setCurrentIndex(TABLE_WIDGET);
-    }
+    (stackLyt->currentIndex() == VARIABLE_WIDGET) ? stackLyt->setCurrentIndex(TABLE_WIDGET) : NULL;
     table->setCurrentCell(row, 0);
     //emit variableAdded(name);
 }
 
 void BehaviorVariablesUI::loadData(HkxObject *data){
-    if (data && data->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
-        table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-        loadedData = static_cast<hkbBehaviorGraphData *>(data);
-        int row;
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        if (varNames){
-            for (auto i = 0; i < varNames->variableNames.size(); i++){
-                row = table->rowCount();
+    if (data){
+        if (data->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
+            loadedData = static_cast<hkbBehaviorGraphData *>(data);
+            auto header = table->horizontalHeader();
+            header->setSectionResizeMode(QHeaderView::Stretch);
+            auto variableNames = loadedData->getVariableNames();
+            for (auto i = 0; i < variableNames.size(); i++){
+                auto row = table->rowCount();
                 if (table->rowCount() > i){
                     table->setRowHidden(i, false);
-                    if (table->item(row, 0)){
-                        table->item(row, 0)->setText(varNames->variableNames.at(i));
-                    }else{
-                        table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
-                    }
+                    (table->item(row, 0)) ? table->item(row, 0)->setText(variableNames.at(i)) : table->setItem(row, 0, new QTableWidgetItem(variableNames.at(i)));
                 }else{
                     table->setRowCount(row + 1);
-                    table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
-                    table->setItem(row, 1, new QTableWidgetItem(loadedData->variableInfos.at(i).type.section("_", -1, -1)));
+                    table->setItem(row, 0, new QTableWidgetItem(variableNames.at(i)));
+                    table->setItem(row, 1, new QTableWidgetItem(getVariableTypeAsString(loadedData->getVariableTypeAt(i)).section("_", -1, -1)));
                     table->setItem(row, 2, new QTableWidgetItem("Edit"));
                 }
             }
-            for (auto j = varNames->variableNames.size(); j < table->rowCount(); j++){
+            for (auto j = variableNames.size(); j < table->rowCount(); j++){
                 table->setRowHidden(j, true);
             }
-            table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+            header->setSectionResizeMode(QHeaderView::Interactive);
         }
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI::viewVariable(): data is nullptr!!");
     }
 }
 
@@ -332,69 +317,40 @@ void BehaviorVariablesUI::clear(){
 
 void BehaviorVariablesUI::addVariable(){
     if (loadedData){
-        int type = typeSelector->currentIndex();
-        hkVariableType varType;
-        QString typeString;
-        hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
+        auto addvariable = [&](hkVariableType type, const QString & typeofvar){
+            loadedData->addVariable(type);
+            addVariableToTable(loadedData->getVariableNameAt(loadedData->getNumberOfVariables() - 1), typeofvar);
+            emit variableAdded(loadedData->getVariableNameAt(loadedData->getNumberOfVariables() - 1), typeofvar);
+        };
+        auto type = typeSelector->currentIndex();
         switch (type){
         case VARIABLE_TYPE_BOOL:
-            varType = hkVariableType::VARIABLE_TYPE_BOOL;
-            loadedData->addVariable(varType);
-            typeString = "BOOL";
-            addVariableToTable(vars->variableNames.last(), typeString);
-            break;
+            addvariable(hkVariableType::VARIABLE_TYPE_BOOL, "VARIABLE_TYPE_BOOL"); break;
         case VARIABLE_TYPE_INT32:
-            varType = hkVariableType::VARIABLE_TYPE_INT32;
-            loadedData->addVariable(varType);
-            typeString = "INT32";
-            addVariableToTable(vars->variableNames.last(), typeString);
-            break;
+            addvariable(hkVariableType::VARIABLE_TYPE_INT32, "VARIABLE_TYPE_INT32"); break;
         case VARIABLE_TYPE_REAL:
-            varType = hkVariableType::VARIABLE_TYPE_REAL;
-            loadedData->addVariable(varType);
-            typeString = "REAL";
-            addVariableToTable(vars->variableNames.last(), typeString);
-            break;
+            addvariable(hkVariableType::VARIABLE_TYPE_REAL, "VARIABLE_TYPE_REAL"); break;
         case VARIABLE_TYPE_POINTER:
-            varType = hkVariableType::VARIABLE_TYPE_POINTER;
-            loadedData->addVariable(varType);
-            typeString = "POINTER";
-            addVariableToTable(vars->variableNames.last(), typeString);
-            break;
+            addvariable(hkVariableType::VARIABLE_TYPE_POINTER, "VARIABLE_TYPE_POINTER"); break;
         case VARIABLE_TYPE_VECTOR4:
-            varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
-            loadedData->addVariable(varType);
-            typeString = "VECTOR4";
-            addVariableToTable(vars->variableNames.last(), typeString);
-            break;
+            addvariable(hkVariableType::VARIABLE_TYPE_VECTOR4, "VARIABLE_TYPE_VECTOR4"); break;
         case VARIABLE_TYPE_QUATERNION:
-            varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
-            loadedData->addVariable(varType);
-            typeString = "QUATERNION";
-            addVariableToTable(vars->variableNames.last(), typeString);
-            break;
-        default:
-            return;
+            addvariable(hkVariableType::VARIABLE_TYPE_QUATERNION, "VARIABLE_TYPE_QUATERNION"); break;
         }
-        loadedData->setIsFileChanged(true);
-        emit variableAdded(vars->variableNames.last(), typeString);
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 
 void BehaviorVariablesUI::removeVariable(){
     if (loadedData){
         disconnect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
-        int index = table->currentRow();
-        QString message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isVariableReferenced(index);
+        auto index = table->currentRow();
+        auto message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isVariableReferenced(index);
         if (message == ""){
             loadedData->removeVariable(index);
-            if (index < table->rowCount()){
-                table->removeRow(index);
-            }
-            if (stackLyt->currentIndex() == VARIABLE_WIDGET){
-                stackLyt->setCurrentIndex(TABLE_WIDGET);
-            }
-            loadedData->setIsFileChanged(true);
+            (index < table->rowCount()) ? table->removeRow(index) : NULL;
+            (stackLyt->currentIndex() == VARIABLE_WIDGET) ? stackLyt->setCurrentIndex(TABLE_WIDGET) : NULL;
             static_cast<BehaviorFile *>(loadedData->getParentFile())->updateVariableIndices(index);
             emit variableRemoved(index);
             table->setFocus();
@@ -402,6 +358,8 @@ void BehaviorVariablesUI::removeVariable(){
             WARNING_MESSAGE(message);
         }
         connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()), Qt::UniqueConnection);
+    }else{
+        LogFile::writeToLog("BehaviorVariablesUI: loadedData is nullptr!!");
     }
 }
 

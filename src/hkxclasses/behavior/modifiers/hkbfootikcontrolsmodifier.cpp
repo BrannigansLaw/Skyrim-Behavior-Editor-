@@ -198,6 +198,171 @@ bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal hkbFootIkControlsModifier::getOnOffGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.onOffGain;
+}
+
+void hkbFootIkControlsModifier::setOnOffGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.onOffGain) ? gains.onOffGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.onOffGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getGroundAscendingGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.groundAscendingGain;
+}
+
+void hkbFootIkControlsModifier::setGroundAscendingGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.groundAscendingGain) ? gains.groundAscendingGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.groundAscendingGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getGroundDescendingGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.groundDescendingGain;
+}
+
+void hkbFootIkControlsModifier::setGroundDescendingGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.groundDescendingGain) ? gains.groundDescendingGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.groundDescendingGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getFootPlantedGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.footPlantedGain;
+}
+
+void hkbFootIkControlsModifier::setFootPlantedGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.footPlantedGain) ? gains.footPlantedGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.footPlantedGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getFootRaisedGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.footRaisedGain;
+}
+
+void hkbFootIkControlsModifier::setFootRaisedGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.footRaisedGain) ? gains.footRaisedGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.footRaisedGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getFootUnlockGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.footUnlockGain;
+}
+
+void hkbFootIkControlsModifier::setFootUnlockGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.footUnlockGain) ? gains.footUnlockGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.footUnlockGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getWorldFromModelFeedbackGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.worldFromModelFeedbackGain;
+}
+
+void hkbFootIkControlsModifier::setWorldFromModelFeedbackGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.worldFromModelFeedbackGain) ? gains.worldFromModelFeedbackGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.worldFromModelFeedbackGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getErrorUpDownBias() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.errorUpDownBias;
+}
+
+void hkbFootIkControlsModifier::setErrorUpDownBias(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.errorUpDownBias) ? gains.errorUpDownBias = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.errorUpDownBias' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getAlignWorldFromModelGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.alignWorldFromModelGain;
+}
+
+void hkbFootIkControlsModifier::setAlignWorldFromModelGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.alignWorldFromModelGain) ? gains.alignWorldFromModelGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.alignWorldFromModelGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getHipOrientationGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.hipOrientationGain;
+}
+
+void hkbFootIkControlsModifier::setHipOrientationGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.hipOrientationGain) ? gains.hipOrientationGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.hipOrientationGain' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getMaxKneeAngleDifference() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.maxKneeAngleDifference;
+}
+
+void hkbFootIkControlsModifier::setMaxKneeAngleDifference(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.maxKneeAngleDifference) ? gains.maxKneeAngleDifference = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.maxKneeAngleDifference' was not set!");
+}
+
+qreal hkbFootIkControlsModifier::getAnkleOrientationGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gains.ankleOrientationGain;
+}
+
+void hkbFootIkControlsModifier::setAnkleOrientationGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gains.ankleOrientationGain) ? gains.ankleOrientationGain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gains.ankleOrientationGain' was not set!");
+}
+
+hkQuadVariable hkbFootIkControlsModifier::getAlignWithGroundRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return alignWithGroundRotation;
+}
+
+void hkbFootIkControlsModifier::setAlignWithGroundRotation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != alignWithGroundRotation) ? alignWithGroundRotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'alignWithGroundRotation' was not set!");
+}
+
+void hkbFootIkControlsModifier::addLeg(hkbFootIkControlsModifier::hkLeg leg){
+    std::lock_guard <std::mutex> guard(mutex);
+    legs.append(leg), setIsFileChanged(true);
+}
+
+void hkbFootIkControlsModifier::removeLeg(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < legs.size()) ? legs.removeAt(index), setIsFileChanged(true) : NULL;
+}
+
+hkQuadVariable hkbFootIkControlsModifier::getErrorOutTranslation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return errorOutTranslation;
+}
+
+void hkbFootIkControlsModifier::setErrorOutTranslation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != errorOutTranslation) ? errorOutTranslation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'errorOutTranslation' was not set!");
+}
+
+bool hkbFootIkControlsModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbFootIkControlsModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbFootIkControlsModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 int hkbFootIkControlsModifier::getNumberOfLegs() const{
     std::lock_guard <std::mutex> guard(mutex);
     return legs.size();
@@ -318,7 +483,7 @@ void hkbFootIkControlsModifier::unlink(){
 QString hkbFootIkControlsModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (legs.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": legs is empty!");

@@ -42,7 +42,7 @@ bool hkbModifierGenerator::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbModifierGenerator::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0){
+    if (!index){
         modifier = HkxSharedPtr();
     }else if (index == 1){
         generator = HkxSharedPtr();
@@ -53,6 +53,11 @@ bool hkbModifierGenerator::removeObjectAt(int index){
         return false;
     }
     return true;
+}
+
+void hkbModifierGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 bool hkbModifierGenerator::hasChildren() const{
@@ -72,6 +77,22 @@ QVector<DataIconManager *> hkbModifierGenerator::getChildren() const{
     getchildren(static_cast<DataIconManager*>(modifier.data()));
     getchildren(static_cast<DataIconManager*>(generator.data()));
     return list;
+}
+
+QString hkbModifierGenerator::getGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    auto gen = static_cast<hkbGenerator *>(generator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
+    return genname;
+}
+
+QString hkbModifierGenerator::getModifierName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString modname("NONE");
+    auto gen = static_cast<hkbGenerator *>(modifier.data());
+    (gen) ? modname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
+    return modname;
 }
 
 int hkbModifierGenerator::getIndexOfObj(DataIconManager *obj) const{
@@ -184,7 +205,7 @@ void hkbModifierGenerator::unlink(){
 QString hkbModifierGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
         QString sigstring;
         if (sig != NULL_SIGNATURE)

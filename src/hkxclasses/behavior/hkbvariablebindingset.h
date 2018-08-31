@@ -39,13 +39,13 @@ public:
     void removeBinding(int varIndex);
     void updateVariableIndices(int index);
     void mergeVariableIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
 private:
     bool link();
     QString evaluateDataValidity();
     bool readData(const HkxXmlReader & reader, long & index);
     QString getPathOfBindingAt(int index);
     bool write(HkxXMLWriter *writer);
-    bool merge(HkxObject *recessiveObject);
     bool fixMergedIndices(BehaviorFile *dominantfile);
 private:
     static uint refCount;

@@ -16,20 +16,24 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class DoubleSpinBox;
 
-class RotateCharacterModifierUI: QGroupBox
+class RotateCharacterModifierUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     RotateCharacterModifierUI();
-    virtual ~RotateCharacterModifierUI(){}
+    RotateCharacterModifierUI& operator=(const RotateCharacterModifierUI&) = delete;
+    RotateCharacterModifierUI(const RotateCharacterModifierUI &) = delete;
+    ~RotateCharacterModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties);
+    void variableRenamed(const QString & name, int index);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void modifierNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setEnable();
     void setDegreesPerSecond();
     void setSpeedMultiplier();
@@ -37,15 +41,10 @@ private slots:
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties);
-    void variableRenamed(const QString & name, int index);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     hkbRotateCharacterModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

@@ -21,21 +21,26 @@ class CheckButtonCombo;
 class DoubleSpinBox;
 class QuadVariableWidget;
 
-class BSLookAtModifierUI: public QStackedWidget
+class BSLookAtModifierUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BSLookAtModifierUI();
-    virtual ~BSLookAtModifierUI(){}
+    BSLookAtModifierUI& operator=(const BSLookAtModifierUI&) = delete;
+    BSLookAtModifierUI(const BSLookAtModifierUI &) = delete;
+    ~BSLookAtModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
+    void variableRenamed(const QString & name, int index);
+    void eventRenamed(const QString & name, int index);
 signals:
     void modifierNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setEnable();
     void setLookAtTarget();
     void setLimitAngleDegrees();
@@ -56,28 +61,21 @@ private slots:
     void variableTableElementSelected(int index, const QString &name);
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void addBone();
     void addEyeBone();
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
-    void variableRenamed(const QString & name, int index);
-    void eventRenamed(const QString & name, int index);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
-    void loadTableValue(int row, const QString & value);
     void removeBone(int index);
     void removeEyeBone(int index);
     void selectTableToView(bool properties, const QString & path);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        BONE_UI_WIDGET = 1,
+        MAIN_WIDGET,
+        BONE_UI_WIDGET,
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     int eyeBoneButtonRow;
     QStringList boneList;
     BSLookAtModifier *bsData;

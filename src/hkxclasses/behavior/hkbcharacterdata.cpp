@@ -380,6 +380,16 @@ bool hkbCharacterData::link(){
     return true;
 }
 
+void hkbCharacterData::setVariableNameAt(int index, const QString & name){
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto strData = static_cast<hkbCharacterStringData *>(stringData.data());
+    if (strData){
+        strData->setVariableNameAt(index, name);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
+    }
+}
+
 QStringList hkbCharacterData::getCharacterPropertyNames() const{
     //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());

@@ -212,7 +212,7 @@ void BSBoneSwitchGeneratorUI::addChildWithGenerator(){
         }
         loadDynamicTableRows();
     }else{
-        LogFile::writeToLog("BSBoneSwitchGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorUI::addChild(): The data is nullptr!!");
     }
 }
 
@@ -228,7 +228,7 @@ void BSBoneSwitchGeneratorUI::removeChild(int index){
         }
         loadDynamicTableRows();
     }else{
-        LogFile::writeToLog("BSBoneSwitchGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorUI::removeChild(): The data is nullptr!!");
     }
 }
 

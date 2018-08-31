@@ -15,6 +15,21 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkQuadVariable getHandlePositionOut() const;
+    void setHandlePositionOut(const hkQuadVariable &value);
+    hkQuadVariable getHandleRotationOut() const;
+    void setHandleRotationOut(const hkQuadVariable &value);
+    bool getIsValidOut() const;
+    void setIsValidOut(bool value);
+    qreal getExtrapolationTimeStep() const;
+    void setExtrapolationTimeStep(const qreal &value);
+    qreal getHandleChangeSpeed() const;
+    void setHandleChangeSpeed(const qreal &value);
+    QString getHandleChangeMode() const;
+    void setHandleChangeMode(int index);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

@@ -54,16 +54,17 @@ private:
     bool hasSameData(TreeGraphicsItem *icon) const;
     bool hasSameData(DataIconManager *data) const;
     int getIconIndex();
-    //int determineInsertionIndex() const;
-    //TreeGraphicsItem *getChildWithData(DataIconManager *data, int index);
     TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
     int getIndexOfChild(TreeGraphicsItem *child) const;
     int getIndexofIconWithData(DataIconManager *data) const;
-    bool getIsExpanded() const;
     void setIsExpanded(bool value);
     void setPathToParent();
     QVector <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
 protected:
+    bool getIsExpanded() const;
+    Qt::GlobalColor getPenColor() const;
+    DataIconManager *getItemData() const;
+private:
     Qt::GlobalColor brushColor;
     Qt::GlobalColor penColor;
     DataIconManager * itemData;
@@ -71,8 +72,6 @@ protected:
     qreal yCoordinate;
     GraphicsPathItem *path;
     QFont itemFont;
-    //QString name;
-    //TreeGraphicsItem *parent;
 };
 
 #endif // TREEGRAPHICSITEM_H

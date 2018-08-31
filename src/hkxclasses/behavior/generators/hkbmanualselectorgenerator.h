@@ -15,6 +15,12 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    qint8 getSelectedGeneratorIndex() const;
+    void setSelectedGeneratorIndex(const qint8 &value);
+    qint8 getCurrentGeneratorIndex() const;
+    void setCurrentGeneratorIndex(const qint8 &value);
+    bool swapChildren(int index1, int index2);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

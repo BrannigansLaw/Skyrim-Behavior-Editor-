@@ -68,8 +68,8 @@ private:
     void setFlag(CheckBox *flagcheckbox, hkbClipGenerator::ClipFlag flagtoset);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        MAIN_WIDGET,
+        CHILD_WIDGET
     };
 private:
     static const QStringList headerLabels;

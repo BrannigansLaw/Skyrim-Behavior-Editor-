@@ -21,17 +21,17 @@ const QString hkbStateMachineEventPropertyArray::getClassname(){
 
 void hkbStateMachineEventPropertyArray::addEvent(const hkEventPayload &event){
     std::lock_guard <std::mutex> guard(mutex);
-    events.append(event);
+    events.append(event), setIsFileChanged(true);
 }
 
 void hkbStateMachineEventPropertyArray::setEventId(int index, int id){
     std::lock_guard <std::mutex> guard(mutex);
-    (events.size() > index) ? events[index].id = id : NULL;
+    (events.size() > index) ? events[index].id = id, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": Unable to add event!");
 }
 
 void hkbStateMachineEventPropertyArray::removeEvent(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (events.size() > index) ? events.removeAt(index) : NULL;
+    (events.size() > index) ? events.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": Unable to remove event!");
 }
 
 int hkbStateMachineEventPropertyArray::getLastEventIndex() const{
@@ -243,7 +243,7 @@ void hkbStateMachineEventPropertyArray::unlink(){
 QString hkbStateMachineEventPropertyArray::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (events.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!");

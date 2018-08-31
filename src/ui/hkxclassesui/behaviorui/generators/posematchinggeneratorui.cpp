@@ -54,7 +54,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList PoseMatchingGeneratorUI::types = {
+const QStringList PoseMatchingGeneratorUI::types = {
     "hkbStateMachine",
     "hkbManualSelectorGenerator",
     "hkbBlenderGenerator",
@@ -70,7 +70,7 @@ QStringList PoseMatchingGeneratorUI::types = {
     "BGSGamebryoSequenceGenerator"
 };
 
-QStringList PoseMatchingGeneratorUI::headerLabels = {
+const QStringList PoseMatchingGeneratorUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -235,905 +235,447 @@ PoseMatchingGeneratorUI::PoseMatchingGeneratorUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(childUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void PoseMatchingGeneratorUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(referencePoseWeightThreshold, SIGNAL(editingFinished()), this, SLOT(setReferencePoseWeightThreshold()), Qt::UniqueConnection);
-    connect(blendParameter, SIGNAL(editingFinished()), this, SLOT(setBlendParameter()), Qt::UniqueConnection);
-    connect(minCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMinCyclicBlendParameter()), Qt::UniqueConnection);
-    connect(maxCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMaxCyclicBlendParameter()), Qt::UniqueConnection);
-    connect(indexOfSyncMasterChild, SIGNAL(editingFinished()), this, SLOT(setIndexOfSyncMasterChild()), Qt::UniqueConnection);
-    connect(flagSync, SIGNAL(released()), this, SLOT(setFlagSync()), Qt::UniqueConnection);
-    connect(flagSmoothGeneratorWeights, SIGNAL(released()), this, SLOT(setFlagSmoothGeneratorWeights()), Qt::UniqueConnection);
-    connect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()), Qt::UniqueConnection);
-    connect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()), Qt::UniqueConnection);
-    connect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()), Qt::UniqueConnection);
-    connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()), Qt::UniqueConnection);
-    connect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()), Qt::UniqueConnection);
-    connect(worldFromModelRotation, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelRotation()), Qt::UniqueConnection);
-    connect(blendSpeed, SIGNAL(editingFinished()), this, SLOT(setBlendSpeed()), Qt::UniqueConnection);
-    connect(minSpeedToSwitch, SIGNAL(editingFinished()), this, SLOT(setMinSpeedToSwitch()), Qt::UniqueConnection);
-    connect(minSwitchTimeNoError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeNoError()), Qt::UniqueConnection);
-    connect(minSwitchTimeFullError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeFullError()), Qt::UniqueConnection);
-    connect(rootBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setRootBoneIndex(int)), Qt::UniqueConnection);
-    connect(otherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setOtherBoneIndex(int)), Qt::UniqueConnection);
-    connect(anotherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnotherBoneIndex(int)), Qt::UniqueConnection);
-    connect(pelvisIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setPelvisIndex(int)), Qt::UniqueConnection);
-    connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)), Qt::UniqueConnection);
-}
-
-void PoseMatchingGeneratorUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(referencePoseWeightThreshold, SIGNAL(editingFinished()), this, SLOT(setReferencePoseWeightThreshold()));
-    disconnect(blendParameter, SIGNAL(editingFinished()), this, SLOT(setBlendParameter()));
-    disconnect(minCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMinCyclicBlendParameter()));
-    disconnect(maxCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMaxCyclicBlendParameter()));
-    disconnect(indexOfSyncMasterChild, SIGNAL(editingFinished()), this, SLOT(setIndexOfSyncMasterChild()));
-    disconnect(flagSync, SIGNAL(released()), this, SLOT(setFlagSync()));
-    disconnect(flagSmoothGeneratorWeights, SIGNAL(released()), this, SLOT(setFlagSmoothGeneratorWeights()));
-    disconnect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()));
-    disconnect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()));
-    disconnect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()));
-    disconnect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
-    disconnect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()));
-    disconnect(worldFromModelRotation, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelRotation()));
-    disconnect(blendSpeed, SIGNAL(editingFinished()), this, SLOT(setBlendSpeed()));
-    disconnect(minSpeedToSwitch, SIGNAL(editingFinished()), this, SLOT(setMinSpeedToSwitch()));
-    disconnect(minSwitchTimeNoError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeNoError()));
-    disconnect(minSwitchTimeFullError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeFullError()));
-    disconnect(rootBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setRootBoneIndex(int)));
-    disconnect(otherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setOtherBoneIndex(int)));
-    disconnect(anotherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnotherBoneIndex(int)));
-    disconnect(pelvisIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setPelvisIndex(int)));
-    disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
-    disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
-    disconnect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
-    disconnect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)));
-}
-
-void PoseMatchingGeneratorUI::loadTableValue(int row, const QString &value){
-    if (table->item(row, VALUE_COLUMN)){
-        if (value != ""){
-            table->item(row, VALUE_COLUMN)->setText(value);
-        }else{
-            table->item(row, VALUE_COLUMN)->setText("NONE");
-        }
+void PoseMatchingGeneratorUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(referencePoseWeightThreshold, SIGNAL(editingFinished()), this, SLOT(setReferencePoseWeightThreshold()), Qt::UniqueConnection);
+        connect(blendParameter, SIGNAL(editingFinished()), this, SLOT(setBlendParameter()), Qt::UniqueConnection);
+        connect(minCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMinCyclicBlendParameter()), Qt::UniqueConnection);
+        connect(maxCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMaxCyclicBlendParameter()), Qt::UniqueConnection);
+        connect(indexOfSyncMasterChild, SIGNAL(editingFinished()), this, SLOT(setIndexOfSyncMasterChild()), Qt::UniqueConnection);
+        connect(flagSync, SIGNAL(released()), this, SLOT(setFlagSync()), Qt::UniqueConnection);
+        connect(flagSmoothGeneratorWeights, SIGNAL(released()), this, SLOT(setFlagSmoothGeneratorWeights()), Qt::UniqueConnection);
+        connect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()), Qt::UniqueConnection);
+        connect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()), Qt::UniqueConnection);
+        connect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()), Qt::UniqueConnection);
+        connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()), Qt::UniqueConnection);
+        connect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()), Qt::UniqueConnection);
+        connect(worldFromModelRotation, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelRotation()), Qt::UniqueConnection);
+        connect(blendSpeed, SIGNAL(editingFinished()), this, SLOT(setBlendSpeed()), Qt::UniqueConnection);
+        connect(minSpeedToSwitch, SIGNAL(editingFinished()), this, SLOT(setMinSpeedToSwitch()), Qt::UniqueConnection);
+        connect(minSwitchTimeNoError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeNoError()), Qt::UniqueConnection);
+        connect(minSwitchTimeFullError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeFullError()), Qt::UniqueConnection);
+        connect(rootBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setRootBoneIndex(int)), Qt::UniqueConnection);
+        connect(otherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setOtherBoneIndex(int)), Qt::UniqueConnection);
+        connect(anotherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnotherBoneIndex(int)), Qt::UniqueConnection);
+        connect(pelvisIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setPelvisIndex(int)), Qt::UniqueConnection);
+        connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
+        connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
+        connect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("StateMachineUI::loadTableValue(): There is no table item here!!");
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(referencePoseWeightThreshold, SIGNAL(editingFinished()), this, SLOT(setReferencePoseWeightThreshold()));
+        disconnect(blendParameter, SIGNAL(editingFinished()), this, SLOT(setBlendParameter()));
+        disconnect(minCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMinCyclicBlendParameter()));
+        disconnect(maxCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMaxCyclicBlendParameter()));
+        disconnect(indexOfSyncMasterChild, SIGNAL(editingFinished()), this, SLOT(setIndexOfSyncMasterChild()));
+        disconnect(flagSync, SIGNAL(released()), this, SLOT(setFlagSync()));
+        disconnect(flagSmoothGeneratorWeights, SIGNAL(released()), this, SLOT(setFlagSmoothGeneratorWeights()));
+        disconnect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()));
+        disconnect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()));
+        disconnect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()));
+        disconnect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
+        disconnect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()));
+        disconnect(worldFromModelRotation, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelRotation()));
+        disconnect(blendSpeed, SIGNAL(editingFinished()), this, SLOT(setBlendSpeed()));
+        disconnect(minSpeedToSwitch, SIGNAL(editingFinished()), this, SLOT(setMinSpeedToSwitch()));
+        disconnect(minSwitchTimeNoError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeNoError()));
+        disconnect(minSwitchTimeFullError, SIGNAL(editingFinished()), this, SLOT(setMinSwitchTimeFullError()));
+        disconnect(rootBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setRootBoneIndex(int)));
+        disconnect(otherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setOtherBoneIndex(int)));
+        disconnect(anotherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnotherBoneIndex(int)));
+        disconnect(pelvisIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setPelvisIndex(int)));
+        disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
+        disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
+        disconnect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+        disconnect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)));
     }
 }
 
 void PoseMatchingGeneratorUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
-    hkbVariableBindingSet *varBind = nullptr;
     if (data){
         if (data->getSignature() == HKB_POSE_MATCHING_GENERATOR){
             bsData = static_cast<hkbPoseMatchingGenerator *>(data);
             name->setText(bsData->getName());
-            referencePoseWeightThreshold->setValue(bsData->referencePoseWeightThreshold);
-            blendParameter->setValue(bsData->blendParameter);
-            minCyclicBlendParameter->setValue(bsData->minCyclicBlendParameter);
-            maxCyclicBlendParameter->setValue(bsData->maxCyclicBlendParameter);
-            indexOfSyncMasterChild->setValue(bsData->indexOfSyncMasterChild);
-            bool ok = true;
+            referencePoseWeightThreshold->setValue(bsData->getReferencePoseWeightThreshold());
+            blendParameter->setValue(bsData->getBlendParameter());
+            minCyclicBlendParameter->setValue(bsData->getMinCyclicBlendParameter());
+            maxCyclicBlendParameter->setValue(bsData->getMaxCyclicBlendParameter());
+            indexOfSyncMasterChild->setValue(bsData->getIndexOfSyncMasterChild());
+            auto ok = true;
             hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
+            auto testflag = [&](CheckBox * checkbox, hkbPoseMatchingGenerator::BlenderFlag flagtotest){
+                (flags.testFlag(flagtotest)) ? checkbox->setChecked(true) : checkbox->setChecked(false);
+            };
             if (ok){
-                if (flags.testFlag(hkbPoseMatchingGenerator::FLAG_SYNC)){
-                    flagSync->setChecked(true);
-                }else{
-                    flagSync->setChecked(false);
-                }
-                if (flags.testFlag(hkbPoseMatchingGenerator::FLAG_SMOOTH_GENERATOR_WEIGHTS)){
-                    flagSmoothGeneratorWeights->setChecked(true);
-                }else{
-                    flagSmoothGeneratorWeights->setChecked(false);
-                }
-                if (flags.testFlag(hkbPoseMatchingGenerator::FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS)){
-                    flagDontDeactivateChildrenWithZeroWeights->setChecked(true);
-                }else{
-                    flagDontDeactivateChildrenWithZeroWeights->setChecked(false);
-                }
-                if (flags.testFlag(hkbPoseMatchingGenerator::FLAG_PARAMETRIC_BLEND)){
-                    flagParametricBlend->setChecked(true);
-                }else{
-                    flagParametricBlend->setChecked(false);
-                }
-                if (flags.testFlag(hkbPoseMatchingGenerator::FLAG_IS_PARAMETRIC_BLEND_CYCLIC)){
-                    flagIsParametricBlendCyclic->setChecked(true);
-                }else{
-                    flagIsParametricBlendCyclic->setChecked(false);
-                }
-                if (flags.testFlag(hkbPoseMatchingGenerator::FLAG_FORCE_DENSE_POSE)){
-                    flagForceDensePose->setChecked(true);
-                }else{
-                    flagForceDensePose->setChecked(false);
-                }
-                subtractLastChild->setChecked(bsData->subtractLastChild);
-                worldFromModelRotation->setValue(bsData->worldFromModelRotation);
-                blendSpeed->setValue(bsData->blendSpeed);
-                minSpeedToSwitch->setValue(bsData->minSpeedToSwitch);
-                minSwitchTimeNoError->setValue(bsData->minSwitchTimeNoError);
-                minSwitchTimeFullError->setValue(bsData->minSwitchTimeFullError);
-                QString varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->startPlayingEventId);
-                loadTableValue(START_PLAYING_EVENT_ID_ROW, varName);
-                varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->startMatchingEventId);
-                loadTableValue(START_MATCHING_EVENT_ID_ROW, varName);
-                QStringList boneNames("None");
-                if (rootBoneIndex->count() == 0){
-                    boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                    rootBoneIndex->insertItems(0, boneNames);
-                }
-                rootBoneIndex->setCurrentIndex(bsData->rootBoneIndex + 1);
-                if (otherBoneIndex->count() == 0){
-                    boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                    otherBoneIndex->insertItems(0, boneNames);
-                }
-                otherBoneIndex->setCurrentIndex(bsData->otherBoneIndex + 1);
-                if (anotherBoneIndex->count() == 0){
-                    boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                    anotherBoneIndex->insertItems(0, boneNames);
-                }
-                anotherBoneIndex->setCurrentIndex(bsData->anotherBoneIndex + 1);
-                if (pelvisIndex->count() == 0){
-                    boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                    pelvisIndex->insertItems(0, boneNames);
-                }
-                pelvisIndex->setCurrentIndex(bsData->pelvisIndex + 1);
-                if (mode->count() == 0){
-                    mode->insertItems(0, bsData->Mode);
-                }
-                mode->setCurrentIndex(bsData->Mode.indexOf(bsData->mode));
-                varBind = bsData->getVariableBindingSetData();
-                if (varBind){
-                    loadBinding(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, varBind, "referencePoseWeightThreshold");
-                    loadBinding(BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "blendParameter");
-                    loadBinding(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "minCyclicBlendParameter");
-                    loadBinding(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "maxCyclicBlendParameter");
-                    loadBinding(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN, varBind, "indexOfSyncMasterChild");
-                    loadBinding(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN, varBind, "subtractLastChild");
-                    loadBinding(WORLD_FROM_MODEL_ROTATION_ROW, BINDING_COLUMN, varBind, "worldFromModelRotation");
-                    loadBinding(BLEND_SPEED_ROW, BINDING_COLUMN, varBind, "blendSpeed");
-                    loadBinding(MIN_SPEED_TO_SWITCH_ROW, BINDING_COLUMN, varBind, "minSpeedToSwitch");
-                    loadBinding(MIN_SWITCH_TIME_NO_ERROR_ROW, BINDING_COLUMN, varBind, "minSwitchTimeNoError");
-                    loadBinding(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN, varBind, "minSwitchTimeFullError");
-                    loadBinding(ROOT_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "rootBoneIndex");
-                    loadBinding(OTHER_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "otherBoneIndex");
-                    loadBinding(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "anotherBoneIndex");
-                    loadBinding(PELVIS_INDEX_ROW, BINDING_COLUMN, varBind, "pelvisIndex");
-                }else{
-                    table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(WORLD_FROM_MODEL_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(BLEND_SPEED_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MIN_SPEED_TO_SWITCH_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MIN_SWITCH_TIME_NO_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(ROOT_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(OTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(PELVIS_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                }
-                loadDynamicTableRows();
+                testflag(flagSync, hkbPoseMatchingGenerator::FLAG_SYNC);
+                testflag(flagSmoothGeneratorWeights, hkbPoseMatchingGenerator::FLAG_SMOOTH_GENERATOR_WEIGHTS);
+                testflag(flagDontDeactivateChildrenWithZeroWeights, hkbPoseMatchingGenerator::FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS);
+                testflag(flagParametricBlend, hkbPoseMatchingGenerator::FLAG_PARAMETRIC_BLEND);
+                testflag(flagIsParametricBlendCyclic, hkbPoseMatchingGenerator::FLAG_IS_PARAMETRIC_BLEND_CYCLIC);
+                testflag(flagForceDensePose, hkbPoseMatchingGenerator::FLAG_FORCE_DENSE_POSE);
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+                LogFile::writeToLog(QString("PoseMatchingGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
+            subtractLastChild->setChecked(bsData->getSubtractLastChild());
+            worldFromModelRotation->setValue(bsData->getWorldFromModelRotation());
+            blendSpeed->setValue(bsData->getBlendSpeed());
+            minSpeedToSwitch->setValue(bsData->getMinSpeedToSwitch());
+            minSwitchTimeNoError->setValue(bsData->getMinSwitchTimeNoError());
+            minSwitchTimeFullError->setValue(bsData->getMinSwitchTimeFullError());
+            auto eventname = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getStartPlayingEventId());
+            auto labeleventnamme = [&](int row, const QString & name){
+                (name != "") ? table->item(row, VALUE_COLUMN)->setText(name) : table->item(row, VALUE_COLUMN)->setText("None");
+            };
+            labeleventnamme(START_PLAYING_EVENT_ID_ROW, eventname);
+            eventname = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getStartMatchingEventId());
+            labeleventnamme(START_MATCHING_EVENT_ID_ROW, eventname);
+            auto fillbonelists = [&](ComboBox *combobox, int boneindex){
+                QStringList boneNames("None");
+                if (!combobox->count()){
+                    boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(boneindex);
+            };
+            fillbonelists(rootBoneIndex, bsData->getRootBoneIndex() + 1);
+            fillbonelists(otherBoneIndex, bsData->getOtherBoneIndex() + 1);
+            fillbonelists(anotherBoneIndex, bsData->getAnotherBoneIndex() + 1);
+            fillbonelists(pelvisIndex, bsData->getPelvisIndex() + 1);
+            (!mode->count()) ? mode->insertItems(0, bsData->Mode) : NULL;
+            mode->setCurrentIndex(bsData->Mode.indexOf(bsData->mode));
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, varBind, "referencePoseWeightThreshold", table, bsData);
+            UIHelper::loadBinding(BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "blendParameter", table, bsData);
+            UIHelper::loadBinding(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "minCyclicBlendParameter", table, bsData);
+            UIHelper::loadBinding(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "maxCyclicBlendParameter", table, bsData);
+            UIHelper::loadBinding(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN, varBind, "indexOfSyncMasterChild", table, bsData);
+            UIHelper::loadBinding(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN, varBind, "subtractLastChild", table, bsData);
+            UIHelper::loadBinding(WORLD_FROM_MODEL_ROTATION_ROW, BINDING_COLUMN, varBind, "worldFromModelRotation", table, bsData);
+            UIHelper::loadBinding(BLEND_SPEED_ROW, BINDING_COLUMN, varBind, "blendSpeed", table, bsData);
+            UIHelper::loadBinding(MIN_SPEED_TO_SWITCH_ROW, BINDING_COLUMN, varBind, "minSpeedToSwitch", table, bsData);
+            UIHelper::loadBinding(MIN_SWITCH_TIME_NO_ERROR_ROW, BINDING_COLUMN, varBind, "minSwitchTimeNoError", table, bsData);
+            UIHelper::loadBinding(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN, varBind, "minSwitchTimeFullError", table, bsData);
+            UIHelper::loadBinding(ROOT_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "rootBoneIndex", table, bsData);
+            UIHelper::loadBinding(OTHER_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "otherBoneIndex", table, bsData);
+            UIHelper::loadBinding(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "anotherBoneIndex", table, bsData);
+            UIHelper::loadBinding(PELVIS_INDEX_ROW, BINDING_COLUMN, varBind, "pelvisIndex", table, bsData);
+            loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("PoseMatchingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void PoseMatchingGeneratorUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_CHILD_ROW + bsData->getNumberOfChildren() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
-        hkbBlenderGeneratorChild *child = nullptr;
+        auto temp = ADD_CHILD_ROW + bsData->getNumberOfChildren() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
         for (auto i = ADD_CHILD_ROW + 1, j = 0; j < bsData->getNumberOfChildren(); i++, j++){
-            child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(j).data());
+            auto child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(j).data());
             if (child){
-                setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child");
+                UIHelper::setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child", table);
             }else{
-                CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadData(): Null child found!!!");
+                LogFile::writeToLog("PoseMatchingGeneratorUI::loadData(): Null child found!!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
-}
-
-void PoseMatchingGeneratorUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
-    }
-}
-
-bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void PoseMatchingGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case REFERENCE_POSE_WEIGHT_THRESHOLD_ROW:
-            if (table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "referencePoseWeightThreshold", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, "referencePoseWeightThreshold", VARIABLE_TYPE_REAL); break;
         case BLEND_PARAMETER_ROW:
-            if (table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "blendParameter", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(BLEND_PARAMETER_ROW, "blendParameter", VARIABLE_TYPE_REAL); break;
         case MIN_CYCLIC_BLEND_PARAMETER_ROW:
-            if (table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "minCyclicBlendParameter", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MIN_CYCLIC_BLEND_PARAMETER_ROW, "minCyclicBlendParameter", VARIABLE_TYPE_REAL); break;
         case MAX_CYCLIC_BLEND_PARAMETER_ROW:
-            if (table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "maxCyclicBlendParameter", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MAX_CYCLIC_BLEND_PARAMETER_ROW, "maxCyclicBlendParameter", VARIABLE_TYPE_REAL); break;
         case INDEX_OF_SYNC_MASTER_CHILD_ROW:
-            if (table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "indexOfSyncMasterChild", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(INDEX_OF_SYNC_MASTER_CHILD_ROW, "indexOfSyncMasterChild", VARIABLE_TYPE_INT32); break;
         case SUBTRACT_LAST_CHILD_ROW:
-            if (table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "subtractLastChild", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(SUBTRACT_LAST_CHILD_ROW, "subtractLastChild", VARIABLE_TYPE_BOOL); break;
         case WORLD_FROM_MODEL_ROTATION_ROW:
-            if (table->item(WORLD_FROM_MODEL_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "worldFromModelRotation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(WORLD_FROM_MODEL_ROTATION_ROW, "worldFromModelRotation", VARIABLE_TYPE_VECTOR4); break;
         case BLEND_SPEED_ROW:
-            if (table->item(BLEND_SPEED_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "blendSpeed", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(BLEND_SPEED_ROW, "blendSpeed", VARIABLE_TYPE_REAL); break;
         case MIN_SPEED_TO_SWITCH_ROW:
-            if (table->item(MIN_SPEED_TO_SWITCH_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "minSpeedToSwitch", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MIN_SPEED_TO_SWITCH_ROW, "minSpeedToSwitch", VARIABLE_TYPE_REAL); break;
         case MIN_SWITCH_TIME_NO_ERROR_ROW:
-            if (table->item(MIN_SWITCH_TIME_NO_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "minSwitchTimeNoError", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MIN_SWITCH_TIME_NO_ERROR_ROW, "minSwitchTimeNoError", VARIABLE_TYPE_REAL); break;
         case MIN_SWITCH_TIME_FULL_ERROR_ROW:
-            if (table->item(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "minSwitchTimeFullError", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MIN_SWITCH_TIME_FULL_ERROR_ROW, "minSwitchTimeFullError", VARIABLE_TYPE_REAL); break;
         case ROOT_BONE_INDEX_ROW:
-            if (table->item(ROOT_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "rootBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(ROOT_BONE_INDEX_ROW, "rootBoneIndex", VARIABLE_TYPE_INT32); break;
         case OTHER_BONE_INDEX_ROW:
-            if (table->item(OTHER_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "otherBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(OTHER_BONE_INDEX_ROW, "otherBoneIndex", VARIABLE_TYPE_INT32); break;
         case ANOTHER_BONE_INDEX_ROW:
-            if (table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "anotherBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(ANOTHER_BONE_INDEX_ROW, "anotherBoneIndex", VARIABLE_TYPE_INT32); break;
         case PELVIS_INDEX_ROW:
-            if (table->item(PELVIS_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "pelvisIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(PELVIS_INDEX_ROW, "pelvisIndex", VARIABLE_TYPE_INT32); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void PoseMatchingGeneratorUI::setName(){
+void PoseMatchingGeneratorUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            for (auto i = 0; i < bsData->children.size(); i++){
-                if (bsData->children.at(i).data()){
-                    static_cast<DataIconManager*>(bsData->children.at(i).data())->updateIconNames();
-                }else{
-                    CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
-                }
-            }
-            emit generatorNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        bsData->updateChildIconNames();
+        emit generatorNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
-    if (bsData){
-        if (bsData->referencePoseWeightThreshold != referencePoseWeightThreshold->value()){
-            bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setReferencePoseWeightThreshold(referencePoseWeightThreshold->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setBlendParameter(){
-    if (bsData){
-        if (bsData->blendParameter != blendParameter->value()){
-            bsData->blendParameter = blendParameter->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBlendParameter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBlendParameter(blendParameter->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setBlendParameter(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
-    if (bsData){
-        if (bsData->minCyclicBlendParameter != minCyclicBlendParameter->value()){
-            bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMinCyclicBlendParameter(minCyclicBlendParameter->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
-    if (bsData){
-        if (bsData->maxCyclicBlendParameter != maxCyclicBlendParameter->value()){
-            bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMaxCyclicBlendParameter(maxCyclicBlendParameter->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(){
+    (bsData) ? bsData->setIndexOfSyncMasterChild(indexOfSyncMasterChild->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
+}
+
+void PoseMatchingGeneratorUI::setFlag(CheckBox *flagcheckbox, hkbPoseMatchingGenerator::BlenderFlag flagtoset){
     if (bsData){
-        if (bsData->indexOfSyncMasterChild != indexOfSyncMasterChild->value()){
-            bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
-            bsData->setIsFileChanged(true);
+        auto ok = true;
+        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->getFlags().toInt(&ok));
+        if (ok){
+            (flagcheckbox->isChecked()) ? flags |= flagtoset : flags &= ~(flagtoset);
+            bsData->setFlags(QString::number(flags));
+        }else{
+            LogFile::writeToLog(QString("PoseMatchingGeneratorUI::setFlag(): The flags string is invalid!!!\nString: "+bsData->getFlags()).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::setFlag(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::setFlagSync(){
-    if (bsData){
-        bool ok = true;
-        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagSync->isChecked()){
-                flags |= hkbPoseMatchingGenerator::FLAG_SYNC;
-            }else{
-                flags &= ~(hkbPoseMatchingGenerator::FLAG_SYNC);
-            }
-            bsData->flags = QString::number(flags);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagSync(): The data is nullptr!!");
-    }
+    setFlag(flagSync, hkbPoseMatchingGenerator::FLAG_SYNC);
 }
 
 void PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(){
-    if (bsData){
-        bool ok = true;
-        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagSmoothGeneratorWeights->isChecked()){
-                flags |= hkbPoseMatchingGenerator::FLAG_SMOOTH_GENERATOR_WEIGHTS;
-            }else{
-                flags &= ~(hkbPoseMatchingGenerator::FLAG_SMOOTH_GENERATOR_WEIGHTS);
-            }
-            bsData->flags = QString::number(flags);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The data is nullptr!!");
-    }
+    setFlag(flagSmoothGeneratorWeights, hkbPoseMatchingGenerator::FLAG_SMOOTH_GENERATOR_WEIGHTS);
 }
 
 void PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(){
-    if (bsData){
-        bool ok = true;
-        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagDontDeactivateChildrenWithZeroWeights->isChecked()){
-                flags |= hkbPoseMatchingGenerator::FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS;
-            }else{
-                flags &= ~(hkbPoseMatchingGenerator::FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS);
-            }
-            bsData->flags = QString::number(flags);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is nullptr!!");
-    }
+    setFlag(flagDontDeactivateChildrenWithZeroWeights, hkbPoseMatchingGenerator::FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS);
 }
 
 void PoseMatchingGeneratorUI::setFlagParametricBlend(){
-    if (bsData){
-        bool ok = true;
-        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagParametricBlend->isChecked()){
-                flags |= hkbPoseMatchingGenerator::FLAG_PARAMETRIC_BLEND;
-            }else{
-                flags &= ~(hkbPoseMatchingGenerator::FLAG_PARAMETRIC_BLEND);
-            }
-            bsData->flags = QString::number(flags);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagParametricBlend(): The data is nullptr!!");
-    }
+    setFlag(flagParametricBlend, hkbPoseMatchingGenerator::FLAG_PARAMETRIC_BLEND);
 }
 
 void PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(){
-    if (bsData){
-        bool ok = true;
-        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagIsParametricBlendCyclic->isChecked()){
-                flags |= hkbPoseMatchingGenerator::FLAG_IS_PARAMETRIC_BLEND_CYCLIC;
-            }else{
-                flags &= ~(hkbPoseMatchingGenerator::FLAG_IS_PARAMETRIC_BLEND_CYCLIC);
-            }
-            bsData->flags = QString::number(flags);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The data is nullptr!!");
-    }
+    setFlag(flagIsParametricBlendCyclic, hkbPoseMatchingGenerator::FLAG_IS_PARAMETRIC_BLEND_CYCLIC);
 }
 
 void PoseMatchingGeneratorUI::setFlagForceDensePose(){
-    if (bsData){
-        bool ok = true;
-        hkbPoseMatchingGenerator::BlenderFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagForceDensePose->isChecked()){
-                flags |= hkbPoseMatchingGenerator::FLAG_FORCE_DENSE_POSE;
-            }else{
-                flags &= ~(hkbPoseMatchingGenerator::FLAG_FORCE_DENSE_POSE);
-            }
-            bsData->flags = QString::number(flags);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
-    }
+    setFlag(flagForceDensePose, hkbPoseMatchingGenerator::FLAG_FORCE_DENSE_POSE);
 }
 
 void PoseMatchingGeneratorUI::setSubtractLastChild(){
-    if (bsData){
-        bsData->subtractLastChild = subtractLastChild->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSubtractLastChild(subtractLastChild->isChecked()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
-    if (bsData){
-        if (bsData->worldFromModelRotation != worldFromModelRotation->value()){
-            bsData->worldFromModelRotation = worldFromModelRotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setWorldFromModelRotation(worldFromModelRotation->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setBlendSpeed(){
-    if (bsData){
-        if (bsData->blendSpeed != blendSpeed->value()){
-            bsData->blendSpeed = blendSpeed->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBlendSpeed(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBlendSpeed(blendSpeed->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setBlendSpeed(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
-    if (bsData){
-        if (bsData->minSpeedToSwitch != minSpeedToSwitch->value()){
-            bsData->minSpeedToSwitch = minSpeedToSwitch->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMinSpeedToSwitch(minSpeedToSwitch->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
-    if (bsData){
-        if (bsData->minSwitchTimeNoError != minSwitchTimeNoError->value()){
-            bsData->minSwitchTimeNoError = minSwitchTimeNoError->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMinSwitchTimeNoError(minSwitchTimeNoError->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setMinSwitchTimeFullError(){
-    if (bsData){
-        if (bsData->minSwitchTimeFullError != minSwitchTimeFullError->value()){
-            bsData->minSwitchTimeFullError = minSwitchTimeFullError->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMinSwitchTimeFullError(minSwitchTimeFullError->value()) : LogFile::writeToLog("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setStartPlayingEventId(int index, const QString &name){
-    if (bsData){
-        bsData->startPlayingEventId = index - 1;
-        table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setStartPlayingEventId(index), table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : LogFile::writeToLog("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &name){
-    if (bsData){
-        bsData->startMatchingEventId = index - 1;
-        table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setStartMatchingEventId(index), table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : LogFile::writeToLog("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
-    if (bsData){
-        bsData->rootBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRootBoneIndex(index - 1) : LogFile::writeToLog("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
-    if (bsData){
-        bsData->otherBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOtherBoneIndex(index - 1) : LogFile::writeToLog("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
-    if (bsData){
-        bsData->anotherBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setAnotherBoneIndex(index - 1) : LogFile::writeToLog("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setPelvisIndex(int index){
-    if (bsData){
-        bsData->pelvisIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setPelvisIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPelvisIndex(index - 1) : LogFile::writeToLog("PoseMatchingGeneratorUI::setPelvisIndex(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::setMode(int index){
-    if (bsData){
-        bsData->mode = bsData->Mode.at(index);
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMode(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMode(index) : LogFile::writeToLog("PoseMatchingGeneratorUI::setMode(): The data is nullptr!!");
 }
 
 void PoseMatchingGeneratorUI::swapGeneratorIndices(int index1, int index2){
-    HkxObject *gen1;
-    HkxObject *gen2;
     if (bsData){
         index1 = index1 - BASE_NUMBER_OF_ROWS;
         index2 = index2 - BASE_NUMBER_OF_ROWS;
-        if (bsData->children.size() > index1 && bsData->children.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
-            gen1 = bsData->children.at(index1).data();
-            gen2 = bsData->children.at(index2).data();
-            bsData->children[index1] = HkxSharedPtr(gen2);
-            bsData->children[index2] = HkxSharedPtr(gen1);
-            if (behaviorView->getSelectedItem()){
-                behaviorView->getSelectedItem()->reorderChildren();
-            }else{
-                CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!");
-            }
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
+        if (!bsData->swapChildren(index1, index2)){
+            WARNING_MESSAGE("Cannot swap these rows!!");
+        }else{  //TO DO: check if necessary...
+            (behaviorView->getSelectedItem()) ? behaviorView->getSelectedItem()->reorderChildren() : LogFile::writeToLog("BlenderGeneratorUI::swapGeneratorIndices(): No item selected!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::addChildWithGenerator(){
-    Generator_Type typeEnum;
     if (bsData && behaviorView){
-        typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
+        auto typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
         behaviorView->appendBlenderGeneratorChild();
         switch (typeEnum){
         case STATE_MACHINE:
-            behaviorView->appendStateMachine();
-            break;
+            behaviorView->appendStateMachine(); break;
         case MANUAL_SELECTOR_GENERATOR:
-            behaviorView->appendManualSelectorGenerator();
-            break;
+            behaviorView->appendManualSelectorGenerator(); break;
         case BLENDER_GENERATOR:
-            behaviorView->appendBlenderGenerator();
-            break;
+            behaviorView->appendBlenderGenerator(); break;
         case I_STATE_TAGGING_GENERATOR:
-            behaviorView->appendIStateTaggingGenerator();
-            break;
+            behaviorView->appendIStateTaggingGenerator(); break;
         case BONE_SWITCH_GENERATOR:
-            behaviorView->appendBoneSwitchGenerator();
-            break;
+            behaviorView->appendBoneSwitchGenerator(); break;
         case CYCLIC_BLEND_TRANSITION_GENERATOR:
-            behaviorView->appendCyclicBlendTransitionGenerator();
-            break;
+            behaviorView->appendCyclicBlendTransitionGenerator(); break;
         case SYNCHRONIZED_CLIP_GENERATOR:
-            behaviorView->appendSynchronizedClipGenerator();
-            break;
+            behaviorView->appendSynchronizedClipGenerator(); break;
         case MODIFIER_GENERATOR:
-            behaviorView->appendModifierGenerator();
-            break;
+            behaviorView->appendModifierGenerator(); break;
         case OFFSET_ANIMATION_GENERATOR:
-            behaviorView->appendOffsetAnimationGenerator();
-            break;
+            behaviorView->appendOffsetAnimationGenerator(); break;
         case POSE_MATCHING_GENERATOR:
-            behaviorView->appendPoseMatchingGenerator();
-            break;
+            behaviorView->appendPoseMatchingGenerator(); break;
         case CLIP_GENERATOR:
-            behaviorView->appendClipGenerator();
-            break;
+            behaviorView->appendClipGenerator(); break;
         case BEHAVIOR_REFERENCE_GENERATOR:
-            behaviorView->appendBehaviorReferenceGenerator();
-            break;
+            behaviorView->appendBehaviorReferenceGenerator(); break;
         case GAMEBYRO_SEQUENCE_GENERATOR:
-            behaviorView->appendBGSGamebryoSequenceGenerator();
-            break;
+            behaviorView->appendBGSGamebryoSequenceGenerator(); break;
         default:
-            CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!");
+            LogFile::writeToLog("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::addChild(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::removeChild(int index){
-    hkbBlenderGeneratorChild *child = nullptr;
     if (bsData && behaviorView){
-        if (index < bsData->children.size() && index >= 0){
-            child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(index).data());
-            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->getChildren().first()), index);//Reorderchildren?
+        auto child = bsData->getChildDataAt(index);
+        if (child){
+            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->getChildren().first()), index);
             behaviorView->removeObjects();
         }else{
-            WARNING_MESSAGE("PoseMatchingGeneratorUI::removeChild(): Invalid index of child to remove!!");
+            WARNING_MESSAGE("Invalid index of child to remove!!");
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::removeChild(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
+    auto checkisproperty = [&](int row, const QString & fieldname){
+        bool properties;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+        selectTableToView(properties, fieldname);
+    };
     if (bsData){
         if (row < ADD_CHILD_ROW && row >= 0){
             if (column == BINDING_COLUMN){
                 switch (row){
                 case REFERENCE_POSE_WEIGHT_THRESHOLD_ROW:
-                    if (table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "referencePoseWeightThreshold");
-                    break;
+                    checkisproperty(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, "referencePoseWeightThreshold"); break;
                 case BLEND_PARAMETER_ROW:
-                    if (table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "blendParameter");
-                    break;
+                    checkisproperty(BLEND_PARAMETER_ROW, "blendParameter"); break;
                 case MIN_CYCLIC_BLEND_PARAMETER_ROW:
-                    if (table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "minCyclicBlendParameter");
+                    checkisproperty(MIN_CYCLIC_BLEND_PARAMETER_ROW, "minCyclicBlendParameter"); break;
                 case MAX_CYCLIC_BLEND_PARAMETER_ROW:
-                    if (table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "maxCyclicBlendParameter");
-                    break;
+                    checkisproperty(MAX_CYCLIC_BLEND_PARAMETER_ROW, "maxCyclicBlendParameter"); break;
                 case INDEX_OF_SYNC_MASTER_CHILD_ROW:
-                    if (table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "indexOfSyncMasterChild");
-                    break;
+                    checkisproperty(INDEX_OF_SYNC_MASTER_CHILD_ROW, "indexOfSyncMasterChild"); break;
                 case SUBTRACT_LAST_CHILD_ROW:
-                    if (table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "subtractLastChild");
-                    break;
-
+                    checkisproperty(SUBTRACT_LAST_CHILD_ROW, "subtractLastChild"); break;
                 case WORLD_FROM_MODEL_ROTATION_ROW:
-                    if (table->item(WORLD_FROM_MODEL_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "worldFromModelRotation");
-                    break;
+                    checkisproperty(WORLD_FROM_MODEL_ROTATION_ROW, "worldFromModelRotation"); break;
                 case BLEND_SPEED_ROW:
-                    if (table->item(BLEND_SPEED_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "blendSpeed");
-                    break;
+                    checkisproperty(BLEND_SPEED_ROW, "blendSpeed"); break;
                 case MIN_SPEED_TO_SWITCH_ROW:
-                    if (table->item(MIN_SPEED_TO_SWITCH_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "minSpeedToSwitch");
-                    break;
+                    checkisproperty(MIN_SPEED_TO_SWITCH_ROW, "minSpeedToSwitch"); break;
                 case MIN_SWITCH_TIME_NO_ERROR_ROW:
-                    if (table->item(MIN_SWITCH_TIME_NO_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "minSwitchTimeNoError");
-                    break;
+                    checkisproperty(MIN_SWITCH_TIME_NO_ERROR_ROW, "minSwitchTimeNoError"); break;
                 case MIN_SWITCH_TIME_FULL_ERROR_ROW:
-                    if (table->item(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "minSwitchTimeFullError");
-                    break;
+                    checkisproperty(MIN_SWITCH_TIME_FULL_ERROR_ROW, "minSwitchTimeFullError"); break;
                 case ROOT_BONE_INDEX_ROW:
-                    if (table->item(ROOT_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "rootBoneIndex");
-                    break;
+                    checkisproperty(ROOT_BONE_INDEX_ROW, "rootBoneIndex"); break;
                 case OTHER_BONE_INDEX_ROW:
-                    if (table->item(OTHER_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "otherBoneIndex");
-                    break;
+                    checkisproperty(OTHER_BONE_INDEX_ROW, "otherBoneIndex"); break;
                 case ANOTHER_BONE_INDEX_ROW:
-                    if (table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "anotherBoneIndex");
-                    break;
+                    checkisproperty(ANOTHER_BONE_INDEX_ROW, "anotherBoneIndex"); break;
                 case PELVIS_INDEX_ROW:
-                    if (table->item(PELVIS_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "pelvisIndex");
-                    break;
+                    checkisproperty(PELVIS_INDEX_ROW, "pelvisIndex"); break;
                 }
             }else if (column == VALUE_COLUMN){
                 if (row == START_PLAYING_EVENT_ID_ROW){
@@ -1145,7 +687,7 @@ void PoseMatchingGeneratorUI::viewSelectedChild(int row, int column){
         }else if (row == ADD_CHILD_ROW && column == NAME_COLUMN){
             addChildWithGenerator();
         }else if (row > ADD_CHILD_ROW && row < ADD_CHILD_ROW + bsData->getNumberOfChildren() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->children.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     childUI->loadData(static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data()), result);
@@ -1156,31 +698,25 @@ void PoseMatchingGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
+                LogFile::writeToLog("PoseMatchingGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::returnToWidget(bool reloadData){
-    if (reloadData){
-        loadDynamicTableRows();
-    }
+    (reloadData) ? loadDynamicTableRows() : NULL;
     setCurrentIndex(MAIN_WIDGET);
 }
 
 void PoseMatchingGeneratorUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (index == bsData->startPlayingEventId){
-            table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->startMatchingEventId){
-            table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->startPlayingEventId) ? table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
+        (index == bsData->startMatchingEventId) ? table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -1189,11 +725,9 @@ void PoseMatchingGeneratorUI::eventTableElementSelected(int index, const QString
     case MAIN_WIDGET:
         switch (table->currentRow()){
         case START_PLAYING_EVENT_ID_ROW:
-            setStartPlayingEventId(index, name);
-            break;
+            setStartPlayingEventId(index, name); break;
         case START_MATCHING_EVENT_ID_ROW:
-            setStartMatchingEventId(index, name);
-            break;
+            setStartMatchingEventId(index, name); break;
         default:
             WARNING_MESSAGE("PoseMatchingGeneratorUI::eventTableElementSelected(): An unwanted element selected event was recieved!!");
             return;
@@ -1207,11 +741,9 @@ void PoseMatchingGeneratorUI::eventTableElementSelected(int index, const QString
 void PoseMatchingGeneratorUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     case CHILD_WIDGET:
-        childUI->setBindingVariable(index, name);
-        break;
+        childUI->setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("PoseMatchingGeneratorUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -1220,8 +752,7 @@ void PoseMatchingGeneratorUI::variableTableElementSelected(int index, const QStr
 void PoseMatchingGeneratorUI::generatorTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case CHILD_WIDGET:
-        childUI->setGenerator(index, name);
-        break;
+        childUI->setGenerator(index, name); break;
     default:
         WARNING_MESSAGE("PoseMatchingGeneratorUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -1242,32 +773,7 @@ void PoseMatchingGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
-    }
-}
-
-void PoseMatchingGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -1287,97 +793,45 @@ void PoseMatchingGeneratorUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("PoseMatchingGeneratorUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
-        index--;
-        bind = bsData->getVariableBindingSetData();
-        if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("referencePoseWeightThreshold");
-            if (bindIndex == index){
-                table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("blendParameter");
-            if (bindIndex == index){
-                table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("minCyclicBlendParameter");
-            if (bindIndex == index){
-                table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("maxCyclicBlendParameter");
-            if (bindIndex == index){
-                table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("indexOfSyncMasterChild");
-            if (bindIndex == index){
-                table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("subtractLastChild");
-            if (bindIndex == index){
-                table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText(name);
-            }
-
-            bindIndex = bind->getVariableIndexOfBinding("worldFromModelRotation");
-            if (bindIndex == index){
-                table->item(WORLD_FROM_MODEL_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("blendSpeed");
-            if (bindIndex == index){
-                table->item(BLEND_SPEED_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("minSpeedToSwitch");
-            if (bindIndex == index){
-                table->item(MIN_SPEED_TO_SWITCH_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("minSwitchTimeNoError");
-            if (bindIndex == index){
-                table->item(MIN_SWITCH_TIME_NO_ERROR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("minSwitchTimeFullError");
-            if (bindIndex == index){
-                table->item(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("rootBoneIndex");
-            if (bindIndex == index){
-                table->item(ROOT_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("otherBoneIndex");
-            if (bindIndex == index){
-                table->item(OTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("anotherBoneIndex");
-            if (bindIndex == index){
-                table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("pelvisIndex");
-            if (bindIndex == index){
-                table->item(PELVIS_INDEX_ROW, BINDING_COLUMN)->setText(name);
+        if (name != ""){
+            index--;
+            auto bind = bsData->getVariableBindingSetData();
+            if (bind){
+                auto setname = [&](const QString & fieldname, int row){
+                    auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                    (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+                };
+                setname("referencePoseWeightThreshold", REFERENCE_POSE_WEIGHT_THRESHOLD_ROW);
+                setname("blendParameter", BLEND_PARAMETER_ROW);
+                setname("minCyclicBlendParameter", MIN_CYCLIC_BLEND_PARAMETER_ROW);
+                setname("maxCyclicBlendParameter", MAX_CYCLIC_BLEND_PARAMETER_ROW);
+                setname("indexOfSyncMasterChild", INDEX_OF_SYNC_MASTER_CHILD_ROW);
+                setname("subtractLastChild", SUBTRACT_LAST_CHILD_ROW);
+                setname("worldFromModelRotation", WORLD_FROM_MODEL_ROTATION_ROW);
+                setname("blendSpeed", BLEND_SPEED_ROW);
+                setname("minSpeedToSwitch", MIN_SPEED_TO_SWITCH_ROW);
+                setname("minSwitchTimeNoError", MIN_SWITCH_TIME_NO_ERROR_ROW);
+                setname("minSwitchTimeFullError", MIN_SWITCH_TIME_FULL_ERROR_ROW);
+                setname("rootBoneIndex", ROOT_BONE_INDEX_ROW);
+                setname("otherBoneIndex", OTHER_BONE_INDEX_ROW);
+                setname("anotherBoneIndex", ANOTHER_BONE_INDEX_ROW);
+                setname("pelvisIndex", PELVIS_INDEX_ROW);
             }
         }
-        if (currentIndex() == CHILD_WIDGET){
-            childUI->variableRenamed(name, index);
-        }
+        (currentIndex() == CHILD_WIDGET) ? childUI->variableRenamed(name, index) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("PoseMatchingGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::generatorRenamed(const QString &name, int index){
-    if (name == ""){
-        WARNING_MESSAGE("PoseMatchingGeneratorUI::generatorRenamed(): The new variable name is the empty string!!");
-    }
-    if (currentIndex() == CHILD_WIDGET){
-        childUI->generatorRenamed(name, index);
-    }
+    (currentIndex() == CHILD_WIDGET) ? childUI->generatorRenamed(name, index) : NULL;
 }
 
 void PoseMatchingGeneratorUI::setBehaviorView(BehaviorGraphView *view){

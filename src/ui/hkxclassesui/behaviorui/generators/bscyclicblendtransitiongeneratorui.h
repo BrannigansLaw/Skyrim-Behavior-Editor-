@@ -59,7 +59,7 @@ private:
     void selectTableToView(bool viewproperties, const QString & path);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
+        MAIN_WIDGET,
         EVENT_WIDGET = 1
     };
 private:

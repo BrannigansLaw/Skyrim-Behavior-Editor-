@@ -117,15 +117,15 @@ public:
     void removeBinding(int varIndex);
     HkxSharedPtr& getVariableBindingSet();
     hkbVariableBindingSet * getVariableBindingSetData() const;
+    bool fixMergedIndices(BehaviorFile *dominantfile);
+    void updateReferences(long &ref);
+    QString evaluateDataValidity();
 protected:
     void unlink();
-    QString evaluateDataValidity();
     bool isVariableReferenced(int variableindex) const;
     bool merge(HkxObject *recessiveObject);
     void setBindingReference(int ref);
-    void updateReferences(long &ref);
     void mergeVariableIndices(int oldindex, int newindex);
-    bool fixMergedIndices(BehaviorFile *dominantfile);
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
 private:

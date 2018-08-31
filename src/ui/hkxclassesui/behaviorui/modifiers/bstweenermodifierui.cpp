@@ -27,7 +27,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSTweenerModifierUI::headerLabels = {
+const QStringList BSTweenerModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -85,30 +85,31 @@ BSTweenerModifierUI::BSTweenerModifierUI()
     table->setCellWidget(TARGET_ROTATION_ROW, VALUE_COLUMN, targetRotation);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSTweenerModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(tweenPosition, SIGNAL(released()), this, SLOT(setTweenPosition()), Qt::UniqueConnection);
-    connect(tweenRotation, SIGNAL(released()), this, SLOT(setTweenRotation()), Qt::UniqueConnection);
-    connect(useTweenDuration, SIGNAL(released()), this, SLOT(setUseTweenDuration()), Qt::UniqueConnection);
-    connect(tweenDuration, SIGNAL(editingFinished()), this, SLOT(setTweenDuration()), Qt::UniqueConnection);
-    connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
-    connect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSTweenerModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(tweenPosition, SIGNAL(released()), this, SLOT(setTweenPosition()));
-    disconnect(tweenRotation, SIGNAL(released()), this, SLOT(setTweenRotation()));
-    disconnect(useTweenDuration, SIGNAL(released()), this, SLOT(setUseTweenDuration()));
-    disconnect(tweenDuration, SIGNAL(editingFinished()), this, SLOT(setTweenDuration()));
-    disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
-    disconnect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSTweenerModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(tweenPosition, SIGNAL(released()), this, SLOT(setTweenPosition()), Qt::UniqueConnection);
+        connect(tweenRotation, SIGNAL(released()), this, SLOT(setTweenRotation()), Qt::UniqueConnection);
+        connect(useTweenDuration, SIGNAL(released()), this, SLOT(setUseTweenDuration()), Qt::UniqueConnection);
+        connect(tweenDuration, SIGNAL(editingFinished()), this, SLOT(setTweenDuration()), Qt::UniqueConnection);
+        connect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()), Qt::UniqueConnection);
+        connect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(tweenPosition, SIGNAL(released()), this, SLOT(setTweenPosition()));
+        disconnect(tweenRotation, SIGNAL(released()), this, SLOT(setTweenRotation()));
+        disconnect(useTweenDuration, SIGNAL(released()), this, SLOT(setUseTweenDuration()));
+        disconnect(tweenDuration, SIGNAL(editingFinished()), this, SLOT(setTweenDuration()));
+        disconnect(targetPosition, SIGNAL(editingFinished()), this, SLOT(setTargetPosition()));
+        disconnect(targetRotation, SIGNAL(editingFinished()), this, SLOT(setTargetRotation()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSTweenerModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -120,186 +121,105 @@ void BSTweenerModifierUI::connectToTables(GenericTableWidget *variables, Generic
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSTweenerModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_TWEENER_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<BSTweenerModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            tweenPosition->setChecked(bsData->tweenPosition);
-            tweenRotation->setChecked(bsData->tweenRotation);
-            useTweenDuration->setChecked(bsData->useTweenDuration);
-            tweenDuration->setValue(bsData->tweenDuration);
-            targetPosition->setValue(bsData->targetPosition);
-            targetRotation->setValue(bsData->targetRotation);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(TWEEN_POSITION_ROW, BINDING_COLUMN, varBind, "tweenPosition");
-                loadBinding(TWEEN_ROTATION_ROW, BINDING_COLUMN, varBind, "tweenRotation");
-                loadBinding(USE_TWEEN_DURATION_ROW, BINDING_COLUMN, varBind, "useTweenDuration");
-                loadBinding(TWEEN_DURATION_ROW, BINDING_COLUMN, varBind, "tweenDuration");
-                loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition");
-                loadBinding(TARGET_ROTATION_ROW, BINDING_COLUMN, varBind, "targetRotation");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TWEEN_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TWEEN_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(USE_TWEEN_DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TWEEN_DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            tweenPosition->setChecked(bsData->getTweenPosition());
+            tweenRotation->setChecked(bsData->getTweenRotation());
+            useTweenDuration->setChecked(bsData->getUseTweenDuration());
+            tweenDuration->setValue(bsData->getTweenDuration());
+            targetPosition->setValue(bsData->getTargetPosition());
+            targetRotation->setValue(bsData->getTargetRotation());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(TWEEN_POSITION_ROW, BINDING_COLUMN, varBind, "tweenPosition", table, bsData);
+            UIHelper::loadBinding(TWEEN_ROTATION_ROW, BINDING_COLUMN, varBind, "tweenRotation", table, bsData);
+            UIHelper::loadBinding(USE_TWEEN_DURATION_ROW, BINDING_COLUMN, varBind, "useTweenDuration", table, bsData);
+            UIHelper::loadBinding(TWEEN_DURATION_ROW, BINDING_COLUMN, varBind, "tweenDuration", table, bsData);
+            UIHelper::loadBinding(TARGET_POSITION_ROW, BINDING_COLUMN, varBind, "targetPosition", table, bsData);
+            UIHelper::loadBinding(TARGET_ROTATION_ROW, BINDING_COLUMN, varBind, "targetRotation", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSTweenerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSTweenerModifierUI::setName(){
+void BSTweenerModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSTweenerModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSTweenerModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::setTweenPosition(){
-    if (bsData){
-        bsData->tweenPosition = tweenPosition->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settweenPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTweenPosition(tweenPosition->isChecked()) : LogFile::writeToLog("BSTweenerModifierUI::setTweenPosition(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::setTweenRotation(){
-    if (bsData){
-        bsData->tweenRotation = tweenRotation->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settweenRotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTweenRotation(tweenRotation->isChecked()) : LogFile::writeToLog("BSTweenerModifierUI::setTweenRotation(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::setUseTweenDuration(){
-    if (bsData){
-        bsData->useTweenDuration = useTweenDuration->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setuseTweenDuration(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setUseTweenDuration(useTweenDuration->isChecked()) : LogFile::writeToLog("BSTweenerModifierUI::setUseTweenDuration(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::setTweenDuration(){
-    if (bsData){
-        if (bsData->tweenDuration != tweenDuration->value()){
-            bsData->tweenDuration = tweenDuration->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settweenDuration(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTweenDuration(tweenDuration->value()) : LogFile::writeToLog("BSTweenerModifierUI::setTweenDuration(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::setTargetPosition(){
-    if (bsData){
-        if (bsData->targetPosition != targetPosition->value()){
-            bsData->targetPosition = targetPosition->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settargetPosition(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetPosition(targetPosition->value()) : LogFile::writeToLog("BSTweenerModifierUI::setTargetPosition(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::setTargetRotation(){
-    if (bsData){
-        if (bsData->targetRotation != targetRotation->value()){
-            bsData->targetRotation = targetRotation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settargetRotation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetRotation(targetRotation->value()) : LogFile::writeToLog("BSTweenerModifierUI::setTargetRotation(): The data is nullptr!!");
 }
 
 void BSTweenerModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case TWEEN_POSITION_ROW:
-                if (table->item(TWEEN_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "tweenPosition");
-                break;
+                checkisproperty(TWEEN_POSITION_ROW, "tweenPosition"); break;
             case TWEEN_ROTATION_ROW:
-                if (table->item(TWEEN_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "tweenRotation");
-                break;
+                checkisproperty(TWEEN_ROTATION_ROW, "tweenRotation"); break;
             case USE_TWEEN_DURATION_ROW:
-                if (table->item(USE_TWEEN_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "useTweenDuration");
-                break;
+                checkisproperty(USE_TWEEN_DURATION_ROW, "useTweenDuration"); break;
             case TWEEN_DURATION_ROW:
-                if (table->item(TWEEN_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "tweenDuration");
-                break;
+                checkisproperty(TWEEN_DURATION_ROW, "tweenDuration"); break;
             case TARGET_POSITION_ROW:
-                if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetPosition");
-                break;
+                checkisproperty(TARGET_POSITION_ROW, "targetPosition"); break;
             case TARGET_ROTATION_ROW:
-                if (table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetRotation");
-                break;
-            default:
-                return;
+                checkisproperty(TARGET_ROTATION_ROW, "targetRotation"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -319,158 +239,57 @@ void BSTweenerModifierUI::selectTableToView(bool viewisProperty, const QString &
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSTweenerModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("tweenPosition");
-            if (bindIndex == index){
-                table->item(TWEEN_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("tweenRotation");
-            if (bindIndex == index){
-                table->item(TWEEN_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("useTweenDuration");
-            if (bindIndex == index){
-                table->item(USE_TWEEN_DURATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("tweenDuration");
-            if (bindIndex == index){
-                table->item(TWEEN_DURATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetPosition");
-            if (bindIndex == index){
-                table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetRotation");
-            if (bindIndex == index){
-                table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("tweenPosition", TWEEN_POSITION_ROW);
+            setname("tweenRotation", TWEEN_ROTATION_ROW);
+            setname("useTweenDuration", USE_TWEEN_DURATION_ROW);
+            setname("tweenDuration", TWEEN_DURATION_ROW);
+            setname("targetPosition", TARGET_POSITION_ROW);
+            setname("targetRotation", TARGET_ROTATION_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSTweenerModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSTweenerModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case TWEEN_POSITION_ROW:
-            if (table->item(TWEEN_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "tweenPosition", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(TWEEN_POSITION_ROW, "tweenPosition", VARIABLE_TYPE_BOOL); break;
         case TWEEN_ROTATION_ROW:
-            if (table->item(TWEEN_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "tweenRotation", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(TWEEN_ROTATION_ROW, "tweenRotation", VARIABLE_TYPE_BOOL); break;
         case USE_TWEEN_DURATION_ROW:
-            if (table->item(USE_TWEEN_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "useTweenDuration", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(USE_TWEEN_DURATION_ROW, "useTweenDuration", VARIABLE_TYPE_BOOL); break;
         case TWEEN_DURATION_ROW:
-            if (table->item(TWEEN_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "tweenDuration", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(TWEEN_DURATION_ROW, "tweenDuration", VARIABLE_TYPE_REAL); break;
         case TARGET_POSITION_ROW:
-            if (table->item(TARGET_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_POSITION_ROW, "targetPosition", VARIABLE_TYPE_VECTOR4); break;
         case TARGET_ROTATION_ROW:
-            if (table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetRotation", VARIABLE_TYPE_QUATERNION, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSTweenerModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(TARGET_ROTATION_ROW, "targetRotation", VARIABLE_TYPE_QUATERNION); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSTweenerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

@@ -15,6 +15,27 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkQuadVariable getTranslationOut() const;
+    void setTranslationOut(const hkQuadVariable &value);
+    hkQuadVariable getRotationOut() const;
+    void setRotationOut(const hkQuadVariable &value);
+    hkQuadVariable getLeftTranslation() const;
+    void setLeftTranslation(const hkQuadVariable &value);
+    hkQuadVariable getLeftRotation() const;
+    void setLeftRotation(const hkQuadVariable &value);
+    hkQuadVariable getRightTranslation() const;
+    void setRightTranslation(const hkQuadVariable &value);
+    hkQuadVariable getRightRotation() const;
+    void setRightRotation(const hkQuadVariable &value);
+    bool getInvertLeftTransform() const;
+    void setInvertLeftTransform(bool value);
+    bool getInvertRightTransform() const;
+    void setInvertRightTransform(bool value);
+    bool getInvertResult() const;
+    void setInvertResult(bool value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

@@ -15,6 +15,15 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    QString getLocalFrameName() const;
+    void setLocalFrameName(int index);
+    int getRagdollBoneIndex() const;
+    void setRagdollBoneIndex(int value);
+    int getAnimationBoneIndex() const;
+    void setAnimationBoneIndex(int value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

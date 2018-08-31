@@ -11,32 +11,33 @@ class TableWidget;
 class LineEdit;
 class GenericTableWidget;
 
-class ModifierGeneratorUI: public QGroupBox
+class ModifierGeneratorUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     ModifierGeneratorUI();
-    virtual ~ModifierGeneratorUI(){}
+    ModifierGeneratorUI& operator=(const ModifierGeneratorUI&) = delete;
+    ModifierGeneratorUI(const ModifierGeneratorUI &) = delete;
+    ~ModifierGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void generatorRenamed(const QString & name, int index);
+    void modifierRenamed(const QString & name, int index);
+    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *generators);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewModifiers(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setModifier(int index, const QString & name);
     void setGenerator(int index, const QString & name);
     void viewSelected(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void generatorRenamed(const QString & name, int index);
-    void modifierRenamed(const QString & name, int index);
-    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *generators);
-    void setBehaviorView(BehaviorGraphView *view);
+    void toggleSignals(bool toggleconnections);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbModifierGenerator *bsData;
     QGridLayout *topLyt;

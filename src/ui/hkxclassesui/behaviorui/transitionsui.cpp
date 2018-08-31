@@ -45,7 +45,7 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-QStringList TransitionsUI::headerLabels = {
+const QStringList TransitionsUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -154,98 +154,99 @@ TransitionsUI::TransitionsUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(transitionUI);
-    connectSignals();
     fromNestedStateId->setDisabled(true);
     toNestedStateId->setDisabled(true);
+    toggleSignals(true);
 }
 
-void TransitionsUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(enterTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalEnterTime()), Qt::UniqueConnection);
-    connect(exitTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalExitTime()), Qt::UniqueConnection);
-    connect(enterTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalEnterTime()), Qt::UniqueConnection);
-    connect(exitTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalExitTime()), Qt::UniqueConnection);
-    connect(transition, SIGNAL(pressed()), this, SLOT(viewTransitionEffect()), Qt::UniqueConnection);
-    connect(transition, SIGNAL(enabled(bool)), this, SLOT(toggleTransitionEffect(bool)), Qt::UniqueConnection);
-    connect(condition, SIGNAL(editingFinished()), this, SLOT(setCondition()), Qt::UniqueConnection);
-    connect(toStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToStateId(QString)), Qt::UniqueConnection);
-    connect(fromNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setFromNestedStateId(QString)), Qt::UniqueConnection);
-    connect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)), Qt::UniqueConnection);
-    connect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()), Qt::UniqueConnection);
-    connect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()), Qt::UniqueConnection);
-    connect(flagLocalWildcard, SIGNAL(released()), this, SLOT(toggleLocalWildcardFlag()), Qt::UniqueConnection);
-    connect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()), Qt::UniqueConnection);
-    connect(flagAllowSelfTransition, SIGNAL(released()), this, SLOT(toggleAllowSelfTransition()), Qt::UniqueConnection);
-    connect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()), Qt::UniqueConnection);
-    connect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()), Qt::UniqueConnection);
-    connect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void TransitionsUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(enterTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalEnterTime()));
-    disconnect(exitTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalExitTime()));
-    disconnect(enterTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalEnterTime()));
-    disconnect(exitTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalExitTime()));
-    disconnect(transition, SIGNAL(pressed()), this, SLOT(viewTransitionEffect()));
-    disconnect(transition, SIGNAL(enabled(bool)), this, SLOT(toggleTransitionEffect(bool)));
-    disconnect(condition, SIGNAL(editingFinished()), this, SLOT(setCondition()));
-    disconnect(toStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToStateId(QString)));
-    disconnect(fromNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setFromNestedStateId(QString)));
-    disconnect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)));
-    disconnect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()));
-    disconnect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()));
-    disconnect(flagLocalWildcard, SIGNAL(released()), this, SLOT(toggleLocalWildcardFlag()));
-    disconnect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()));
-    disconnect(flagAllowSelfTransition, SIGNAL(released()), this, SLOT(toggleAllowSelfTransition()));
-    disconnect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()));
-    disconnect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()));
-    disconnect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()));
-    disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)));
-    disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void TransitionsUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(enterTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalEnterTime()), Qt::UniqueConnection);
+        connect(exitTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalExitTime()), Qt::UniqueConnection);
+        connect(enterTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalEnterTime()), Qt::UniqueConnection);
+        connect(exitTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalExitTime()), Qt::UniqueConnection);
+        connect(transition, SIGNAL(pressed()), this, SLOT(viewTransitionEffect()), Qt::UniqueConnection);
+        connect(transition, SIGNAL(enabled(bool)), this, SLOT(toggleTransitionEffect(bool)), Qt::UniqueConnection);
+        connect(condition, SIGNAL(editingFinished()), this, SLOT(setCondition()), Qt::UniqueConnection);
+        connect(toStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToStateId(QString)), Qt::UniqueConnection);
+        connect(fromNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setFromNestedStateId(QString)), Qt::UniqueConnection);
+        connect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)), Qt::UniqueConnection);
+        connect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()), Qt::UniqueConnection);
+        connect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()), Qt::UniqueConnection);
+        connect(flagLocalWildcard, SIGNAL(released()), this, SLOT(toggleLocalWildcardFlag()), Qt::UniqueConnection);
+        connect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()), Qt::UniqueConnection);
+        connect(flagAllowSelfTransition, SIGNAL(released()), this, SLOT(toggleAllowSelfTransition()), Qt::UniqueConnection);
+        connect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()), Qt::UniqueConnection);
+        connect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()), Qt::UniqueConnection);
+        connect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(enterTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalEnterTime()));
+        disconnect(exitTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalExitTime()));
+        disconnect(enterTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalEnterTime()));
+        disconnect(exitTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalExitTime()));
+        disconnect(transition, SIGNAL(pressed()), this, SLOT(viewTransitionEffect()));
+        disconnect(transition, SIGNAL(enabled(bool)), this, SLOT(toggleTransitionEffect(bool)));
+        disconnect(condition, SIGNAL(editingFinished()), this, SLOT(setCondition()));
+        disconnect(toStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToStateId(QString)));
+        disconnect(fromNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setFromNestedStateId(QString)));
+        disconnect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)));
+        disconnect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()));
+        disconnect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()));
+        disconnect(flagLocalWildcard, SIGNAL(released()), this, SLOT(toggleLocalWildcardFlag()));
+        disconnect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()));
+        disconnect(flagAllowSelfTransition, SIGNAL(released()), this, SLOT(toggleAllowSelfTransition()));
+        disconnect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()));
+        disconnect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()));
+        disconnect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()));
+        disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+        disconnect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)));
+        disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data, int index){
-    disconnectSignals();
+    toggleSignals(false);
     if (data && parent && parentfile){
         bsData = (hkbStateMachineTransitionInfoArray::HkTransition *)data;
         parentObj = parent;
         file = parentfile;
         transitionIndex = index;
-        QString name = file->getEventNameAt(bsData->triggerInterval.enterEventId);
-        loadTableValue(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, name);
+        auto name = file->getEventNameAt(bsData->triggerInterval.enterEventId);
+        auto loadTableValue = [&](int row){
+            auto item = table->item(row, VALUE_COLUMN);
+            (name != "") ? item->setText(name) : item->setText("NONE");
+        };
+        loadTableValue(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW);
         name = file->getEventNameAt(bsData->triggerInterval.exitEventId);
-        loadTableValue(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, name);
+        loadTableValue(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW);
         enterTimeTI->setValue(bsData->triggerInterval.enterTime);
         exitTimeTI->setValue(bsData->triggerInterval.exitTime);
         name = file->getEventNameAt(bsData->initiateInterval.enterEventId);
-        loadTableValue(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, name);
+        loadTableValue(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW);
         name = file->getEventNameAt(bsData->initiateInterval.exitEventId);
-        loadTableValue(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, name);
+        loadTableValue(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW);
         enterTimeII->setValue(bsData->initiateInterval.enterTime);
         exitTimeII->setValue(bsData->initiateInterval.exitTime);
-        if (bsData->transition.data()){
+        auto transeffect = static_cast<hkbBlendingTransitionEffect *>(bsData->transition.data());
+        if (transeffect){
             transition->setChecked(true);
-            transition->setText(static_cast<hkbBlendingTransitionEffect *>(bsData->transition.data())->getName());
+            transition->setText(transeffect->getName());
         }else{
             transition->setChecked(false);
             transition->setText("nullptr");
         }
-        if (bsData->condition.data()){
-            condition->setText(static_cast<hkbExpressionCondition *>(bsData->condition.data())->getExpression());
-        }else{
-            condition->setText("");
-        }
+        (bsData->condition.data()) ? condition->setText(static_cast<hkbExpressionCondition *>(bsData->condition.data())->getExpression()) : condition->setText("");
         name = file->getEventNameAt(bsData->eventId);
-        loadTableValue(EVENT_ID_ROW, name);
+        loadTableValue(EVENT_ID_ROW);
         toStateId->clear();
         toStateId->addItems(parentObj->getStateNames());
         toStateId->setCurrentIndex(parentObj->getStateNames().indexOf(parentObj->getStateName(bsData->toStateId)));
@@ -255,7 +256,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
         toNestedStateId->addItems(parentObj->getNestedStateNames(bsData->toStateId));
         toNestedStateId->setCurrentIndex(parentObj->getNestedStateNames(bsData->toStateId).indexOf(parentObj->getNestedStateName(bsData->toStateId, bsData->toNestedStateId)));
         priority->setValue(bsData->priority);
-        QStringList flags = bsData->flags.split("|");
+        auto flags = bsData->flags.split("|");
         flagGlobalWildcard->setChecked(false);
         flagUseNestedState->setChecked(false);
         flagDisallowRandomTransition->setChecked(false);
@@ -300,204 +301,122 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::loadData(): The data, parent file or parent state machine is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::loadData(): The data, parent file or parent state machine is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
+}
+
+void TransitionsUI::setId(int index, const QString &name, int & eventid, int row){
+    if (bsData){
+        eventid = --index;
+        auto item = table->item(row, VALUE_COLUMN);
+        if (item){
+            item->setText(name);
+            checkInterval();
+            (parentObj) ? parentObj->setIsFileChanged(true) : LogFile::writeToLog("TransitionsUI::setId(): parentObj is nullptr!!");
+        }else{
+            LogFile::writeToLog("TransitionsUI::setId(): invalid row selected!!");
+        }
+    }else{
+        LogFile::writeToLog("TransitionsUI::setId(): The data is nullptr!!");
+    }
 }
 
 void TransitionsUI::setTriggerIntervalEnterEventId(int index, const QString &name){
     if (bsData){
-        bsData->triggerInterval.enterEventId = index - 1;
-        table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
-        parentObj->setIsFileChanged(true);
+        setId(index, name, bsData->triggerInterval.enterEventId, TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalEnterEventId(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setTriggerIntervalEnterEventId(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name){
     if (bsData){
-        bsData->triggerInterval.exitEventId = index - 1;
-        table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
-        parentObj->setIsFileChanged(true);
+        setId(index, name, bsData->triggerInterval.exitEventId, TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalExitEventId(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setTriggerIntervalExitEventId(): The data is nullptr!!");
+    }
+}
+
+void TransitionsUI::checkInterval(){
+    if (bsData){
+        auto check = [&](bool value, const QString & flag){
+            if (value){
+                if (!bsData->flags.contains(flag)){
+                    (bsData->flags != "0") ? bsData->flags.append("|"+flag) : bsData->flags = flag;
+                }
+            }else{
+                bsData->flags.remove(flag);
+                auto lastindex = bsData->flags.lastIndexOf("|");
+                (lastindex > bsData->flags.size() - 1) ? bsData->flags.remove(lastindex, lastindex + 1) : NULL;
+            }
+        };
+        check(bsData->usingTriggerInterval(), "FLAG_USE_TRIGGER_INTERVAL");
+        check(bsData->usingInitiateInterval(), "FLAG_USE_INITIATE_INTERVAL");
+    }else{
+        LogFile::writeToLog("TransitionsUI::checkInterval(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setTriggerIntervalEnterTime(){
     if (bsData){
         bsData->triggerInterval.enterTime = enterTimeTI->value();
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
+        checkInterval();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalEnterTime(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setTriggerIntervalEnterTime(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setTriggerIntervalExitTime(){
     if (bsData){
         bsData->triggerInterval.exitTime = exitTimeTI->value();
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
+        checkInterval();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalExitTime(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setTriggerIntervalExitTime(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setInitiateIntervalEnterEventId(int index, const QString &name){
     if (bsData){
-        bsData->initiateInterval.enterEventId = index - 1;
+        bsData->initiateInterval.enterEventId = --index;
         table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
+        checkInterval();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalEnterEventId(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setInitiateIntervalEnterEventId(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &name){
     if (bsData){
-        bsData->initiateInterval.exitEventId = index - 1;
+        bsData->initiateInterval.exitEventId = --index;
         table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
+        checkInterval();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalExitEventId(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setInitiateIntervalExitEventId(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setInitiateIntervalEnterTime(){
     if (bsData){
         bsData->initiateInterval.enterTime = enterTimeII->value();
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
+        checkInterval();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalEnterTime(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setInitiateIntervalEnterTime(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setInitiateIntervalExitTime(){
     if (bsData){
         bsData->initiateInterval.exitTime = exitTimeII->value();
-        if (bsData->usingTriggerInterval()){
-            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
-                if (bsData->flags != "0"){
-                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
-                }else{
-                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
-                }
-            }
-        }else{
-            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
-            auto lastindex = bsData->flags.lastIndexOf("|");
-            if (lastindex > bsData->flags.size() - 1){
-                bsData->flags.remove(lastindex, lastindex + 1);
-            }
-        }
+        checkInterval();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalExitTime(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setInitiateIntervalExitTime(): The data is nullptr!!");
     }
 }
 
@@ -506,7 +425,7 @@ void TransitionsUI::viewTransitionEffect(){
         transitionUI->loadData(bsData->transition.data());
         setCurrentIndex(TRANSITION_EFFECT_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::viewTransitionEffect(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::viewTransitionEffect(): The data is nullptr!!");
     }
 }
 
@@ -516,13 +435,12 @@ void TransitionsUI::toggleTransitionEffect(bool enable){
             bsData->transition = HkxSharedPtr();
             static_cast<BehaviorFile *>(parentObj->getParentFile())->removeOtherData();
         }else if (!bsData->transition.data()){
-            hkbBlendingTransitionEffect *effect = new hkbBlendingTransitionEffect(parentObj->getParentFile());
-            parentObj->getParentFile()->addObjectToFile(effect, -1);
+            auto effect = new hkbBlendingTransitionEffect(parentObj->getParentFile());
             bsData->transition = HkxSharedPtr(effect);
             transition->setText(effect->getName());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleTransitionEffect(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::toggleTransitionEffect(): The data is nullptr!!");
     }
 }
 
@@ -532,36 +450,27 @@ void TransitionsUI::setCondition(){
             if (bsData->condition.data()){
                 static_cast<hkbExpressionCondition *>(bsData->condition.data())->setExpression(condition->text());
             }else{
-                hkbExpressionCondition *con = new hkbExpressionCondition(static_cast<BehaviorFile *>(parentObj->getParentFile()), condition->text());
-                bsData->condition = HkxSharedPtr(con);
+                bsData->condition = HkxSharedPtr(new hkbExpressionCondition(static_cast<BehaviorFile *>(parentObj->getParentFile()), condition->text()));
             }
         }else{
             bsData->condition = HkxSharedPtr();
             if (!bsData->flags.contains("FLAG_DISABLE_CONDITION")){
-                if (bsData->flags == "0"){
-                    bsData->flags = "FLAG_DISABLE_CONDITION";
-                }else{
-                    bsData->flags.append("|FLAG_DISABLE_CONDITION");
-                }
+                (bsData->flags == "0") ? bsData->flags = "FLAG_DISABLE_CONDITION" : bsData->flags.append("|FLAG_DISABLE_CONDITION");
             }
         }
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setCondition(): The data or parent object is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setCondition(): The data or parent object is nullptr!!");
     }
 }
 
 void TransitionsUI::setEventId(int index, const QString &name){
     if (bsData){
-        bsData->eventId = index - 1;
-        if (name != ""){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }else{
-            CRITICAL_ERROR_MESSAGE("TransitionsUI::setEventId(): The event name is nullptr!!");
-        }
+        bsData->eventId = --index;
+        (name != "") ? table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : LogFile::writeToLog("TransitionsUI::setEventId(): The event name is nullptr!!");
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setEventId(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setEventId(): The data is nullptr!!");
     }
 }
 
@@ -580,24 +489,20 @@ void TransitionsUI::setToStateId(const QString &name){
                 emit transitionNameChanged("to_"+name, transitionIndex);
             }
         }else{
-            CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The event name is nullptr!!");
+            LogFile::writeToLog("TransitionsUI::setToStateId(): The event name is nullptr!!");
         }
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The data or parent object is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setToStateId(): The data or parent object is nullptr!!");
     }
 }
 
 void TransitionsUI::setFromNestedStateId(const QString &name){
     if (bsData && parentObj){
-        if (name != ""){
-            bsData->fromNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
-        }else{
-            CRITICAL_ERROR_MESSAGE("TransitionsUI::setFromNestedStateId(): The event name is nullptr!!");
-        }
+        (name != "") ? bsData->fromNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId) : LogFile::writeToLog("TransitionsUI::setFromNestedStateId(): The event name is nullptr!!");
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setFromNestedStateId(): The data or parent object is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setFromNestedStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -607,11 +512,11 @@ void TransitionsUI::setToNestedStateId(const QString &name){
             bsData->toNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
             emit transitionNameChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
         }else{
-            CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
+            LogFile::writeToLog("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
         }
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The data or parent object is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setToNestedStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -620,192 +525,75 @@ void TransitionsUI::setPriority(){
         bsData->priority = priority->value();
         parentObj->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::setPriority(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::setPriority(): The data is nullptr!!");
+    }
+}
+
+void TransitionsUI::toggleFlag(CheckBox *checkbox, const QString & flag, ComboBox *combobox){
+    if (bsData){
+        if (checkbox->isChecked()){
+            if (bsData->flags == "0"){
+                bsData->flags = flag;
+            }else if (!bsData->flags.contains(flag)){
+                bsData->flags.append("|"+flag);
+            }
+            (combobox) ? combobox->setDisabled(false) : NULL;
+        }else{
+            (bsData->flags == flag) ? bsData->flags = "0" : bsData->flags.remove(flag), bsData->flags.replace("||", "|");
+            (combobox) ? combobox->setDisabled(true) : NULL;
+        }
+        (parentObj) ? parentObj->setIsFileChanged(true) : LogFile::writeToLog("TransitionsUI::toggleFlag(): The parentObj is nullptr!!");
+    }else{
+        LogFile::writeToLog("TransitionsUI::toggleFlag(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::toggleGlobalWildcardFlag(){
-    if (bsData){
-        if (flagGlobalWildcard->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_IS_GLOBAL_WILDCARD";
-            }else if (!bsData->flags.contains("FLAG_IS_GLOBAL_WILDCARD")){
-                bsData->flags.append("|FLAG_IS_GLOBAL_WILDCARD");
-            }
-        }else{
-            if (bsData->flags == "FLAG_IS_GLOBAL_WILDCARD"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_IS_GLOBAL_WILDCARD");
-                bsData->flags.replace("||", "|");
-            }
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleGlobalWildcardFlag(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagGlobalWildcard, "FLAG_IS_GLOBAL_WILDCARD") : LogFile::writeToLog("TransitionsUI::toggleGlobalWildcardFlag(): The data is nullptr!!");
 }
 
 void TransitionsUI::toggleLocalWildcardFlag(){
-    if (bsData){
-        if (flagLocalWildcard->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_IS_LOCAL_WILDCARD";
-            }else if (!bsData->flags.contains("FLAG_IS_LOCAL_WILDCARD")){
-                bsData->flags.append("|FLAG_IS_LOCAL_WILDCARD");
-            }
-        }else{
-            if (bsData->flags == "FLAG_IS_LOCAL_WILDCARD"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_IS_LOCAL_WILDCARD");
-                bsData->flags.replace("||", "|");
-            }
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleLocalWildcardFlag(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagLocalWildcard, "FLAG_IS_LOCAL_WILDCARD") : LogFile::writeToLog("TransitionsUI::toggleLocalWildcardFlag(): The data is nullptr!!");
 }
 
 void TransitionsUI::toggleUseNestedStateFlag(){
-    if (bsData){
-        if (flagUseNestedState->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_TO_NESTED_STATE_ID_IS_VALID";
-            }else if (!bsData->flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID")){
-                bsData->flags.append("|FLAG_TO_NESTED_STATE_ID_IS_VALID");
-            }
-            toNestedStateId->setDisabled(false);
-        }else{
-            if (bsData->flags == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_TO_NESTED_STATE_ID_IS_VALID");
-                bsData->flags.replace("||", "|");
-            }
-            toNestedStateId->setDisabled(true);
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleUseNestedStateFlag(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagUseNestedState, "FLAG_TO_NESTED_STATE_ID_IS_VALID", toNestedStateId) : LogFile::writeToLog("TransitionsUI::toggleUseNestedStateFlag(): The data is nullptr!!");
 }
 
 void TransitionsUI::toggleAllowSelfTransition(){
-    if (bsData){
-        if (flagUseNestedState->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE";
-            }else if (!bsData->flags.contains("FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE")){
-                bsData->flags.append("|FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE");
-            }
-            toNestedStateId->setDisabled(false);
-        }else{
-            if (bsData->flags == "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE");
-                bsData->flags.replace("||", "|");
-            }
-            toNestedStateId->setDisabled(true);
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleAllowSelfTransition(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagUseNestedState, "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE", toNestedStateId) : LogFile::writeToLog("TransitionsUI::toggleAllowSelfTransition(): The data is nullptr!!");
 }
 
 void TransitionsUI::toggleDisallowRandomTransitionFlag(){
-    if (bsData){
-        if (flagDisallowRandomTransition->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_DISALLOW_RANDOM_TRANSITION";
-            }else if (!bsData->flags.contains("FLAG_DISALLOW_RANDOM_TRANSITION")){
-                bsData->flags.append("|FLAG_DISALLOW_RANDOM_TRANSITION");
-            }
-        }else{
-            if (bsData->flags == "FLAG_DISALLOW_RANDOM_TRANSITION"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_DISALLOW_RANDOM_TRANSITION");
-                bsData->flags.replace("||", "|");
-            }
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagDisallowRandomTransition, "FLAG_DISALLOW_RANDOM_TRANSITION") : LogFile::writeToLog("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is nullptr!!");
 }
 
 void TransitionsUI::toggleDisallowReturnToStateFlag(){
-    if (bsData){
-        if (flagDisallowReturnToState->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE";
-            }else if (!bsData->flags.contains("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE")){
-                bsData->flags.append("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
-            }
-        }else{
-            if (bsData->flags == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
-                bsData->flags.replace("||", "|");
-            }
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagDisallowReturnToState, "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE") : LogFile::writeToLog("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is nullptr!!");
 }
 
 void TransitionsUI::toggleAbutEndStateFlag(){
-    if (bsData){
-        if (flagAbutEndState->isChecked()){
-            if (bsData->flags == "0"){
-                bsData->flags = "FLAG_ABUT_AT_END_OF_FROM_GENERATOR";
-            }else if (!bsData->flags.contains("FLAG_ABUT_AT_END_OF_FROM_GENERATOR")){
-                bsData->flags.append("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
-            }
-        }else{
-            if (bsData->flags == "FLAG_ABUT_AT_END_OF_FROM_GENERATOR"){
-                bsData->flags = "0";
-            }else{
-                bsData->flags.remove("FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
-                bsData->flags.replace("||", "|");
-            }
-        }
-        parentObj->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleAbutEndStateFlag(): The data is nullptr!!");
-    }
+    (bsData) ? toggleFlag(flagAbutEndState, "FLAG_ABUT_AT_END_OF_FROM_GENERATOR") : LogFile::writeToLog("TransitionsUI::toggleAbutEndStateFlag(): The data is nullptr!!");
 }
 
 void TransitionsUI::eventTableElementSelected(int index, const QString &name){
     if (bsData){
         switch (table->currentRow()){
         case TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW:
-            setTriggerIntervalEnterEventId(index, name);
-            break;
+            setTriggerIntervalEnterEventId(index, name); break;
         case TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW:
-            setTriggerIntervalExitEventId(index, name);
-            break;
+            setTriggerIntervalExitEventId(index, name); break;
         case INITIATE_INTERVAL_ENTER_EVENT_ID_ROW:
-            setInitiateIntervalEnterEventId(index, name);
-            break;
+            setInitiateIntervalEnterEventId(index, name); break;
         case INITIATE_INTERVAL_EXIT_EVENT_ID_ROW:
-            setInitiateIntervalExitEventId(index, name);
-            break;
+            setInitiateIntervalExitEventId(index, name); break;
         case EVENT_ID_ROW:
-            setEventId(index, name);
-            break;
+            setEventId(index, name); break;
         default:
-            CRITICAL_ERROR_MESSAGE("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!");
-            return;
+            LogFile::writeToLog("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::eventTableElementSelected(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::eventTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -813,14 +601,12 @@ void TransitionsUI::variableTableElementSelected(int index, const QString &name)
     if (bsData){
         switch (currentIndex()){
         case TRANSITION_EFFECT_WIDGET:
-            transitionUI->setBindingVariable(index, name);
-            break;
+            transitionUI->setBindingVariable(index, name); break;
         default:
-            CRITICAL_ERROR_MESSAGE("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!");
-            return;
+            LogFile::writeToLog("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::variableTableElementSelected(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::variableTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -829,75 +615,47 @@ void TransitionsUI::returnToWidget(){
 }
 
 void TransitionsUI::viewSelectedChild(int row, int column){
-    int index = 0;
     if (bsData){
+        auto index = 0;
         if (row < BASE_NUMBER_OF_ROWS && row >= 0){
             if (column == VALUE_COLUMN){
                 switch (row){
                 case TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW:
-                    index = bsData->triggerInterval.enterEventId;
-                    break;
+                    index = bsData->triggerInterval.enterEventId; break;
                 case TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW:
-                    index = bsData->triggerInterval.exitEventId;
-                    break;
+                    index = bsData->triggerInterval.exitEventId; break;
                 case INITIATE_INTERVAL_ENTER_EVENT_ID_ROW:
-                    index = bsData->initiateInterval.enterEventId;
-                    break;
+                    index = bsData->initiateInterval.enterEventId; break;
                 case INITIATE_INTERVAL_EXIT_EVENT_ID_ROW:
-                    index = bsData->initiateInterval.exitEventId;
-                    break;
+                    index = bsData->initiateInterval.exitEventId; break;
                 case EVENT_ID_ROW:
-                    index = bsData->eventId;
-                    break;
+                    index = bsData->eventId; break;
                 default:
                     return;
                 }
-                emit viewEvents(index + 1, QString(), QStringList());
+                emit viewEvents(++index, QString(), QStringList());
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("BlendingTransitionEffectUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::transitionEffectRenamed(const QString &name){
-    if (name != ""){
-        transition->setText(name);
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::transitionEffectRenamed(): The name the empty string!!");
-    }
-}
-
-void TransitionsUI::loadTableValue(int row, const QString &value){
-    if (table->item(row, VALUE_COLUMN)){
-        if (value != ""){
-            table->item(row, VALUE_COLUMN)->setText(value);
-        }else{
-            table->item(row, VALUE_COLUMN)->setText("NONE");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::loadTableValue(): There is no table item here!!");
-    }
+    (name != "") ? transition->setText(name) : LogFile::writeToLog("TransitionsUI::transitionEffectRenamed(): The name the empty string!!");
 }
 
 void TransitionsUI::eventRenamed(const QString &name, int index){
     if (bsData){
-        if (index == bsData->triggerInterval.enterEventId){
-            table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->triggerInterval.exitEventId){
-            table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->initiateInterval.enterEventId){
-            table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->initiateInterval.exitEventId){
-            table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->eventId){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        auto set = [&](int eventid, int row){
+            (index == eventid) ? table->item(row, VALUE_COLUMN)->setText(name) : NULL;
+        };
+        set(bsData->triggerInterval.enterEventId, TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW);
+        set(bsData->triggerInterval.exitEventId, TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW);
+        set(bsData->initiateInterval.enterEventId, INITIATE_INTERVAL_ENTER_EVENT_ID_ROW);
+        set(bsData->initiateInterval.exitEventId, INITIATE_INTERVAL_EXIT_EVENT_ID_ROW);
+        set(bsData->eventId, EVENT_ID_ROW);
     }else{
-        CRITICAL_ERROR_MESSAGE("TransitionsUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("TransitionsUI::eventRenamed(): The data is nullptr!!");
     }
 }

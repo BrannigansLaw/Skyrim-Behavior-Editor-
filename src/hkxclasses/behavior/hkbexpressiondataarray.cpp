@@ -193,10 +193,17 @@ bool hkbExpressionDataArray::link(){
     return true;
 }
 
+QString hkbExpressionDataArray::getExpressionAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString exp;
+    (index < expressionsData.size() && index >= 0) ? exp = expressionsData.at(index).expression : NULL;
+    return exp;
+}
+
 QString hkbExpressionDataArray::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (expressionsData.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!");
@@ -227,3 +234,4 @@ QString hkbExpressionDataArray::evaluateDataValidity(){
 hkbExpressionDataArray::~hkbExpressionDataArray(){
     refCount--;
 }
+

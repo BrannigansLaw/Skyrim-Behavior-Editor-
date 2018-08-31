@@ -141,6 +141,151 @@ bool hkbDampingModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal hkbDampingModifier::getPreviousError() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return previousError;
+}
+
+void hkbDampingModifier::setPreviousError(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != previousError) ? previousError = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'previousError' was not set!");
+}
+
+qreal hkbDampingModifier::getErrorSum() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return errorSum;
+}
+
+void hkbDampingModifier::setErrorSum(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != errorSum) ? errorSum = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'errorSum' was not set!");
+}
+
+hkQuadVariable hkbDampingModifier::getVecPreviousError() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return vecPreviousError;
+}
+
+void hkbDampingModifier::setVecPreviousError(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != vecPreviousError) ? vecPreviousError = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'vecPreviousError' was not set!");
+}
+
+hkQuadVariable hkbDampingModifier::getVecErrorSum() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return vecErrorSum;
+}
+
+void hkbDampingModifier::setVecErrorSum(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != vecErrorSum) ? vecErrorSum = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'vecErrorSum' was not set!");
+}
+
+hkQuadVariable hkbDampingModifier::getDampedVector() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return dampedVector;
+}
+
+void hkbDampingModifier::setDampedVector(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != dampedVector) ? dampedVector = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'dampedVector' was not set!");
+}
+
+hkQuadVariable hkbDampingModifier::getRawVector() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rawVector;
+}
+
+void hkbDampingModifier::setRawVector(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rawVector) ? rawVector = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rawVector' was not set!");
+}
+
+qreal hkbDampingModifier::getDampedValue() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return dampedValue;
+}
+
+void hkbDampingModifier::setDampedValue(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != dampedValue) ? dampedValue = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'dampedValue' was not set!");
+}
+
+qreal hkbDampingModifier::getRawValue() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rawValue;
+}
+
+void hkbDampingModifier::setRawValue(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rawValue) ? rawValue = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rawValue' was not set!");
+}
+
+bool hkbDampingModifier::getEnableVectorDamping() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enableVectorDamping;
+}
+
+void hkbDampingModifier::setEnableVectorDamping(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enableVectorDamping) ? enableVectorDamping = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enableVectorDamping' was not set!");
+}
+
+bool hkbDampingModifier::getEnableScalarDamping() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enableScalarDamping;
+}
+
+void hkbDampingModifier::setEnableScalarDamping(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enableScalarDamping) ? enableScalarDamping = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enableScalarDamping' was not set!");
+}
+
+qreal hkbDampingModifier::getKD() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return kD;
+}
+
+void hkbDampingModifier::setKD(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != kD) ? kD = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'kD' was not set!");
+}
+
+qreal hkbDampingModifier::getKI() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return kI;
+}
+
+void hkbDampingModifier::setKI(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != kI) ? kI = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'kI' was not set!");
+}
+
+qreal hkbDampingModifier::getKP() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return kP;
+}
+
+void hkbDampingModifier::setKP(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != kP) ? kP = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'kP' was not set!");
+}
+
+bool hkbDampingModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbDampingModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbDampingModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbDampingModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -157,7 +302,7 @@ void hkbDampingModifier::unlink(){
 QString hkbDampingModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

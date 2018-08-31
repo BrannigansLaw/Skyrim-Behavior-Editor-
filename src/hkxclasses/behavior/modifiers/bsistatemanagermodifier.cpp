@@ -169,7 +169,7 @@ void BSIStateManagerModifier::unlink(){
 
 QString BSIStateManagerModifier::evaluateDataValidity(){
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (stateData.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData is empty!");

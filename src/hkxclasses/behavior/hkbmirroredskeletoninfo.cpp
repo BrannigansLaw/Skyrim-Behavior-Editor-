@@ -60,11 +60,7 @@ bool hkbMirroredSkeletonInfo::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < bonePairMap.size(); i++, j++){
             bones.append(QString::number(bonePairMap.at(i)));
-            if (j % 16 == 0){
-                bones.append("\n");
-            }else{
-                bones.append(" ");
-            }
+            (!(j % 16)) ? bones.append("\n") : bones.append(" ");
         }
         if (bonePairMap.size() > 0){
             if (bones.endsWith(" \0")){

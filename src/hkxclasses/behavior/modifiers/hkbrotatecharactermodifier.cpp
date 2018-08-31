@@ -94,6 +94,51 @@ bool hkbRotateCharacterModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+hkQuadVariable hkbRotateCharacterModifier::getAxisOfRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return axisOfRotation;
+}
+
+void hkbRotateCharacterModifier::setAxisOfRotation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != axisOfRotation) ? axisOfRotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'axisOfRotation' was not set!");
+}
+
+qreal hkbRotateCharacterModifier::getSpeedMultiplier() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return speedMultiplier;
+}
+
+void hkbRotateCharacterModifier::setSpeedMultiplier(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != speedMultiplier) ? speedMultiplier = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'speedMultiplier' was not set!");
+}
+
+qreal hkbRotateCharacterModifier::getDegreesPerSecond() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return degreesPerSecond;
+}
+
+void hkbRotateCharacterModifier::setDegreesPerSecond(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != degreesPerSecond) ? degreesPerSecond = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'degreesPerSecond' was not set!");
+}
+
+bool hkbRotateCharacterModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbRotateCharacterModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbRotateCharacterModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbRotateCharacterModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -110,7 +155,7 @@ void hkbRotateCharacterModifier::unlink(){
 QString hkbRotateCharacterModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

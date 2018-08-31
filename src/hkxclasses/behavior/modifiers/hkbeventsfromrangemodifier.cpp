@@ -167,6 +167,51 @@ bool hkbEventsFromRangeModifier::merge(HkxObject *recessiveObject){ //TO DO: Mak
     return false;
 }
 
+hkbEventRangeDataArray *hkbEventsFromRangeModifier::getEventRanges() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbEventRangeDataArray *>(eventRanges.data());
+}
+
+void hkbEventsFromRangeModifier::setEventRanges(hkbEventRangeDataArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    eventRanges = HkxSharedPtr(value);
+}
+
+qreal hkbEventsFromRangeModifier::getLowerBound() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return lowerBound;
+}
+
+void hkbEventsFromRangeModifier::setLowerBound(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != lowerBound) ? lowerBound = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'lowerBound' was not set!");
+}
+
+qreal hkbEventsFromRangeModifier::getInputValue() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return inputValue;
+}
+
+void hkbEventsFromRangeModifier::setInputValue(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != inputValue) ? inputValue = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'inputValue' was not set!");
+}
+
+bool hkbEventsFromRangeModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbEventsFromRangeModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbEventsFromRangeModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbEventsFromRangeModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -192,7 +237,7 @@ void hkbEventsFromRangeModifier::unlink(){
 QString hkbEventsFromRangeModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

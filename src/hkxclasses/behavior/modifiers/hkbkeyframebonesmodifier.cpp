@@ -1,6 +1,7 @@
 #include "hkbkeyframebonesmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbboneindexarray.h"
 
 uint hkbKeyframeBonesModifier::refCount = 0;
 
@@ -165,6 +166,41 @@ bool hkbKeyframeBonesModifier::merge(HkxObject *recessiveObject){ //TO DO: Make 
     return false;
 }
 
+hkbBoneIndexArray * hkbKeyframeBonesModifier::getKeyframedBonesList() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbBoneIndexArray *>(keyframedBonesList.data());
+}
+
+void hkbKeyframeBonesModifier::setKeyframedBonesList(hkbBoneIndexArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    keyframedBonesList = value;
+}
+
+void hkbKeyframeBonesModifier::addKeyframeInfo(hkbKeyframeBonesModifier::hkKeyframeInfo info){
+    std::lock_guard <std::mutex> guard(mutex);
+    keyframeInfo.append(info);
+}
+
+void hkbKeyframeBonesModifier::removeKeyframeInfo(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < keyframeInfo.size()) ? keyframeInfo.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'keyframeInfo' was not removed!");
+}
+
+bool hkbKeyframeBonesModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbKeyframeBonesModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbKeyframeBonesModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbKeyframeBonesModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -190,7 +226,7 @@ void hkbKeyframeBonesModifier::unlink(){
 QString hkbKeyframeBonesModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (keyframeInfo.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": keyframeInfo is empty!");

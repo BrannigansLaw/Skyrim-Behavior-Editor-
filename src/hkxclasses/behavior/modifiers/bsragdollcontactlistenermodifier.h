@@ -3,6 +3,9 @@
 
 #include "hkbmodifier.h"
 
+class hkbStringEventPayload;
+class hkbBoneIndexArray;
+
 class BSRagdollContactListenerModifier final: public hkbModifier
 {
     friend class BSRagdollContactListenerModifierUI;
@@ -15,6 +18,15 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setBones(hkbBoneIndexArray *value);
+    hkbBoneIndexArray * getBones() const;
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkbStringEventPayload * getContactEventPayload() const;
+    int getContactEventID() const;
+    void setContactEventID(int value);
+    void setContactEventPayload(hkbStringEventPayload *value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

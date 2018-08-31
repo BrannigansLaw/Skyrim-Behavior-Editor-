@@ -40,7 +40,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSDirectAtModifierUI::headerLabels = {
+const QStringList BSDirectAtModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -163,56 +163,57 @@ BSDirectAtModifierUI::BSDirectAtModifierUI()
     table->setCellWidget(CURRENT_PITCH_OFFSET_ROW, VALUE_COLUMN, currentPitchOffset);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSDirectAtModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(directAtTarget, SIGNAL(released()), this, SLOT(setDirectAtTarget()), Qt::UniqueConnection);
-    connect(sourceBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSourceBoneIndex(int)), Qt::UniqueConnection);
-    connect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)), Qt::UniqueConnection);
-    connect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)), Qt::UniqueConnection);
-    connect(limitHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitHeadingDegrees()), Qt::UniqueConnection);
-    connect(limitPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitPitchDegrees()), Qt::UniqueConnection);
-    connect(offsetHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetHeadingDegrees()), Qt::UniqueConnection);
-    connect(offsetPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetPitchDegrees()), Qt::UniqueConnection);
-    connect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()), Qt::UniqueConnection);
-    connect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()), Qt::UniqueConnection);
-    connect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()), Qt::UniqueConnection);
-    connect(userInfo, SIGNAL(editingFinished()), this, SLOT(setUserInfo()), Qt::UniqueConnection);
-    connect(directAtCamera, SIGNAL(released()), this, SLOT(setDirectAtCamera()), Qt::UniqueConnection);
-    connect(directAtCameraX, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraX()), Qt::UniqueConnection);
-    connect(directAtCameraY, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraY()), Qt::UniqueConnection);
-    connect(directAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraZ()), Qt::UniqueConnection);
-    connect(active, SIGNAL(released()), this, SLOT(setActive()), Qt::UniqueConnection);
-    connect(currentHeadingOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentHeadingOffset()), Qt::UniqueConnection);
-    connect(currentPitchOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentPitchOffset()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSDirectAtModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(directAtTarget, SIGNAL(released()), this, SLOT(setDirectAtTarget()));
-    disconnect(sourceBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSourceBoneIndex(int)));
-    disconnect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)));
-    disconnect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)));
-    disconnect(limitHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitHeadingDegrees()));
-    disconnect(limitPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitPitchDegrees()));
-    disconnect(offsetHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetHeadingDegrees()));
-    disconnect(offsetPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetPitchDegrees()));
-    disconnect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()));
-    disconnect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()));
-    disconnect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()));
-    disconnect(userInfo, SIGNAL(editingFinished()), this, SLOT(setUserInfo()));
-    disconnect(directAtCamera, SIGNAL(released()), this, SLOT(setDirectAtCamera()));
-    disconnect(directAtCameraX, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraX()));
-    disconnect(directAtCameraY, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraY()));
-    disconnect(directAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraZ()));
-    disconnect(active, SIGNAL(released()), this, SLOT(setActive()));
-    disconnect(currentHeadingOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentHeadingOffset()));
-    disconnect(currentPitchOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentPitchOffset()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSDirectAtModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(directAtTarget, SIGNAL(released()), this, SLOT(setDirectAtTarget()), Qt::UniqueConnection);
+        connect(sourceBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSourceBoneIndex(int)), Qt::UniqueConnection);
+        connect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)), Qt::UniqueConnection);
+        connect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)), Qt::UniqueConnection);
+        connect(limitHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitHeadingDegrees()), Qt::UniqueConnection);
+        connect(limitPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitPitchDegrees()), Qt::UniqueConnection);
+        connect(offsetHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetHeadingDegrees()), Qt::UniqueConnection);
+        connect(offsetPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetPitchDegrees()), Qt::UniqueConnection);
+        connect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()), Qt::UniqueConnection);
+        connect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()), Qt::UniqueConnection);
+        connect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()), Qt::UniqueConnection);
+        connect(userInfo, SIGNAL(editingFinished()), this, SLOT(setUserInfo()), Qt::UniqueConnection);
+        connect(directAtCamera, SIGNAL(released()), this, SLOT(setDirectAtCamera()), Qt::UniqueConnection);
+        connect(directAtCameraX, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraX()), Qt::UniqueConnection);
+        connect(directAtCameraY, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraY()), Qt::UniqueConnection);
+        connect(directAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraZ()), Qt::UniqueConnection);
+        connect(active, SIGNAL(released()), this, SLOT(setActive()), Qt::UniqueConnection);
+        connect(currentHeadingOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentHeadingOffset()), Qt::UniqueConnection);
+        connect(currentPitchOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentPitchOffset()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(directAtTarget, SIGNAL(released()), this, SLOT(setDirectAtTarget()));
+        disconnect(sourceBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSourceBoneIndex(int)));
+        disconnect(startBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartBoneIndex(int)));
+        disconnect(endBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setEndBoneIndex(int)));
+        disconnect(limitHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitHeadingDegrees()));
+        disconnect(limitPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitPitchDegrees()));
+        disconnect(offsetHeadingDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetHeadingDegrees()));
+        disconnect(offsetPitchDegrees, SIGNAL(editingFinished()), this, SLOT(setOffsetPitchDegrees()));
+        disconnect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()));
+        disconnect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()));
+        disconnect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()));
+        disconnect(userInfo, SIGNAL(editingFinished()), this, SLOT(setUserInfo()));
+        disconnect(directAtCamera, SIGNAL(released()), this, SLOT(setDirectAtCamera()));
+        disconnect(directAtCameraX, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraX()));
+        disconnect(directAtCameraY, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraY()));
+        disconnect(directAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setDirectAtCameraZ()));
+        disconnect(active, SIGNAL(released()), this, SLOT(setActive()));
+        disconnect(currentHeadingOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentHeadingOffset()));
+        disconnect(currentPitchOffset, SIGNAL(editingFinished()), this, SLOT(setCurrentPitchOffset()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSDirectAtModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -224,452 +225,216 @@ void BSDirectAtModifierUI::connectToTables(GenericTableWidget *variables, Generi
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSDirectAtModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_DIRECT_AT_MODIFIER){
-            QStringList boneNames;
-            boneNames.append("None");
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<BSDirectAtModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            directAtTarget->setChecked(bsData->directAtTarget);
-            if (sourceBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                sourceBoneIndex->insertItems(0, boneNames);
-            }
-            sourceBoneIndex->setCurrentIndex(bsData->sourceBoneIndex + 1);
-            if (startBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                startBoneIndex->insertItems(0, boneNames);
-            }
-            startBoneIndex->setCurrentIndex(bsData->startBoneIndex + 1);
-            if (endBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                endBoneIndex->insertItems(0, boneNames);
-            }
-            endBoneIndex->setCurrentIndex(bsData->endBoneIndex + 1);
-            limitHeadingDegrees->setValue(bsData->limitHeadingDegrees);
-            limitPitchDegrees->setValue(bsData->limitPitchDegrees);
-            offsetHeadingDegrees->setValue(bsData->offsetHeadingDegrees);
-            offsetPitchDegrees->setValue(bsData->offsetPitchDegrees);
-            onGain->setValue(bsData->onGain);
-            offGain->setValue(bsData->offGain);
-            targetLocation->setValue(bsData->targetLocation);
-            userInfo->setValue(bsData->userInfo);
-            directAtCamera->setChecked(bsData->directAtCamera);
-            directAtCameraX->setValue(bsData->directAtCameraX);
-            directAtCameraY->setValue(bsData->directAtCameraY);
-            directAtCameraZ->setValue(bsData->directAtCameraZ);
-            active->setChecked(bsData->active);
-            currentHeadingOffset->setValue(bsData->currentHeadingOffset);
-            currentPitchOffset->setValue(bsData->currentPitchOffset);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(DIRECT_AT_TARGET_ROW, BINDING_COLUMN, varBind, "directAtTarget");
-                loadBinding(SOURCE_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "sourceBoneIndex");
-                loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex");
-                loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex");
-                loadBinding(LIMIT_HEADING_DEGREES_ROW, BINDING_COLUMN, varBind, "limitHeadingDegrees");
-                loadBinding(LIMIT_PITCH_DEGREES_ROW, BINDING_COLUMN, varBind, "limitPitchDegrees");
-                loadBinding(OFFSET_HEADING_DEGREES_ROW, BINDING_COLUMN, varBind, "offsetHeadingDegrees");
-                loadBinding(OFFSET_PITCH_DEGREES_ROW, BINDING_COLUMN, varBind, "offsetPitchDegrees");
-                loadBinding(ON_GAIN_ROW, BINDING_COLUMN, varBind, "onGain");
-                loadBinding(OFF_GAIN_ROW, BINDING_COLUMN, varBind, "offGain");
-                loadBinding(TARGET_LOCATION_ROW, BINDING_COLUMN, varBind, "targetLocation");
-                loadBinding(USER_INFO_ROW, BINDING_COLUMN, varBind, "userInfo");
-                loadBinding(DIRECT_AT_CAMERA_ROW, BINDING_COLUMN, varBind, "directAtCamera");
-                loadBinding(DIRECT_AT_CAMERA_X_ROW, BINDING_COLUMN, varBind, "directAtCameraX");
-                loadBinding(DIRECT_AT_CAMERA_Y_ROW, BINDING_COLUMN, varBind, "directAtCameraY");
-                loadBinding(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN, varBind, "directAtCameraZ");
-                loadBinding(ACTIVE_ROW, BINDING_COLUMN, varBind, "active");
-                loadBinding(CURRENT_HEADING_OFFSET_ROW, BINDING_COLUMN, varBind, "currentHeadingOffset");
-                loadBinding(CURRENT_PITCH_OFFSET_ROW, BINDING_COLUMN, varBind, "currentPitchOffset");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DIRECT_AT_TARGET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(SOURCE_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_HEADING_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LIMIT_PITCH_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(OFFSET_HEADING_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(OFFSET_PITCH_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ON_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(OFF_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(USER_INFO_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DIRECT_AT_CAMERA_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DIRECT_AT_CAMERA_X_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DIRECT_AT_CAMERA_Y_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ACTIVE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CURRENT_HEADING_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CURRENT_PITCH_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            directAtTarget->setChecked(bsData->getDirectAtTarget());
+            auto loadbones = [&](ComboBox *combobox, int indextoset){
+                if (!combobox->count()){
+                    auto boneNames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(startBoneIndex, bsData->getStartBoneIndex() + 1);
+            loadbones(sourceBoneIndex, bsData->getSourceBoneIndex() + 1);
+            loadbones(endBoneIndex, bsData->getEndBoneIndex() + 1);
+            limitHeadingDegrees->setValue(bsData->getLimitHeadingDegrees());
+            limitPitchDegrees->setValue(bsData->getLimitPitchDegrees());
+            offsetHeadingDegrees->setValue(bsData->getOffsetHeadingDegrees());
+            offsetPitchDegrees->setValue(bsData->getOffsetPitchDegrees());
+            onGain->setValue(bsData->getOnGain());
+            offGain->setValue(bsData->getOffGain());
+            targetLocation->setValue(bsData->getTargetLocation());
+            userInfo->setValue(bsData->getUserInfo());
+            directAtCamera->setChecked(bsData->getDirectAtCamera());
+            directAtCameraX->setValue(bsData->getDirectAtCameraX());
+            directAtCameraY->setValue(bsData->getDirectAtCameraY());
+            directAtCameraZ->setValue(bsData->getDirectAtCameraZ());
+            active->setChecked(bsData->getActive());
+            currentHeadingOffset->setValue(bsData->getCurrentHeadingOffset());
+            currentPitchOffset->setValue(bsData->getCurrentPitchOffset());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(DIRECT_AT_TARGET_ROW, BINDING_COLUMN, varBind, "directAtTarget", table, bsData);
+            UIHelper::loadBinding(SOURCE_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "sourceBoneIndex", table, bsData);
+            UIHelper::loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex", table, bsData);
+            UIHelper::loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex", table, bsData);
+            UIHelper::loadBinding(LIMIT_HEADING_DEGREES_ROW, BINDING_COLUMN, varBind, "limitHeadingDegrees", table, bsData);
+            UIHelper::loadBinding(LIMIT_PITCH_DEGREES_ROW, BINDING_COLUMN, varBind, "limitPitchDegrees", table, bsData);
+            UIHelper::loadBinding(OFFSET_HEADING_DEGREES_ROW, BINDING_COLUMN, varBind, "offsetHeadingDegrees", table, bsData);
+            UIHelper::loadBinding(OFFSET_PITCH_DEGREES_ROW, BINDING_COLUMN, varBind, "offsetPitchDegrees", table, bsData);
+            UIHelper::loadBinding(ON_GAIN_ROW, BINDING_COLUMN, varBind, "onGain", table, bsData);
+            UIHelper::loadBinding(OFF_GAIN_ROW, BINDING_COLUMN, varBind, "offGain", table, bsData);
+            UIHelper::loadBinding(TARGET_LOCATION_ROW, BINDING_COLUMN, varBind, "targetLocation", table, bsData);
+            UIHelper::loadBinding(USER_INFO_ROW, BINDING_COLUMN, varBind, "userInfo", table, bsData);
+            UIHelper::loadBinding(DIRECT_AT_CAMERA_ROW, BINDING_COLUMN, varBind, "directAtCamera", table, bsData);
+            UIHelper::loadBinding(DIRECT_AT_CAMERA_X_ROW, BINDING_COLUMN, varBind, "directAtCameraX", table, bsData);
+            UIHelper::loadBinding(DIRECT_AT_CAMERA_Y_ROW, BINDING_COLUMN, varBind, "directAtCameraY", table, bsData);
+            UIHelper::loadBinding(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN, varBind, "directAtCameraZ", table, bsData);
+            UIHelper::loadBinding(ACTIVE_ROW, BINDING_COLUMN, varBind, "active", table, bsData);
+            UIHelper::loadBinding(CURRENT_HEADING_OFFSET_ROW, BINDING_COLUMN, varBind, "currentHeadingOffset", table, bsData);
+            UIHelper::loadBinding(CURRENT_PITCH_OFFSET_ROW, BINDING_COLUMN, varBind, "currentPitchOffset", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSDirectAtModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSDirectAtModifierUI::setName(){
+void BSDirectAtModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSDirectAtModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSDirectAtModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setDirectAtTarget(){
-    if (bsData){
-        bsData->directAtTarget = directAtTarget->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtTarget(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDirectAtTarget(directAtTarget->isChecked()) : LogFile::writeToLog("BSDirectAtModifierUI::setDirectAtTarget(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setSourceBoneIndex(int index){
-    if (bsData){
-        bsData->sourceBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setSourceBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSourceBoneIndex(index - 1) : LogFile::writeToLog("BSDirectAtModifierUI::setSourceBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setStartBoneIndex(int index){
-    if (bsData){
-        bsData->startBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setStartBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setStartBoneIndex(index - 1) : LogFile::writeToLog("BSDirectAtModifierUI::setStartBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setEndBoneIndex(int index){
-    if (bsData){
-        bsData->endBoneIndex = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setEndBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEndBoneIndex(index - 1) : LogFile::writeToLog("BSDirectAtModifierUI::setEndBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setLimitHeadingDegrees(){
-    if (bsData){
-        if (bsData->limitHeadingDegrees != limitHeadingDegrees->value()){
-            bsData->limitHeadingDegrees = limitHeadingDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setLimitHeadingDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitHeadingDegrees(limitHeadingDegrees->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setLimitHeadingDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setLimitPitchDegrees(){
-    if (bsData){
-        if (bsData->limitPitchDegrees != limitPitchDegrees->value()){
-            bsData->limitPitchDegrees = limitPitchDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setLimitPitchDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitPitchDegrees(limitPitchDegrees->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setLimitPitchDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setOffsetHeadingDegrees(){
-    if (bsData){
-        if (bsData->offsetHeadingDegrees != offsetHeadingDegrees->value()){
-            bsData->offsetHeadingDegrees = offsetHeadingDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOffsetHeadingDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOffsetHeadingDegrees(offsetHeadingDegrees->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setOffsetHeadingDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setOffsetPitchDegrees(){
-    if (bsData){
-        if (bsData->offsetPitchDegrees != offsetPitchDegrees->value()){
-            bsData->offsetPitchDegrees = offsetPitchDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOffsetPitchDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOffsetPitchDegrees(offsetPitchDegrees->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setOffsetPitchDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setOnGain(){
-    if (bsData){
-        if (bsData->onGain != onGain->value()){
-            bsData->onGain = onGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOnGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOnGain(onGain->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setOnGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setOffGain(){
-    if (bsData){
-        if (bsData->offGain != offGain->value()){
-            bsData->offGain = offGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOffGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOffGain(offGain->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setOffGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setTargetLocation(){
-    if (bsData){
-        if (bsData->targetLocation != targetLocation->value()){
-            bsData->targetLocation = targetLocation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setTargetLocation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetLocation(targetLocation->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setTargetLocation(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setUserInfo(){
-    if (bsData){
-        if (bsData->userInfo != userInfo->value()){
-            bsData->userInfo = userInfo->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setUserInfo(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setUserInfo(userInfo->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setUserInfo(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setDirectAtCamera(){
-    if (bsData){
-        bsData->directAtCamera = directAtCamera->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCamera(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDirectAtCamera(directAtCamera->isChecked()) : LogFile::writeToLog("BSDirectAtModifierUI::setDirectAtCamera(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setDirectAtCameraX(){
-    if (bsData){
-        if (bsData->directAtCameraX != directAtCameraX->value()){
-            bsData->directAtCameraX = directAtCameraX->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCameraX(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDirectAtCameraX(directAtCameraX->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setDirectAtCameraX(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setDirectAtCameraY(){
-    if (bsData){
-        if (bsData->directAtCameraY != directAtCameraY->value()){
-            bsData->directAtCameraY = directAtCameraY->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCameraY(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDirectAtCameraY(directAtCameraY->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setDirectAtCameraY(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setDirectAtCameraZ(){
-    if (bsData){
-        if (bsData->directAtCameraZ != directAtCameraZ->value()){
-            bsData->directAtCameraZ = directAtCameraZ->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCameraZ(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDirectAtCameraZ(directAtCameraZ->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setDirectAtCameraZ(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setActive(){
-    if (bsData){
-        bsData->active = active->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setActive(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setActive(active->isChecked()) : LogFile::writeToLog("BSDirectAtModifierUI::setActive(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSDirectAtModifierUI::setCurrentHeadingOffset(){
-    if (bsData){
-        if (bsData->currentHeadingOffset != currentHeadingOffset->value()){
-            bsData->currentHeadingOffset = currentHeadingOffset->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setCurrentHeadingOffset(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCurrentHeadingOffset(currentHeadingOffset->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setCurrentHeadingOffset(): The 'bsData' pointer is nullptr!!");
 }
+
 void BSDirectAtModifierUI::setCurrentPitchOffset(){
-    if (bsData){
-        if (bsData->currentPitchOffset != currentPitchOffset->value()){
-            bsData->currentPitchOffset = currentPitchOffset->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setCurrentPitchOffset(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCurrentPitchOffset(currentPitchOffset->value()) : LogFile::writeToLog("BSDirectAtModifierUI::setCurrentPitchOffset(): The 'bsData' pointer is nullptr!!");
 }
+
 void BSDirectAtModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case DIRECT_AT_TARGET_ROW:
-                if (table->item(DIRECT_AT_TARGET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "directAtTarget");
-                break;
+                checkisproperty(DIRECT_AT_TARGET_ROW, "directAtTarget"); break;
             case SOURCE_BONE_INDEX_ROW:
-                if (table->item(SOURCE_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "sourceBoneIndex");
-                break;
+                checkisproperty(SOURCE_BONE_INDEX_ROW, "sourceBoneIndex"); break;
             case START_BONE_INDEX_ROW:
-                if (table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "startBoneIndex");
-                break;
+                checkisproperty(START_BONE_INDEX_ROW, "startBoneIndex"); break;
             case END_BONE_INDEX_ROW:
-                if (table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "endBoneIndex");
-                break;
+                checkisproperty(END_BONE_INDEX_ROW, "endBoneIndex"); break;
             case LIMIT_HEADING_DEGREES_ROW:
-                if (table->item(LIMIT_HEADING_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitHeadingDegrees");
-                break;
+                checkisproperty(LIMIT_HEADING_DEGREES_ROW, "limitHeadingDegrees"); break;
             case LIMIT_PITCH_DEGREES_ROW:
-                if (table->item(LIMIT_PITCH_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "limitPitchDegrees");
-                break;
+                checkisproperty(LIMIT_PITCH_DEGREES_ROW, "limitPitchDegrees"); break;
             case OFFSET_HEADING_DEGREES_ROW:
-                if (table->item(OFFSET_HEADING_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "offsetHeadingDegrees");
-                break;
+                checkisproperty(OFFSET_HEADING_DEGREES_ROW, "offsetHeadingDegrees"); break;
             case OFFSET_PITCH_DEGREES_ROW:
-                if (table->item(OFFSET_PITCH_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "offsetPitchDegrees");
-                break;
+                checkisproperty(OFFSET_PITCH_DEGREES_ROW, "offsetPitchDegrees"); break;
             case ON_GAIN_ROW:
-                if (table->item(ON_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "onGain");
-                break;
+                checkisproperty(ON_GAIN_ROW, "onGain"); break;
             case OFF_GAIN_ROW:
-                if (table->item(OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "offGain");
-                break;
+                checkisproperty(OFF_GAIN_ROW, "offGain"); break;
             case TARGET_LOCATION_ROW:
-                if (table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "targetLocation");
-                break;
+                checkisproperty(TARGET_LOCATION_ROW, "targetLocation"); break;
             case USER_INFO_ROW:
-                if (table->item(USER_INFO_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "userInfo");
-                break;
+                checkisproperty(USER_INFO_ROW, "userInfo"); break;
             case DIRECT_AT_CAMERA_ROW:
-                if (table->item(DIRECT_AT_CAMERA_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "directAtCamera");
-                break;
+                checkisproperty(DIRECT_AT_CAMERA_ROW, "directAtCamera"); break;
             case DIRECT_AT_CAMERA_X_ROW:
-                if (table->item(DIRECT_AT_CAMERA_X_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "directAtCameraX");
-                break;
+                checkisproperty(DIRECT_AT_CAMERA_X_ROW, "directAtCameraX"); break;
             case DIRECT_AT_CAMERA_Y_ROW:
-                if (table->item(DIRECT_AT_CAMERA_Y_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "directAtCameraY");
-                break;
+                checkisproperty(DIRECT_AT_CAMERA_Y_ROW, "directAtCameraY"); break;
             case DIRECT_AT_CAMERA_Z_ROW:
-                if (table->item(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "directAtCameraZ");
-                break;
+                checkisproperty(DIRECT_AT_CAMERA_Z_ROW, "directAtCameraZ"); break;
             case ACTIVE_ROW:
-                if (table->item(ACTIVE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "active");
-                break;
+                checkisproperty(ACTIVE_ROW, "active"); break;
             case CURRENT_HEADING_OFFSET_ROW:
-                if (table->item(CURRENT_HEADING_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "currentHeadingOffset");
-                break;
+                checkisproperty(CURRENT_HEADING_OFFSET_ROW, "currentHeadingOffset"); break;
             case CURRENT_PITCH_OFFSET_ROW:
-                if (table->item(CURRENT_PITCH_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "currentPitchOffset");
-                break;
-            default:
-                return;
+                checkisproperty(CURRENT_PITCH_OFFSET_ROW, "currentPitchOffset"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -689,288 +454,96 @@ void BSDirectAtModifierUI::selectTableToView(bool viewisProperty, const QString 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSDirectAtModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("directAtTarget");
-            if (bindIndex == index){
-                table->item(DIRECT_AT_TARGET_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("sourceBoneIndex");
-            if (bindIndex == index){
-                table->item(SOURCE_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("startBoneIndex");
-            if (bindIndex == index){
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("endBoneIndex");
-            if (bindIndex == index){
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitHeadingDegrees");
-            if (bindIndex == index){
-                table->item(LIMIT_HEADING_DEGREES_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitPitchDegrees");
-            if (bindIndex == index){
-                table->item(LIMIT_PITCH_DEGREES_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("offsetHeadingDegrees");
-            if (bindIndex == index){
-                table->item(OFFSET_HEADING_DEGREES_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("offsetPitchDegrees");
-            if (bindIndex == index){
-                table->item(OFFSET_PITCH_DEGREES_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("onGain");
-            if (bindIndex == index){
-                table->item(ON_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("offGain");
-            if (bindIndex == index){
-                table->item(OFF_GAIN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetLocation");
-            if (bindIndex == index){
-                table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("userInfo");
-            if (bindIndex == index){
-                table->item(USER_INFO_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("directAtCamera");
-            if (bindIndex == index){
-                table->item(DIRECT_AT_CAMERA_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("directAtCameraX");
-            if (bindIndex == index){
-                table->item(DIRECT_AT_CAMERA_X_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("directAtCameraY");
-            if (bindIndex == index){
-                table->item(DIRECT_AT_CAMERA_Y_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("directAtCameraZ");
-            if (bindIndex == index){
-                table->item(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("active");
-            if (bindIndex == index){
-                table->item(ACTIVE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("currentHeadingOffset");
-            if (bindIndex == index){
-                table->item(CURRENT_HEADING_OFFSET_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("currentPitchOffset");
-            if (bindIndex == index){
-                table->item(CURRENT_PITCH_OFFSET_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("directAtTarget", DIRECT_AT_TARGET_ROW);
+            setname("sourceBoneIndex", SOURCE_BONE_INDEX_ROW);
+            setname("startBoneIndex", START_BONE_INDEX_ROW);
+            setname("endBoneIndex", END_BONE_INDEX_ROW);
+            setname("limitHeadingDegrees", LIMIT_HEADING_DEGREES_ROW);
+            setname("limitPitchDegrees", LIMIT_PITCH_DEGREES_ROW);
+            setname("offsetHeadingDegrees", OFFSET_HEADING_DEGREES_ROW);
+            setname("offsetPitchDegrees", OFFSET_PITCH_DEGREES_ROW);
+            setname("onGain", ON_GAIN_ROW);
+            setname("offGain", OFF_GAIN_ROW);
+            setname("targetLocation", TARGET_LOCATION_ROW);
+            setname("userInfo", USER_INFO_ROW);
+            setname("directAtCamera", DIRECT_AT_CAMERA_ROW);
+            setname("directAtCameraX", DIRECT_AT_CAMERA_X_ROW);
+            setname("directAtCameraY", DIRECT_AT_CAMERA_Y_ROW);
+            setname("directAtCameraZ", DIRECT_AT_CAMERA_Z_ROW);
+            setname("active", ACTIVE_ROW);
+            setname("currentHeadingOffset", CURRENT_HEADING_OFFSET_ROW);
+            setname("currentPitchOffset", CURRENT_PITCH_OFFSET_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSDirectAtModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSDirectAtModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case DIRECT_AT_TARGET_ROW:
-            if (table->item(DIRECT_AT_TARGET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "directAtTarget", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(DIRECT_AT_TARGET_ROW, "directAtTarget", VARIABLE_TYPE_BOOL); break;
         case SOURCE_BONE_INDEX_ROW:
-            if (table->item(SOURCE_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "sourceBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(SOURCE_BONE_INDEX_ROW, "sourceBoneIndex", VARIABLE_TYPE_INT32); break;
         case START_BONE_INDEX_ROW:
-            if (table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "startBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(START_BONE_INDEX_ROW, "startBoneIndex", VARIABLE_TYPE_INT32); break;
         case END_BONE_INDEX_ROW:
-            if (table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "endBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(END_BONE_INDEX_ROW, "endBoneIndex", VARIABLE_TYPE_INT32); break;
         case LIMIT_HEADING_DEGREES_ROW:
-            if (table->item(LIMIT_HEADING_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitHeadingDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_HEADING_DEGREES_ROW, "limitHeadingDegrees", VARIABLE_TYPE_REAL); break;
         case LIMIT_PITCH_DEGREES_ROW:
-            if (table->item(LIMIT_PITCH_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitPitchDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_PITCH_DEGREES_ROW, "limitPitchDegrees", VARIABLE_TYPE_REAL); break;
         case OFFSET_HEADING_DEGREES_ROW:
-            if (table->item(OFFSET_HEADING_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "offsetHeadingDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(OFFSET_HEADING_DEGREES_ROW, "offsetHeadingDegrees", VARIABLE_TYPE_REAL); break;
         case OFFSET_PITCH_DEGREES_ROW:
-            if (table->item(OFFSET_PITCH_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "offsetPitchDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(OFFSET_PITCH_DEGREES_ROW, "offsetPitchDegrees", VARIABLE_TYPE_REAL); break;
         case ON_GAIN_ROW:
-            if (table->item(ON_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "onGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ON_GAIN_ROW, "onGain", VARIABLE_TYPE_REAL); break;
         case OFF_GAIN_ROW:
-            if (table->item(OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "offGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(OFF_GAIN_ROW, "offGain", VARIABLE_TYPE_REAL); break;
         case TARGET_LOCATION_ROW:
-            if (table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetLocation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_LOCATION_ROW, "targetLocation", VARIABLE_TYPE_VECTOR4); break;
         case USER_INFO_ROW:
-            if (table->item(USER_INFO_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "userInfo", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(USER_INFO_ROW, "userInfo", VARIABLE_TYPE_INT32); break;
         case DIRECT_AT_CAMERA_ROW:
-            if (table->item(DIRECT_AT_CAMERA_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "directAtCamera", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(DIRECT_AT_CAMERA_ROW, "directAtCamera", VARIABLE_TYPE_BOOL); break;
         case DIRECT_AT_CAMERA_X_ROW:
-            if (table->item(DIRECT_AT_CAMERA_X_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "directAtCameraX", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(DIRECT_AT_CAMERA_X_ROW, "directAtCameraX", VARIABLE_TYPE_REAL); break;
         case DIRECT_AT_CAMERA_Y_ROW:
-            if (table->item(DIRECT_AT_CAMERA_Y_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "directAtCameraY", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(DIRECT_AT_CAMERA_Y_ROW, "directAtCameraY", VARIABLE_TYPE_REAL); break;
         case DIRECT_AT_CAMERA_Z_ROW:
-            if (table->item(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "directAtCameraZ", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(DIRECT_AT_CAMERA_Z_ROW, "directAtCameraZ", VARIABLE_TYPE_REAL); break;
         case ACTIVE_ROW:
-            if (table->item(ACTIVE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "active", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ACTIVE_ROW, "active", VARIABLE_TYPE_REAL); break;
         case CURRENT_HEADING_OFFSET_ROW:
-            if (table->item(CURRENT_HEADING_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "currentHeadingOffset", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(CURRENT_HEADING_OFFSET_ROW, "currentHeadingOffset", VARIABLE_TYPE_REAL); break;
         case CURRENT_PITCH_OFFSET_ROW:
-            if (table->item(CURRENT_PITCH_OFFSET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "currentPitchOffset", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSDirectAtModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(CURRENT_PITCH_OFFSET_ROW, "currentPitchOffset", VARIABLE_TYPE_REAL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSDirectAtModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

@@ -29,7 +29,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList DetectCloseToGroundModifierUI::collisionLayers = {
+const QStringList DetectCloseToGroundModifierUI::collisionLayers = {
     "NONE",
     "L_UNIDENTIFIED",
     "L_STATIC",
@@ -88,7 +88,7 @@ QStringList DetectCloseToGroundModifierUI::collisionLayers = {
     "L_TRAP_TRIGGER"
 };
 
-QStringList DetectCloseToGroundModifierUI::headerLabels = {
+const QStringList DetectCloseToGroundModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -151,30 +151,31 @@ DetectCloseToGroundModifierUI::DetectCloseToGroundModifierUI()
     table->setCellWidget(ANIM_BONE_INDEX_ROW, VALUE_COLUMN, animBoneIndex);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void DetectCloseToGroundModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(closeToGroundHeight, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundHeight()), Qt::UniqueConnection);
-    connect(raycastDistanceDown, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceDown()), Qt::UniqueConnection);
-    connect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)), Qt::UniqueConnection);
-    connect(boneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setBoneIndex(int)), Qt::UniqueConnection);
-    connect(animBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnimBoneIndex(int)), Qt::UniqueConnection);
-    connect(closeToGroundEventPayload, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void DetectCloseToGroundModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(closeToGroundHeight, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundHeight()));
-    disconnect(raycastDistanceDown, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceDown()));
-    disconnect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)));
-    disconnect(boneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setBoneIndex(int)));
-    disconnect(animBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnimBoneIndex(int)));
-    disconnect(closeToGroundEventPayload, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void DetectCloseToGroundModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(closeToGroundHeight, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundHeight()), Qt::UniqueConnection);
+        connect(raycastDistanceDown, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceDown()), Qt::UniqueConnection);
+        connect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)), Qt::UniqueConnection);
+        connect(boneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setBoneIndex(int)), Qt::UniqueConnection);
+        connect(animBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnimBoneIndex(int)), Qt::UniqueConnection);
+        connect(closeToGroundEventPayload, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(closeToGroundHeight, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundHeight()));
+        disconnect(raycastDistanceDown, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceDown()));
+        disconnect(collisionFilterInfo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCollisionFilterInfo(int)));
+        disconnect(boneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setBoneIndex(int)));
+        disconnect(animBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnimBoneIndex(int)));
+        disconnect(closeToGroundEventPayload, SIGNAL(editingFinished()), this, SLOT(setCloseToGroundEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void DetectCloseToGroundModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
@@ -189,233 +190,142 @@ void DetectCloseToGroundModifierUI::connectToTables(GenericTableWidget *variable
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void DetectCloseToGroundModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_DETECT_CLOSE_TO_GROUND_MODIFIER){
             bsData = static_cast<hkbDetectCloseToGroundModifier *>(data);
-            QStringList boneNames("None");
-            hkbVariableBindingSet *varBind = nullptr;
-            hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->closeToGroundEvent.payload.data());
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            QString text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->closeToGroundEvent.id);
-            if (text != ""){
-                table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN)->setText(text);
+            enable->setChecked(bsData->getEnable());
+            auto text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getCloseToGroundEventID());
+            auto item = table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN);
+            (text != "") ? item->setText(text) : item->setText("None");
+            auto payload = bsData->getCloseToGroundEventPayload();
+            (payload) ? closeToGroundEventPayload->setText(payload->getData()) : closeToGroundEventPayload->setText("");
+            closeToGroundHeight->setValue(bsData->getCloseToGroundHeight());
+            raycastDistanceDown->setValue(bsData->getRaycastDistanceDown());
+            if (bsData->getCollisionFilterInfo() + 1 >= collisionFilterInfo->count() || bsData->getCollisionFilterInfo() + 1 < 0){
+                LogFile::writeToLog("DetectCloseToGroundModifierUI::loadData(): Invalid collisionFilterInfo!!!");
             }else{
-                table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
+                collisionFilterInfo->setCurrentIndex(bsData->getCollisionFilterInfo() + 1);
             }
-            if (payload){
-                closeToGroundEventPayload->setText(payload->getData());
-            }else{
-                closeToGroundEventPayload->setText("");
-            }
-            closeToGroundHeight->setValue(bsData->closeToGroundHeight);
-            raycastDistanceDown->setValue(bsData->raycastDistanceDown);
-            if (bsData->collisionFilterInfo + 1 >= collisionFilterInfo->count() || bsData->collisionFilterInfo + 1 < 0){
-                CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::loadData(): Invalid collisionFilterInfo!!!");
-                return;
-            }
-            collisionFilterInfo->setCurrentIndex(bsData->collisionFilterInfo + 1);
-            if (boneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                boneIndex->insertItems(0, boneNames);
-            }
-            boneIndex->setCurrentIndex(bsData->boneIndex + 1);
-            if (animBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
-                animBoneIndex->insertItems(0, boneNames);
-            }
-            animBoneIndex->setCurrentIndex(bsData->animBoneIndex + 1);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(CLOSE_TO_GROUND_HEIGHT_ROW, BINDING_COLUMN, varBind, "closeToGroundHeight");
-                loadBinding(RAYCAST_DISTANCE_DOWN_ROW, BINDING_COLUMN, varBind, "raycastDistanceDown");
-                loadBinding(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN, varBind, "collisionFilterInfo");
-                loadBinding(BONE_INDEX_ROW, BINDING_COLUMN, varBind, "boneIndex");
-                loadBinding(ANIM_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "animBoneIndex");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(CLOSE_TO_GROUND_HEIGHT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(RAYCAST_DISTANCE_DOWN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ANIM_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            auto loadbones = [&](ComboBox *combobox, int indextoset){
+                if (!combobox->count()){
+                    auto boneNames = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                    combobox->insertItems(0, boneNames);
+                }
+                combobox->setCurrentIndex(indextoset);
+            };
+            loadbones(boneIndex, bsData->getBoneIndex() + 1);
+            loadbones(animBoneIndex, bsData->getAnimBoneIndex() + 1);
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(CLOSE_TO_GROUND_HEIGHT_ROW, BINDING_COLUMN, varBind, "closeToGroundHeight", table, bsData);
+            UIHelper::loadBinding(RAYCAST_DISTANCE_DOWN_ROW, BINDING_COLUMN, varBind, "raycastDistanceDown", table, bsData);
+            UIHelper::loadBinding(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN, varBind, "collisionFilterInfo", table, bsData);
+            UIHelper::loadBinding(BONE_INDEX_ROW, BINDING_COLUMN, varBind, "boneIndex", table, bsData);
+            UIHelper::loadBinding(ANIM_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "animBoneIndex", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("DetectCloseToGroundModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void DetectCloseToGroundModifierUI::setName(){
+void DetectCloseToGroundModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void DetectCloseToGroundModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void DetectCloseToGroundModifierUI::setCloseToGroundEventId(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->closeToGroundEvent.id != index){
-            bsData->closeToGroundEvent.id = index;
-            table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setCloseToGroundEventID(index - 1);
+        table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setcloseToGroundEventId(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::setcloseToGroundEventId(): The data is nullptr!!");
     }
 }
 
 void DetectCloseToGroundModifierUI::setCloseToGroundEventPayload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->closeToGroundEvent.payload.data());
+        auto payload = bsData->getCloseToGroundEventPayload();
         if (closeToGroundEventPayload->text() != ""){
             if (payload){
-                payload->getData() = closeToGroundEventPayload->text();
+                payload->setData(closeToGroundEventPayload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), closeToGroundEventPayload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->closeToGroundEvent.payload = HkxSharedPtr(payload);
+                bsData->setCloseToGroundEventPayload(payload);
             }
         }else{
-            bsData->closeToGroundEvent.payload = HkxSharedPtr();
+            bsData->setCloseToGroundEventPayload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setcloseToGroundEventPayload(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::setcloseToGroundEventPayload(): The data is nullptr!!");
     }
 }
 
 void DetectCloseToGroundModifierUI::setCloseToGroundHeight(){
-    if (bsData){
-        if (bsData->closeToGroundHeight != closeToGroundHeight->value()){
-            bsData->closeToGroundHeight = closeToGroundHeight->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setcloseToGroundHeight(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCloseToGroundHeight(closeToGroundHeight->value()) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setCloseToGroundHeight(): The data is nullptr!!");
 }
 
 void DetectCloseToGroundModifierUI::setRaycastDistanceDown(){
-    if (bsData){
-        if (bsData->raycastDistanceDown != raycastDistanceDown->value()){
-            bsData->raycastDistanceDown = raycastDistanceDown->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setdistance(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRaycastDistanceDown(raycastDistanceDown->value()) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setRaycastDistanceDown(): The data is nullptr!!");
 }
 
 void DetectCloseToGroundModifierUI::setCollisionFilterInfo(int index){
-    if (bsData){
-        bsData->collisionFilterInfo = index - 1;
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setcollisionFilterInfo(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCollisionFilterInfo(index - 1) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setCollisionFilterInfo(): The 'bsData' pointer is nullptr!!");
 }
 
 void DetectCloseToGroundModifierUI::setBoneIndex(int index){
-    if (bsData){
-        bsData->boneIndex = index - 1;
-        if (bsData->boneIndex > -1){   //boneIndex and animBoneIndex cannot simultaneously have nonnegative values!!!
-            setAnimBoneIndex(0);
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBoneIndex(index - 1) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void DetectCloseToGroundModifierUI::setAnimBoneIndex(int index){
-    if (bsData){
-        bsData->animBoneIndex = index - 1;
-        if (bsData->animBoneIndex > -1){   //boneIndex and animBoneIndex cannot simultaneously have nonnegative values!!!
-            setBoneIndex(0);
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setAnimBoneIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setAnimBoneIndex(index - 1) : LogFile::writeToLog("DetectCloseToGroundModifierUI::setAnimBoneIndex(): The 'bsData' pointer is nullptr!!");
 }
 
 void DetectCloseToGroundModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case CLOSE_TO_GROUND_HEIGHT_ROW:
-                if (table->item(CLOSE_TO_GROUND_HEIGHT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "closeToGroundHeight");
-                break;
+                checkisproperty(CLOSE_TO_GROUND_HEIGHT_ROW, "closeToGroundHeight"); break;
             case RAYCAST_DISTANCE_DOWN_ROW:
-                if (table->item(RAYCAST_DISTANCE_DOWN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "raycastDistanceDown");
-                break;
+                checkisproperty(RAYCAST_DISTANCE_DOWN_ROW, "raycastDistanceDown"); break;
             case COLLISION_FILTER_INFO_ROW:
-                if (table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "collisionFilterInfo");
-                break;
+                checkisproperty(COLLISION_FILTER_INFO_ROW, "collisionFilterInfo"); break;
             case BONE_INDEX_ROW:
-                if (table->item(BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "boneIndex");
-                break;
+                checkisproperty(BONE_INDEX_ROW, "boneIndex"); break;
             case ANIM_BONE_INDEX_ROW:
-                if (table->item(ANIM_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "animBoneIndex");
-                break;
-            default:
-                return;
+                checkisproperty(ANIM_BONE_INDEX_ROW, "animBoneIndex"); break;
             }
         }else if (column == VALUE_COLUMN && row == CLOSE_TO_GROUND_EVENT_ID_ROW){
-            emit viewEvents(bsData->closeToGroundEvent.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getCloseToGroundEventID() + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -435,160 +345,65 @@ void DetectCloseToGroundModifierUI::selectTableToView(bool viewisProperty, const
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void DetectCloseToGroundModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        if (index == bsData->closeToGroundEvent.id){
+        if (index == bsData->getCloseToGroundEventID()){
             table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void DetectCloseToGroundModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("closeToGroundHeight");
-            if (bindIndex == index){
-                table->item(CLOSE_TO_GROUND_HEIGHT_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("raycastDistanceDown");
-            if (bindIndex == index){
-                table->item(RAYCAST_DISTANCE_DOWN_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("collisionFilterInfo");
-            if (bindIndex == index){
-                table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("boneIndex");
-            if (bindIndex == index){
-                table->item(BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("animBoneIndex");
-            if (bindIndex == index){
-                table->item(ANIM_BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("closeToGroundHeight", CLOSE_TO_GROUND_HEIGHT_ROW);
+            setname("raycastDistanceDown", RAYCAST_DISTANCE_DOWN_ROW);
+            setname("collisionFilterInfo", COLLISION_FILTER_INFO_ROW);
+            setname("boneIndex", BONE_INDEX_ROW);
+            setname("animBoneIndex", ANIM_BONE_INDEX_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool DetectCloseToGroundModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void DetectCloseToGroundModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case CLOSE_TO_GROUND_HEIGHT_ROW:
-            if (table->item(CLOSE_TO_GROUND_HEIGHT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "closeToGroundHeight", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(CLOSE_TO_GROUND_HEIGHT_ROW, "closeToGroundHeight", VARIABLE_TYPE_REAL); break;
         case RAYCAST_DISTANCE_DOWN_ROW:
-            if (table->item(RAYCAST_DISTANCE_DOWN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "raycastDistanceDown", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(RAYCAST_DISTANCE_DOWN_ROW, "raycastDistanceDown", VARIABLE_TYPE_REAL); break;
         case COLLISION_FILTER_INFO_ROW:
-            if (table->item(COLLISION_FILTER_INFO_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "collisionFilterInfo", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(COLLISION_FILTER_INFO_ROW, "collisionFilterInfo", VARIABLE_TYPE_INT32); break;
         case BONE_INDEX_ROW:
-            if (table->item(BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "boneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
+            checkisproperty(BONE_INDEX_ROW, "boneIndex", VARIABLE_TYPE_INT32); break;
         case ANIM_BONE_INDEX_ROW:
-            if (table->item(ANIM_BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "animBoneIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void DetectCloseToGroundModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(ANIM_BONE_INDEX_ROW, "animBoneIndex", VARIABLE_TYPE_INT32); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DetectCloseToGroundModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("DetectCloseToGroundModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
-

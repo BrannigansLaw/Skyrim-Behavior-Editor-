@@ -11,12 +11,16 @@ class BehaviorFile;
 class ComboBox;
 class TableWidget;
 
-class ExpressionDataArrayUI: public QGroupBox
+class ExpressionDataArrayUI final: public QGroupBox
 {
     Q_OBJECT
     friend class EvaluateExpressionModifierUI;
 public:
     ExpressionDataArrayUI();
+    ExpressionDataArrayUI& operator=(const ExpressionDataArrayUI&) = delete;
+    ExpressionDataArrayUI(const ExpressionDataArrayUI &) = delete;
+    ~ExpressionDataArrayUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, hkbExpressionDataArray::hkExpression *exp);
 signals:
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -29,13 +33,12 @@ private slots:
     void setEventMode(int index);
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void eventRenamed(const QString & name, int index);
     void variableRenamed(const QString & name, int index);
 private:
-    static QStringList EventModeUI;
-    static QStringList headerLabels;
+    static const QStringList EventModeUI;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     hkbExpressionDataArray::hkExpression *bsData;
     QGridLayout *topLyt;

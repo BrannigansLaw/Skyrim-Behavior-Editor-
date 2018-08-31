@@ -27,7 +27,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList RangesUI::headerLabels = {
+const QStringList RangesUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -74,186 +74,87 @@ RangesUI::RangesUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void RangesUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()), Qt::UniqueConnection);
-    connect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()), Qt::UniqueConnection);
-    connect(ignoreHandle, SIGNAL(released()), this, SLOT(setIgnoreHandle()), Qt::UniqueConnection);
-    connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void RangesUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()));
-    disconnect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()));
-    disconnect(ignoreHandle, SIGNAL(released()), this, SLOT(setIgnoreHandle()));
-    disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void RangesUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()), Qt::UniqueConnection);
+        connect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()), Qt::UniqueConnection);
+        connect(ignoreHandle, SIGNAL(released()), this, SLOT(setIgnoreHandle()), Qt::UniqueConnection);
+        connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(minDistance, SIGNAL(editingFinished()), this, SLOT(setMinDistance()));
+        disconnect(maxDistance, SIGNAL(editingFinished()), this, SLOT(setMaxDistance()));
+        disconnect(ignoreHandle, SIGNAL(released()), this, SLOT(setIgnoreHandle()));
+        disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void RangesUI::loadData(BehaviorFile *parentFile, hkbSenseHandleModifier::hkRanges *ranges, hkbSenseHandleModifier *par, int index){
-    disconnectSignals();
-    QString text;
+    toggleSignals(false);
     if (parentFile && ranges && par && index > -1){
         parent = par;
         rangeIndex = index;
         file = parentFile;
         bsData = ranges;
-        text = file->getEventNameAt(ranges->event.id);
-        if (text == ""){
-            if (ranges->event.id != -1){
-                WARNING_MESSAGE("RangesUI::loadData(): Invalid event id!!!");
-            }
-            text = "NONE";
-        }
-        QString eventName = file->getEventNameAt(bsData->event.id);
-        if (eventName != ""){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(eventName);
-        }else{
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        if (ranges->event.payload.data()){
-            payload->setText(static_cast<hkbStringEventPayload *>(ranges->event.payload.data())->getData());
-        }else{
-            payload->setText("");
-        }
+        auto eventName = file->getEventNameAt(bsData->event.id);
+        auto item = table->item(EVENT_ID_ROW, VALUE_COLUMN);
+        (eventName != "") ? item->setText(eventName) : item->setText("NONE");
+        (ranges->event.payload.data()) ? payload->setText(static_cast<hkbStringEventPayload *>(ranges->event.payload.data())->getData()) : payload->setText("");
         minDistance->setValue(bsData->minDistance);
         maxDistance->setValue(bsData->maxDistance);
         ignoreHandle->setChecked(bsData->ignoreHandle);
-        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-        if (varBind){
-            loadBinding(MINIMUM_DISTANCE_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(rangeIndex)+"/minDistance");
-            loadBinding(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(rangeIndex)+"/maxDistance");
-            loadBinding(IGNORE_HANDLE_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(rangeIndex)+"/ignoreHandle");
-        }else{
-            table->item(MINIMUM_DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(IGNORE_HANDLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }
+        auto varBind = parent->getVariableBindingSetData();
+        UIHelper::loadBinding(MINIMUM_DISTANCE_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(rangeIndex)+"/minDistance", table, parent);
+        UIHelper::loadBinding(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(rangeIndex)+"/maxDistance", table, parent);
+        UIHelper::loadBinding(IGNORE_HANDLE_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(rangeIndex)+"/ignoreHandle", table, parent);
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::loadData(): Behavior file, bind or event data is null!!!");
+        LogFile::writeToLog("RangesUI::loadData(): Behavior file, bind or data is null!!!");
     }
-    connectSignals();
-}
-
-void RangesUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(file)->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("RangesUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-bool RangesUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->getVariableBindingSet() = HkxSharedPtr();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(file);
-                parent->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->setIsChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
+    toggleSignals(true);
 }
 
 void RangesUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, parent);
+        };
         switch (row){
         case MINIMUM_DISTANCE_ROW:
-            if (table->item(MINIMUM_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "ranges:"+QString::number(rangeIndex)+"/minDistance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MINIMUM_DISTANCE_ROW, "ranges:"+QString::number(rangeIndex)+"/minDistance", VARIABLE_TYPE_REAL); break;
         case MAXIMUM_DISTANCE_ROW:
-            if (table->item(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "ranges:"+QString::number(rangeIndex)+"/maxDistance", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MAXIMUM_DISTANCE_ROW, "ranges:"+QString::number(rangeIndex)+"/maxDistance", VARIABLE_TYPE_REAL); break;
         case IGNORE_HANDLE_ROW:
-            if (table->item(IGNORE_HANDLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "ranges:"+QString::number(rangeIndex)+"/ignoreHandle", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(IGNORE_HANDLE_ROW, "ranges:"+QString::number(rangeIndex)+"/ignoreHandle", VARIABLE_TYPE_BOOL); break;
         }
-        file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("RangesUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-/*QSize RangesUI::sizeHint() const{
-    return QSize(1600, 800);
-}
-
-QSize RangesUI::minimumSizeHint() const{
-    return QSize(1200, 600);
-}*/
-
 void RangesUI::setEventId(int index, const QString & name){
     if (bsData && file){
-        index--;
-        if (bsData->event.id != index){
+        if (bsData->event.id != --index){
             bsData->event.id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setEvent(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("RangesUI::setEvent(): Behavior file or data is null!!!");
     }
 }
 
 void RangesUI::setEventPayload(){
-    hkbStringEventPayload *payloadData;
     if (bsData && file){
-        payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
+        auto payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
         if (payload->text() != ""){
             if (payloadData){
                 if (payloadData->getData() != payload->text()){
@@ -262,81 +163,62 @@ void RangesUI::setEventPayload(){
                     return;
                 }
             }else{
-                payloadData = new hkbStringEventPayload(file, payload->text());
-                file->addObjectToFile(payloadData);
-                bsData->event.payload = HkxSharedPtr(payloadData);
+                bsData->event.payload = HkxSharedPtr(new hkbStringEventPayload(file, payload->text()));
             }
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setEventPayload(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("RangesUI::setEventPayload(): Behavior file or data is null!!!");
     }
 }
 
 void RangesUI::setMinDistance(){
     if (bsData && file){
-        if (bsData->minDistance != minDistance->value()){
-            bsData->minDistance = minDistance->value();
-            file->setIsChanged(true);
-        }
+        (bsData->minDistance != minDistance->value()) ? bsData->minDistance = minDistance->value(), file->setIsChanged(true) : LogFile::writeToLog("RangesUI::setminDistance(): minDistance not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setMinDistance(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("RangesUI::setMinDistance(): Behavior file or data is null!!!");
     }
 }
 
 void RangesUI::setMaxDistance(){
     if (bsData && file){
-        if (bsData->maxDistance != maxDistance->value()){
-            bsData->maxDistance = maxDistance->value();
-            file->setIsChanged(true);
-        }
+        (bsData->maxDistance != maxDistance->value()) ? bsData->maxDistance = maxDistance->value(), file->setIsChanged(true) : LogFile::writeToLog("RangesUI::setmaxDistance(): maxDistance not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setMaxDistance(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("RangesUI::setMaxDistance(): Behavior file or data is null!!!");
     }
 }
 
 void RangesUI::setIgnoreHandle(){
     if (bsData && file){
-        if (bsData->ignoreHandle != ignoreHandle->isChecked()){
-            bsData->ignoreHandle = ignoreHandle->isChecked();
-            file->setIsChanged(true);
-        }
+        (bsData->ignoreHandle != ignoreHandle->isChecked()) ? bsData->ignoreHandle = ignoreHandle->isChecked(), file->setIsChanged(true) : LogFile::writeToLog("RangesUI::setignoreHandle(): ignoreHandle not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::setIsAnnotation(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("RangesUI::setIsAnnotation(): Behavior file or data is null!!!");
     }
 }
 
 void RangesUI::viewSelectedChild(int row, int column){
     if (bsData){
-        bool properties = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case MINIMUM_DISTANCE_ROW:
-                if (table->item(MINIMUM_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "ranges:"+QString::number(rangeIndex)+"/minDistance");
-                break;
+                checkisproperty(MINIMUM_DISTANCE_ROW, "ranges:"+QString::number(rangeIndex)+"/minDistance"); break;
             case MAXIMUM_DISTANCE_ROW:
-                if (table->item(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "ranges:"+QString::number(rangeIndex)+"/maxDistance");
-                break;
+                checkisproperty(MAXIMUM_DISTANCE_ROW, "ranges:"+QString::number(rangeIndex)+"/maxDistance"); break;
             case IGNORE_HANDLE_ROW:
-                if (table->item(IGNORE_HANDLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "ranges:"+QString::number(rangeIndex)+"/ignoreHandle");
-                break;
+                checkisproperty(IGNORE_HANDLE_ROW, "ranges:"+QString::number(rangeIndex)+"/ignoreHandle"); break;
             }
         }else if (row == EVENT_ID_ROW && column == VALUE_COLUMN){
-                emit viewEvents(bsData->event.id + 1, QString(), QStringList());
-            }
+            emit viewEvents(bsData->event.id + 1, QString(), QStringList());
+        }
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("RangesUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -356,44 +238,32 @@ void RangesUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("RangesUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void RangesUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (index == bsData->event.id){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->event.id) ? table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("RangesUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void RangesUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("RangesUI::variableRenamed(): The new variable name is the empty string!!");
-    }
-    if (bsData){
+    if (parent){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
+        auto bind = parent->getVariableBindingSetData();
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(rangeIndex)+"/minDistance");
-            if (bindIndex == index){
-                table->item(MINIMUM_DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(rangeIndex)+"/maxDistance");
-            if (bindIndex == index){
-                table->item(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(rangeIndex)+"/ignoreHandle");
-            if (bindIndex == index){
-                table->item(IGNORE_HANDLE_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("ranges:"+QString::number(rangeIndex)+"/minDistance", MINIMUM_DISTANCE_ROW);
+            setname("ranges:"+QString::number(rangeIndex)+"/maxDistance", MAXIMUM_DISTANCE_ROW);
+            setname("ranges:"+QString::number(rangeIndex)+"/ignoreHandle", IGNORE_HANDLE_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("RangesUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("RangesUI::variableRenamed(): The data is nullptr!!");
     }
 }

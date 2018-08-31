@@ -3,10 +3,6 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/filetypes/characterfile.h"
 
-/*
- * CLASS: hkbVariableValueSet
-*/
-
 uint hkbVariableValueSet::refCount = 0;
 
 const QString hkbVariableValueSet::classname = "hkbVariableValueSet";
@@ -51,42 +47,42 @@ hkQuadVariable hkbVariableValueSet::getQuadVariableValueAt(int index, bool *ok){
 
 void hkbVariableValueSet::setQuadVariableValueAt(int index, const hkQuadVariable &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (quadVariableValues.size() > index && index > -1) ? quadVariableValues.replace(index, value) : NULL;
+    (quadVariableValues.size() > index && index > -1) ? quadVariableValues.replace(index, value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'setQuadVariableValueAt' failed!");
 }
 
 void hkbVariableValueSet::setWordVariableAt(int index, int value){
     std::lock_guard <std::mutex> guard(mutex);
-    (wordVariableValues.size() > index && index > -1) ? wordVariableValues.replace(index, value) : NULL;
+    (wordVariableValues.size() > index && index > -1) ? wordVariableValues.replace(index, value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'setWordVariableAt' failed!");
 }
 
 void hkbVariableValueSet::removeWordVariableValueAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index > -1 && index < wordVariableValues.size()) ? wordVariableValues.removeAt(index) : NULL;
+    (index > -1 && index < wordVariableValues.size()) ? wordVariableValues.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'removeWordVariableValueAt' failed!");
 }
 
 void hkbVariableValueSet::removeQuadVariableValueAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index > -1 && index < quadVariableValues.size()) ? quadVariableValues.removeAt(index) : NULL;
+    (index > -1 && index < quadVariableValues.size()) ? quadVariableValues.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'removeQuadVariableValueAt' failed!");
 }
 
 void hkbVariableValueSet::removeVariantVariableValueAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index > -1 && index < variantVariableValues.size()) ? variantVariableValues.removeAt(index) : NULL;
+    (index > -1 && index < variantVariableValues.size()) ? variantVariableValues.removeAt(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'removeVariantVariableValueAt' failed!");
 }
 
 void hkbVariableValueSet::addQuadVariableValue(const hkQuadVariable &value){
     std::lock_guard <std::mutex> guard(mutex);
-    quadVariableValues.append(value);
+    quadVariableValues.append(value), setIsFileChanged(true);
 }
 
 void hkbVariableValueSet::addWordVariableValue(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    wordVariableValues.append(value);
+    wordVariableValues.append(value), setIsFileChanged(true);
 }
 
 bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long & index){
     bool ok;
-    int numElems = 0;
+    auto numElems = 0;
     auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
@@ -173,11 +169,7 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         QString refs;
         for (auto i = 0, j = 1; i < variantVariableValues.size(); i++, j++){
             refs.append(variantVariableValues.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refs.append("\n");
-            }else{
-                refs.append(" ");
-            }
+            (!(j % 16)) ? refs.append("\n") : refs.append(" ");
         }
         if (variantVariableValues.size() > 0){
             if (refs.endsWith(" \0")){
@@ -201,7 +193,7 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
 bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
     if (recessiveobj){
         if (getSignature() == recessiveobj->getSignature()){
-            //
+            //TO DO???
         }else{
             LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!");
         }
@@ -212,15 +204,11 @@ bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
 }
 
 bool hkbVariableValueSet::link(){
-    if (!getParentFile()){
-        return false;
-    }
-    HkxSharedPtr *ptr = nullptr;
     HkxFile *file = nullptr;
     for (auto i = 0; i < variantVariableValues.size(); i++){
         file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
-            ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
+            auto ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
             if (!ptr || !ptr->data()){
                 LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!");
                 setDataValidity(false);
@@ -234,7 +222,7 @@ bool hkbVariableValueSet::link(){
         }else{
             file = dynamic_cast<CharacterFile *>(getParentFile());
             if (file){
-                ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
+                auto ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
                 if (!ptr || !ptr->data()){
                     LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!");
                     setDataValidity(false);

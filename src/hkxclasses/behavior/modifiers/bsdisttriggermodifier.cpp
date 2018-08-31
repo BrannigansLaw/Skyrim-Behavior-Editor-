@@ -2,6 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSDistTriggerModifier::refCount = 0;
 
@@ -182,6 +183,71 @@ bool BSDistTriggerModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thr
     return false;
 }
 
+void BSDistTriggerModifier::setTriggerEventID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != triggerEvent.id && triggerEvent.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? triggerEvent.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'triggerEvent.id' was not set!");
+}
+
+void BSDistTriggerModifier::setTriggerEventPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(triggerEvent.payload.data())) ? triggerEvent.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'triggerEvent.payload' was not set!");
+}
+
+int BSDistTriggerModifier::getTriggerEventID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return triggerEvent.id;
+}
+
+hkbStringEventPayload *BSDistTriggerModifier::getTriggerEventPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(triggerEvent.payload.data());
+}
+
+qreal BSDistTriggerModifier::getDistanceTrigger() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return distanceTrigger;
+}
+
+void BSDistTriggerModifier::setDistanceTrigger(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != distanceTrigger) ? distanceTrigger = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'distanceTrigger' was not set!");
+}
+
+qreal BSDistTriggerModifier::getDistance() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return distance;
+}
+
+void BSDistTriggerModifier::setDistance(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != distance) ? distance = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'distance' was not set!");
+}
+
+hkQuadVariable BSDistTriggerModifier::getTargetPosition() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetPosition;
+}
+
+void BSDistTriggerModifier::setTargetPosition(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetPosition) ? targetPosition = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetPosition' was not set!");
+}
+
+bool BSDistTriggerModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSDistTriggerModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSDistTriggerModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSDistTriggerModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -207,7 +273,7 @@ void BSDistTriggerModifier::unlink(){
 QString BSDistTriggerModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
     if (name == ""){

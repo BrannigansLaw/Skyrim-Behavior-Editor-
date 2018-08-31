@@ -29,7 +29,7 @@ QString BSBoneSwitchGenerator::getName() const{
 
 void BSBoneSwitchGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 bool BSBoneSwitchGenerator::swapChildren(int index1, int index2){
@@ -40,7 +40,7 @@ bool BSBoneSwitchGenerator::swapChildren(int index1, int index2){
         gen2 = ChildrenA.at(index2).data();
         ChildrenA[index1] = HkxSharedPtr(gen2);
         ChildrenA[index2] = HkxSharedPtr(gen1);
-        getParentFile()->setIsChanged(true);
+        setIsFileChanged(true);
     }else{
         return false;
     }
@@ -59,8 +59,8 @@ void BSBoneSwitchGenerator::updateChildIconNames() const{
 QString BSBoneSwitchGenerator::getDefaultGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
@@ -68,7 +68,7 @@ bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
     std::lock_guard <std::mutex> guard(mutex);
     if (obj){
         if (obj->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-            if (index == 0){
+            if (!index){
                 return false;
             }else if (index >= ChildrenA.size() || index == -1){
                 ChildrenA.append(HkxSharedPtr(obj));
@@ -76,7 +76,7 @@ bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
                 ChildrenA.replace(index - 1, HkxSharedPtr(obj));
             }
         }else if (obj->getType() == TYPE_GENERATOR){
-            if (index == 0){
+            if (!index){
                 pDefaultGenerator = HkxSharedPtr(obj);
             }else{
                 return false;
@@ -140,7 +140,7 @@ int BSBoneSwitchGenerator::getIndexOfObj(DataIconManager *obj) const{
 bool BSBoneSwitchGenerator::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
     BSBoneSwitchGeneratorBoneData *objChild;
-    if (index == 0){
+    if (!index){
         pDefaultGenerator = HkxSharedPtr();
     }else if (index > -1 && index <= ChildrenA.size()){
         objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
@@ -261,11 +261,7 @@ bool BSBoneSwitchGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < ChildrenA.size(); i++, j++){
             refString.append(ChildrenA.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refString.append("\n");
-            }else{
-                refString.append(" ");
-            }
+            (!(j % 16)) ? refString.append("\n") : refString.append(" ");
         }
         if (ChildrenA.size() > 0){
             if (refString.endsWith(" \0")){
@@ -334,7 +330,7 @@ void BSBoneSwitchGenerator::unlink(){
 QString BSBoneSwitchGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](bool value, const QString & fieldname){
         if (!value){
             isvalid = false;

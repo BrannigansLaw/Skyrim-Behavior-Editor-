@@ -32,7 +32,7 @@ bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
     if (obj && obj->getType() == TYPE_MODIFIER){
         if (index >= modifiers.size() || index == -1){
             modifiers.append(HkxSharedPtr(obj));
-        }else if (index == 0 || !modifiers.isEmpty()){
+        }else if (!index || !modifiers.isEmpty()){
             modifiers.replace(index, HkxSharedPtr(obj));
         }
         return true;
@@ -52,6 +52,33 @@ bool hkbModifierList::removeObjectAt(int index){
     return true;
 }
 
+bool hkbModifierList::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbModifierList::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+hkbModifier *hkbModifierList::getModifierAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbModifier *modifier;
+    (index >= 0 && index < modifiers.size()) ? modifier = static_cast<hkbModifier *>(modifiers.at(index).data()) : modifier = nullptr;
+    return modifier;
+}
+
+int hkbModifierList::getNumberOfModifiers() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return modifiers.size();
+}
+
+void hkbModifierList::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbModifierList::hasChildren() const{
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < modifiers.size(); i++){
@@ -66,7 +93,7 @@ bool hkbModifierList::merge(HkxObject *recessiveObject){ //TO DO: Make thread sa
     std::lock_guard <std::mutex> guard(mutex);
     hkbModifierList *recobj = nullptr;
     bool found;
-    int size = modifiers.size();
+    auto size = modifiers.size();
     QVector <DataIconManager *> objects;
     QVector <DataIconManager *> children;
     QVector <HkxObject *> othertypes;
@@ -193,11 +220,7 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < modifiers.size(); i++, j++){
             refString.append(modifiers.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refString.append("\n");
-            }else{
-                refString.append(" ");
-            }
+            (!(j % 16)) ? refString.append("\n") : refString.append(" ");
         }
         if (modifiers.size() > 0){
             if (refString.endsWith(" \0")){
@@ -250,7 +273,7 @@ void hkbModifierList::unlink(){
 QString hkbModifierList::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (modifiers.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers is empty!");

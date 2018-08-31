@@ -100,6 +100,61 @@ bool hkbExtractRagdollPoseModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbExtractRagdollPoseModifier::getEnableComputeWorldFromModel() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enableComputeWorldFromModel;
+}
+
+void hkbExtractRagdollPoseModifier::setEnableComputeWorldFromModel(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enableComputeWorldFromModel) ? enableComputeWorldFromModel = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enableComputeWorldFromModel' was not set!");
+}
+
+int hkbExtractRagdollPoseModifier::getPoseMatchingBone2() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return poseMatchingBone2;
+}
+
+void hkbExtractRagdollPoseModifier::setPoseMatchingBone2(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != poseMatchingBone2) ? poseMatchingBone2 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'poseMatchingBone2' was not set!");
+}
+
+int hkbExtractRagdollPoseModifier::getPoseMatchingBone1() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return poseMatchingBone1;
+}
+
+void hkbExtractRagdollPoseModifier::setPoseMatchingBone1(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != poseMatchingBone1) ? poseMatchingBone1 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'poseMatchingBone1' was not set!");
+}
+
+int hkbExtractRagdollPoseModifier::getPoseMatchingBone0() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return poseMatchingBone0;
+}
+
+void hkbExtractRagdollPoseModifier::setPoseMatchingBone0(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != poseMatchingBone0) ? poseMatchingBone0 = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'poseMatchingBone0' was not set!");
+}
+
+bool hkbExtractRagdollPoseModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbExtractRagdollPoseModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbExtractRagdollPoseModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbExtractRagdollPoseModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -116,7 +171,7 @@ void hkbExtractRagdollPoseModifier::unlink(){
 QString hkbExtractRagdollPoseModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

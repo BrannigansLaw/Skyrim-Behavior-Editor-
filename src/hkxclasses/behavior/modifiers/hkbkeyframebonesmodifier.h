@@ -3,6 +3,8 @@
 
 #include "hkbmodifier.h"
 
+class hkbBoneIndexArray;
+
 class hkbKeyframeBonesModifier final: public hkbModifier
 {
     friend class KeyframeInfoUI;
@@ -16,6 +18,21 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    struct hkKeyframeInfo{
+        hkKeyframeInfo() : boneIndex(-1), isValid(false){}
+        hkQuadVariable keyframedPosition;
+        hkQuadVariable keyframedRotation;
+        int boneIndex;
+        bool isValid;
+    };
+private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkbBoneIndexArray * getKeyframedBonesList() const;
+    void setKeyframedBonesList(hkbBoneIndexArray *value);
+    void addKeyframeInfo(hkKeyframeInfo info = hkKeyframeInfo());
+    void removeKeyframeInfo(int index);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
@@ -25,14 +42,6 @@ private:
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
-private:
-    struct hkKeyframeInfo{
-        hkKeyframeInfo() : boneIndex(-1), isValid(false){}
-        hkQuadVariable keyframedPosition;
-        hkQuadVariable keyframedRotation;
-        int boneIndex;
-        bool isValid;
-    };
 private:
     static uint refCount;
     static const QString classname;

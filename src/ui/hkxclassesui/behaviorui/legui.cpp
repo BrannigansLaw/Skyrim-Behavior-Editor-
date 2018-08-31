@@ -28,7 +28,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList LegUI::headerLabels = {
+const QStringList LegUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -80,189 +80,93 @@ LegUI::LegUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void LegUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(groundPosition, SIGNAL(editingFinished()), this, SLOT(setGroundPosition()), Qt::UniqueConnection);
-    connect(verticalError, SIGNAL(editingFinished()), this, SLOT(setVerticalError()), Qt::UniqueConnection);
-    connect(hitSomething, SIGNAL(released()), this, SLOT(setHitSomething()), Qt::UniqueConnection);
-    connect(isPlantedMS, SIGNAL(released()), this, SLOT(setIsPlantedMS()), Qt::UniqueConnection);
-    connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void LegUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(groundPosition, SIGNAL(editingFinished()), this, SLOT(setGroundPosition()));
-    disconnect(verticalError, SIGNAL(editingFinished()), this, SLOT(setVerticalError()));
-    disconnect(hitSomething, SIGNAL(released()), this, SLOT(setHitSomething()));
-    disconnect(isPlantedMS, SIGNAL(released()), this, SLOT(setIsPlantedMS()));
-    disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void LegUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(groundPosition, SIGNAL(editingFinished()), this, SLOT(setGroundPosition()), Qt::UniqueConnection);
+        connect(verticalError, SIGNAL(editingFinished()), this, SLOT(setVerticalError()), Qt::UniqueConnection);
+        connect(hitSomething, SIGNAL(released()), this, SLOT(setHitSomething()), Qt::UniqueConnection);
+        connect(isPlantedMS, SIGNAL(released()), this, SLOT(setIsPlantedMS()), Qt::UniqueConnection);
+        connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(groundPosition, SIGNAL(editingFinished()), this, SLOT(setGroundPosition()));
+        disconnect(verticalError, SIGNAL(editingFinished()), this, SLOT(setVerticalError()));
+        disconnect(hitSomething, SIGNAL(released()), this, SLOT(setHitSomething()));
+        disconnect(isPlantedMS, SIGNAL(released()), this, SLOT(setIsPlantedMS()));
+        disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void LegUI::loadData(BehaviorFile *parentFile, hkbFootIkControlsModifier::hkLeg *leg, hkbFootIkControlsModifier *par, int index){
-    disconnectSignals();
-    QString text;
+    toggleSignals(false);
     if (parentFile && leg && par && index > -1){
         parent = par;
         legIndex = index;
         file = parentFile;
         bsData = leg;
-        text = file->getEventNameAt(leg->id);
-        if (text == ""){
-            if (leg->id != -1){
-                WARNING_MESSAGE("LegUI::loadData(): Invalid event id!!!");
-            }
-            text = "NONE";
-        }
-        QString eventName = file->getEventNameAt(bsData->id);
-        if (eventName != ""){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(eventName);
-        }else{
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        if (leg->payload.data()){
-            payload->setText(static_cast<hkbStringEventPayload *>(leg->payload.data())->getData());
-        }else{
-            payload->setText("");
-        }
+        auto eventName = file->getEventNameAt(bsData->id);
+        auto item = table->item(EVENT_ID_ROW, VALUE_COLUMN);
+        (eventName != "") ? item->setText(eventName) : item->setText("NONE");
+        (leg->payload.data()) ? payload->setText(static_cast<hkbStringEventPayload *>(leg->payload.data())->getData()) : payload->setText("");
         groundPosition->setValue(bsData->groundPosition);
         verticalError->setValue(bsData->verticalError);
         hitSomething->setChecked(bsData->hitSomething);
         isPlantedMS->setChecked(bsData->isPlantedMS);
-        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-        if (varBind){
-            loadBinding(GROUND_POSITION_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/groundPosition");
-            loadBinding(VERTICAL_ERROR_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/verticalError");
-            loadBinding(HIT_SOMETHING_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/hitSomething");
-            loadBinding(IS_PLANTED_MS_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/isPlantedMS");
-        }else{
-            table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }
+        auto varBind = parent->getVariableBindingSetData();
+        UIHelper::loadBinding(GROUND_POSITION_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/groundPosition", table, parent);
+        UIHelper::loadBinding(VERTICAL_ERROR_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/verticalError", table, parent);
+        UIHelper::loadBinding(HIT_SOMETHING_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/hitSomething", table, parent);
+        UIHelper::loadBinding(IS_PLANTED_MS_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/isPlantedMS", table, parent);
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::loadData(): Behavior file, bind or event data is null!!!");
+        LogFile::writeToLog("LegUI::loadData(): Behavior file, bind or data is null!!!");
     }
-    connectSignals();
-}
-
-void LegUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(file)->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("LegUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-bool LegUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->getVariableBindingSet() = HkxSharedPtr();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(file);
-                parent->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->setIsChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
+    toggleSignals(true);
 }
 
 void LegUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, parent);
+        };
         switch (row){
         case GROUND_POSITION_ROW:
-            if (table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/groundPosition", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(GROUND_POSITION_ROW, "legs:"+QString::number(legIndex)+"/groundPosition", VARIABLE_TYPE_VECTOR4); break;
         case VERTICAL_ERROR_ROW:
-            if (table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/verticalError", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(VERTICAL_ERROR_ROW, "legs:"+QString::number(legIndex)+"/verticalError", VARIABLE_TYPE_REAL); break;
         case HIT_SOMETHING_ROW:
-            if (table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/hitSomething", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(HIT_SOMETHING_ROW, "legs:"+QString::number(legIndex)+"/hitSomething", VARIABLE_TYPE_BOOL); break;
         case IS_PLANTED_MS_ROW:
-            if (table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/isPlantedMS", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(IS_PLANTED_MS_ROW, "legs:"+QString::number(legIndex)+"/isPlantedMS", VARIABLE_TYPE_BOOL); break;
         }
-        file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("LegUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
 void LegUI::setEventId(int index, const QString & name){
     if (bsData && file){
-        index--;
-        if (bsData->id != index){
+        if (bsData->id != --index){
             bsData->id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setEvent(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("LegUI::setEvent(): Behavior file or data is null!!!");
     }
 }
 
 void LegUI::setEventPayload(){
-    hkbStringEventPayload *payloadData;
     if (bsData && file){
-        payloadData = static_cast<hkbStringEventPayload *>(bsData->payload.data());
+        auto payloadData = static_cast<hkbStringEventPayload *>(bsData->payload.data());
         if (payload->text() != ""){
             if (payloadData){
                 if (payloadData->getData() != payload->text()){
@@ -271,97 +175,72 @@ void LegUI::setEventPayload(){
                     return;
                 }
             }else{
-                payloadData = new hkbStringEventPayload(file, payload->text());
-                bsData->payload = HkxSharedPtr(payloadData);
+                bsData->payload = HkxSharedPtr(new hkbStringEventPayload(file, payload->text()));
             }
         }else{
             bsData->payload = HkxSharedPtr();
         }
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setEventPayload(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("LegUI::setEventPayload(): Behavior file or data is null!!!");
     }
 }
 
 void LegUI::setGroundPosition(){
     if (bsData && file){
-        if (bsData->groundPosition != groundPosition->value()){
-            bsData->groundPosition = groundPosition->value();
-            file->setIsChanged(true);
-        }
+        (bsData->groundPosition != groundPosition->value()) ? bsData->groundPosition = groundPosition->value(), file->setIsChanged(true) : LogFile::writeToLog("LegUI::setgroundPosition(): groundPosition not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setGroundPosition(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("LegUI::setGroundPosition(): Behavior file or data is null!!!");
     }
 }
 
 void LegUI::setVerticalError(){
     if (bsData && file){
-        if (bsData->verticalError != verticalError->value()){
-            bsData->verticalError = verticalError->value();
-            file->setIsChanged(true);
-        }
+        (bsData->verticalError != verticalError->value()) ? bsData->verticalError = verticalError->value(), file->setIsChanged(true) : LogFile::writeToLog("LegUI::setverticalError(): verticalError not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setverticalError(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("LegUI::setverticalError(): Behavior file or data is null!!!");
     }
 }
 
 void LegUI::setHitSomething(){
     if (bsData && file){
-        if (bsData->hitSomething != hitSomething->isChecked()){
-            bsData->hitSomething = hitSomething->isChecked();
-            file->setIsChanged(true);
-        }
+        (bsData->hitSomething != hitSomething->isChecked()) ? bsData->hitSomething = hitSomething->isChecked(), file->setIsChanged(true) : LogFile::writeToLog("LegUI::sethitSomething(): hitSomething not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::sethitSomething(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("LegUI::sethitSomething(): Behavior file or data is null!!!");
     }
 }
 
 void LegUI::setIsPlantedMS(){
     if (bsData && file){
-        if (bsData->isPlantedMS != isPlantedMS->isChecked()){
-            bsData->isPlantedMS = isPlantedMS->isChecked();
-            file->setIsChanged(true);
-        }
+        (bsData->isPlantedMS != isPlantedMS->isChecked()) ? bsData->isPlantedMS = isPlantedMS->isChecked(), file->setIsChanged(true) : LogFile::writeToLog("LegUI::setisPlantedMS(): isPlantedMS not set!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::setIsPlantedMS(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("LegUI::setIsPlantedMS(): Behavior file or data is null!!!");
     }
 }
 
 void LegUI::viewSelectedChild(int row, int column){
     if (bsData){
-        bool properties = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case GROUND_POSITION_ROW:
-                if (table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/groundPosition");
-                break;
+                checkisproperty(GROUND_POSITION_ROW, "legs:"+QString::number(legIndex)+"/groundPosition"); break;
             case VERTICAL_ERROR_ROW:
-                if (table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/verticalError");
-                break;
+                checkisproperty(VERTICAL_ERROR_ROW, "legs:"+QString::number(legIndex)+"/verticalError"); break;
             case HIT_SOMETHING_ROW:
-                if (table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/hitSomething");
-                break;
+                checkisproperty(HIT_SOMETHING_ROW, "legs:"+QString::number(legIndex)+"/hitSomething"); break;
             case IS_PLANTED_MS_ROW:
-                if (table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/isPlantedMS");
-                break;
+                checkisproperty(IS_PLANTED_MS_ROW, "legs:"+QString::number(legIndex)+"/isPlantedMS"); break;
             }
         }else if (row == EVENT_ID_ROW && column == VALUE_COLUMN){
                 emit viewEvents(bsData->id + 1, QString(), QStringList());
             }
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("LegUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -381,48 +260,33 @@ void LegUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("LegUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void LegUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (index == bsData->id){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->id) ? table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("LegUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void LegUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("LegUI::variableRenamed(): The new variable name is the empty string!!");
-    }
-    if (bsData){
+    if (parent){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
+        auto bind = parent->getVariableBindingSetData();
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/groundPosition");
-            if (bindIndex == index){
-                table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/verticalError");
-            if (bindIndex == index){
-                table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/hitSomething");
-            if (bindIndex == index){
-                table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/isPlantedMS");
-            if (bindIndex == index){
-                table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("legs:"+QString::number(legIndex)+"/groundPosition", GROUND_POSITION_ROW);
+            setname("legs:"+QString::number(legIndex)+"/verticalError", VERTICAL_ERROR_ROW);
+            setname("legs:"+QString::number(legIndex)+"/hitSomething", HIT_SOMETHING_ROW);
+            setname("legs:"+QString::number(legIndex)+"/isPlantedMS", IS_PLANTED_MS_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("LegUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("LegUI::variableRenamed(): The data is nullptr!!");
     }
 }

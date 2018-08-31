@@ -45,7 +45,7 @@ bool BSSynchronizedClipGenerator::insertObjectAt(int , DataIconManager *obj){
 
 bool BSSynchronizedClipGenerator::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         pClipGenerator = HkxSharedPtr();
         return true;
     }
@@ -54,7 +54,7 @@ bool BSSynchronizedClipGenerator::removeObjectAt(int index){
 
 void BSSynchronizedClipGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 int BSSynchronizedClipGenerator::getSAnimationBindingIndex() const{
@@ -64,7 +64,7 @@ int BSSynchronizedClipGenerator::getSAnimationBindingIndex() const{
 
 void BSSynchronizedClipGenerator::setSAnimationBindingIndex(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != sAnimationBindingIndex) ? sAnimationBindingIndex = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'sAnimationBindingIndex' was not set!");
+    (value != sAnimationBindingIndex) ? sAnimationBindingIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'sAnimationBindingIndex' was not set!");
 }
 
 bool BSSynchronizedClipGenerator::getBApplyMotionFromRoot() const{
@@ -74,7 +74,7 @@ bool BSSynchronizedClipGenerator::getBApplyMotionFromRoot() const{
 
 void BSSynchronizedClipGenerator::setBApplyMotionFromRoot(bool value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != bApplyMotionFromRoot) ? bApplyMotionFromRoot = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'bApplyMotionFromRoot' was not set!");
+    (value != bApplyMotionFromRoot) ? bApplyMotionFromRoot = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bApplyMotionFromRoot' was not set!");
 }
 
 bool BSSynchronizedClipGenerator::getBReorientSupportChar() const{
@@ -84,7 +84,7 @@ bool BSSynchronizedClipGenerator::getBReorientSupportChar() const{
 
 void BSSynchronizedClipGenerator::setBReorientSupportChar(bool value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != bReorientSupportChar) ? bReorientSupportChar = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'bReorientSupportChar' was not set!");
+    (value != bReorientSupportChar) ? bReorientSupportChar = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bReorientSupportChar' was not set!");
 }
 
 bool BSSynchronizedClipGenerator::getBLeadCharacter() const{
@@ -94,7 +94,7 @@ bool BSSynchronizedClipGenerator::getBLeadCharacter() const{
 
 void BSSynchronizedClipGenerator::setBLeadCharacter(bool value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != bLeadCharacter) ? bLeadCharacter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'bLeadCharacter' was not set!");
+    (value != bLeadCharacter) ? bLeadCharacter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bLeadCharacter' was not set!");
 }
 
 qreal BSSynchronizedClipGenerator::getFMarkErrorThreshold() const{
@@ -104,7 +104,7 @@ qreal BSSynchronizedClipGenerator::getFMarkErrorThreshold() const{
 
 void BSSynchronizedClipGenerator::setFMarkErrorThreshold(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fMarkErrorThreshold) ? fMarkErrorThreshold = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fMarkErrorThreshold' was not set!");
+    (value != fMarkErrorThreshold) ? fMarkErrorThreshold = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fMarkErrorThreshold' was not set!");
 }
 
 qreal BSSynchronizedClipGenerator::getFGetToMarkTime() const{
@@ -114,7 +114,7 @@ qreal BSSynchronizedClipGenerator::getFGetToMarkTime() const{
 
 void BSSynchronizedClipGenerator::setFGetToMarkTime(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fGetToMarkTime) ? fGetToMarkTime = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fGetToMarkTime' was not set!");
+    (value != fGetToMarkTime) ? fGetToMarkTime = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fGetToMarkTime' was not set!");
 }
 
 bool BSSynchronizedClipGenerator::getBSyncClipIgnoreMarkPlacement() const{
@@ -124,7 +124,7 @@ bool BSSynchronizedClipGenerator::getBSyncClipIgnoreMarkPlacement() const{
 
 void BSSynchronizedClipGenerator::setBSyncClipIgnoreMarkPlacement(bool value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != bSyncClipIgnoreMarkPlacement) ? bSyncClipIgnoreMarkPlacement = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'bSyncClipIgnoreMarkPlacement' was not set!");
+    (value != bSyncClipIgnoreMarkPlacement) ? bSyncClipIgnoreMarkPlacement = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'bSyncClipIgnoreMarkPlacement' was not set!");
 }
 
 QString BSSynchronizedClipGenerator::getSyncAnimPrefix() const{
@@ -134,14 +134,14 @@ QString BSSynchronizedClipGenerator::getSyncAnimPrefix() const{
 
 void BSSynchronizedClipGenerator::setSyncAnimPrefix(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != syncAnimPrefix) ? syncAnimPrefix = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'syncAnimPrefix' was not set!");
+    (value != syncAnimPrefix) ? syncAnimPrefix = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'syncAnimPrefix' was not set!");
 }
 
 QString BSSynchronizedClipGenerator::getClipGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(pClipGenerator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(pClipGenerator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
@@ -287,7 +287,7 @@ void BSSynchronizedClipGenerator::unlink(){
 QString BSSynchronizedClipGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
         QString sigstring;
         if (sig != NULL_SIGNATURE)

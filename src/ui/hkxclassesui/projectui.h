@@ -16,15 +16,17 @@ class AnimationsUI;
 class QPushButton;
 class AnimationCacheUI;
 
-class ProjectUI: public QGroupBox
+class ProjectUI final: public QGroupBox
 {
     Q_OBJECT
-    //friend class MainWindow;
 public:
     ProjectUI(ProjectFile *file);
-    virtual ~ProjectUI();
-    void setProject(ProjectFile *file);
+    ProjectUI& operator=(const ProjectUI&) = delete;
+    ProjectUI(const ProjectUI &) = delete;
+    ~ProjectUI() = default;
+public:
     void loadData();
+    void setProject(ProjectFile *file);
     void setFilePath(const QString & path);
     void setDisabled(bool disable);
     AnimationsUI *getAnimations() const;
@@ -33,7 +35,6 @@ signals:
     void addBehavior(bool initData);
     void openAnimation(const QString & filename);
     void animationRemoved(int index);
-protected:
 private slots:
     void toggleFootIK(bool toggle);
     void toggleHandIK(bool toggle);

@@ -15,6 +15,16 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkbModifier *getModifier() const;
+    qreal getDelaySeconds() const;
+    void setDelaySeconds(const qreal &value);
+    qreal getDurationSeconds() const;
+    void setDurationSeconds(const qreal &value);
+    qreal getSecondsElapsed() const;
+    void setSecondsElapsed(const qreal &value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

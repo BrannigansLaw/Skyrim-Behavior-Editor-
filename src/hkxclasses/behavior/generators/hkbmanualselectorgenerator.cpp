@@ -33,7 +33,7 @@ bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj)
         if (obj->getType() == TYPE_GENERATOR){
             if (index >= generators.size() || index == -1){
                 generators.append(HkxSharedPtr(obj));
-            }else if (index == 0 || !generators.isEmpty()){
+            }else if (!index || !generators.isEmpty()){
                 generators.replace(index, HkxSharedPtr(obj));
             }
             return true;
@@ -52,6 +52,54 @@ bool hkbManualSelectorGenerator::removeObjectAt(int index){
         return false;
     }
     return true;
+}
+
+void hkbManualSelectorGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+qint8 hkbManualSelectorGenerator::getCurrentGeneratorIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return currentGeneratorIndex;
+}
+
+void hkbManualSelectorGenerator::setCurrentGeneratorIndex(const qint8 &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != currentGeneratorIndex) ? currentGeneratorIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'currentGeneratorIndex' was not set!");
+}
+
+bool hkbManualSelectorGenerator::swapChildren(int index1, int index2){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (generators.size() > index1 && generators.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+        auto gen1 = generators.at(index1).data();
+        auto gen2 = generators.at(index2).data();
+        generators[index1] = HkxSharedPtr(gen2);
+        generators[index2] = HkxSharedPtr(gen1);
+        if (selectedGeneratorIndex == index1){
+            selectedGeneratorIndex = index2;
+        }else if (selectedGeneratorIndex == index2){
+            selectedGeneratorIndex = index1;
+        }
+        if (currentGeneratorIndex == index1){
+            currentGeneratorIndex = index2;
+        }else if (currentGeneratorIndex == index2){
+            currentGeneratorIndex = index1;
+        }
+        setIsFileChanged(true);
+        return true;
+    }
+    return false;
+}
+
+qint8 hkbManualSelectorGenerator::getSelectedGeneratorIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return selectedGeneratorIndex;
+}
+
+void hkbManualSelectorGenerator::setSelectedGeneratorIndex(const qint8 &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != selectedGeneratorIndex) ? selectedGeneratorIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'selectedGeneratorIndex' was not set!");
 }
 
 bool hkbManualSelectorGenerator::hasChildren() const{
@@ -164,11 +212,7 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < generators.size(); i++, j++){
             refString.append(generators.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refString.append("\n");
-            }else{
-                refString.append(" ");
-            }
+            (!(j % 16)) ? refString.append("\n") : refString.append(" ");
         }
         if (generators.size() > 0){
             if (refString.endsWith(" \0")){
@@ -223,7 +267,7 @@ void hkbManualSelectorGenerator::unlink(){
 QString hkbManualSelectorGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](bool value, const QString & fieldname){
         if (!value){
             isvalid = false;

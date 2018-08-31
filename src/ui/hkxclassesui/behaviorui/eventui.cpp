@@ -32,44 +32,34 @@ EventUI::EventUI()
     topLyt->addWidget(payloadL, 4, 0, 1, 1);
     topLyt->addWidget(eventPayload, 4, 2, 1, 2);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void EventUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(selectEvent, SIGNAL(released()), this, SLOT(emitViewEvent()), Qt::UniqueConnection);
-    connect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
-}
-
-void EventUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(selectEvent, SIGNAL(released()), this, SLOT(emitViewEvent()));
-    disconnect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+void EventUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(selectEvent, SIGNAL(released()), this, SLOT(emitViewEvent()), Qt::UniqueConnection);
+        connect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(selectEvent, SIGNAL(released()), this, SLOT(emitViewEvent()));
+        disconnect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+    }
 }
 
 void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
-    disconnectSignals();
-    QString text;
+    toggleSignals(false);
     if (parentFile && event){
         file = parentFile;
         eventData = event;
-        text = file->getEventNameAt(event->id);
-        if (text == ""){
-            if (event->id != -1){
-                WARNING_MESSAGE("EventUI::loadData(): Invalid event id!!!");
-            }
-            text = "NONE";
-        }
+        auto text = file->getEventNameAt(event->id);
+        (text == "") ? text = "NONE" : NULL;
         selectEvent->setText(text);
-        if (event->payload.data()){
-            eventPayload->setText(static_cast<hkbStringEventPayload *>(event->payload.data())->getData());
-        }else{
-            eventPayload->setText("");
-        }
+        (event->payload.data()) ? eventPayload->setText(static_cast<hkbStringEventPayload *>(event->payload.data())->getData()) : eventPayload->setText("");
     }else{
-        CRITICAL_ERROR_MESSAGE("EventUI::loadData(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("EventUI::loadData(): Behavior file or data is null!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 QSize EventUI::sizeHint() const{
@@ -82,31 +72,25 @@ QSize EventUI::minimumSizeHint() const{
 
 void EventUI::setEvent(int index, const QString & name){
     if (eventData && file){
-        eventData->id = index - 1;
+        eventData->id = --index;
         selectEvent->setText(name);
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventUI::setEvent(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("EventUI::setEvent(): Behavior file or data is null!!!");
     }
 }
 
 void EventUI::setEventPayload(){
-    hkbStringEventPayload *payload;
     if (eventData && file){
-        payload = static_cast<hkbStringEventPayload *>(eventData->payload.data());
+        auto payload = static_cast<hkbStringEventPayload *>(eventData->payload.data());
         if (eventPayload->text() != ""){
-            if (payload){
-                payload->setData(eventPayload->text());
-            }else{
-                payload = new hkbStringEventPayload(file, eventPayload->text());
-                eventData->payload = HkxSharedPtr(payload);
-            }
+            (payload) ? payload->setData(eventPayload->text()) : eventData->payload = HkxSharedPtr(new hkbStringEventPayload(file, eventPayload->text()));
         }else{
             eventData->payload = HkxSharedPtr();
         }
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventUI::setEventPayload(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("EventUI::setEventPayload(): Behavior file or data is null!!!");
     }
 }
 
@@ -114,16 +98,14 @@ void EventUI::emitViewEvent(){
     if (eventData){
         emit viewEvents(eventData->id + 1, QString(), QStringList());
     }else{
-        CRITICAL_ERROR_MESSAGE("EventUI::emitViewEvent(): Event data is null!!!");
+        LogFile::writeToLog("EventUI::emitViewEvent(): Event data is null!!!");
     }
 }
 
 void EventUI::eventRenamed(const QString & name, int index){
     if (eventData){
-        if (index == eventData->id){
-            selectEvent->setText(name);
-        }
+        (index == eventData->id) ? selectEvent->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("EventUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("EventUI::eventRenamed(): The data is nullptr!!");
     }
 }

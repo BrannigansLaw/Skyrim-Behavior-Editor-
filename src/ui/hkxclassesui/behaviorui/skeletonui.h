@@ -11,24 +11,22 @@ class HkxObject;
 class QPushButton;
 class QSignalMapper;
 
-class SkeletonUI: public QGroupBox
+class SkeletonUI final: public QGroupBox
 {
     Q_OBJECT
 public:
     SkeletonUI(const QString & title);
-    virtual ~SkeletonUI();
+    SkeletonUI& operator=(const SkeletonUI&) = delete;
+    SkeletonUI(const SkeletonUI &) = delete;
+    ~SkeletonUI() = default;
+public:
     void loadData(HkxObject *data, bool isRagdoll = false);
-protected:
 signals:
     void returnToParent();
-private slots:
-    void setLocalFrame(int row);
 private:
     hkaSkeleton *bsData;
     QVBoxLayout *lyt;
-    //QPushButton *backPB;
     TableWidget *bones;
-    QSignalMapper *mapper;
 };
 
 #endif // SKELETONUI_H

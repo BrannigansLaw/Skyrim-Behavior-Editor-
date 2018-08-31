@@ -35,6 +35,12 @@ public:
     QString getStateNameNoLock(int stateId) const;
     QString getNestedStateNameNoLock(int stateId, ulong nestedStateId) const;
 private:
+    QString getGeneratorName() const;
+    void setName(const QString &newname);
+    qreal getProbability() const;
+    void setProbability(const qreal &value);
+    bool getEnable() const;
+    void setEnable(bool value);
     HkxSharedPtr getEnterNotifyEvents() const;
     HkxSharedPtr getExitNotifyEvents() const;
     HkxSharedPtr getTransitions() const;

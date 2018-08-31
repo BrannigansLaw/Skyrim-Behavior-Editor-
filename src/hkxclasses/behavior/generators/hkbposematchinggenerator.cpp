@@ -52,13 +52,101 @@ int hkbPoseMatchingGenerator::getNumberOfChildren() const{
     return children.size();
 }
 
+void hkbPoseMatchingGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+QString hkbPoseMatchingGenerator::getFlags() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return flags;
+}
+
+void hkbPoseMatchingGenerator::setFlags(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != flags) ? flags = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
+}
+
+void hkbPoseMatchingGenerator::setSubtractLastChild(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != subtractLastChild) ? subtractLastChild = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'subtractLastChild' was not set!");
+}
+
+bool hkbPoseMatchingGenerator::getSubtractLastChild() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return subtractLastChild;
+}
+
+int hkbPoseMatchingGenerator::getIndexOfSyncMasterChild() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return indexOfSyncMasterChild;
+}
+
+void hkbPoseMatchingGenerator::setIndexOfSyncMasterChild(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != indexOfSyncMasterChild) ? indexOfSyncMasterChild = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'indexOfSyncMasterChild' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getMaxCyclicBlendParameter() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return maxCyclicBlendParameter;
+}
+
+void hkbPoseMatchingGenerator::setMaxCyclicBlendParameter(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != maxCyclicBlendParameter) ? maxCyclicBlendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'maxCyclicBlendParameter' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getMinCyclicBlendParameter() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return minCyclicBlendParameter;
+}
+
+void hkbPoseMatchingGenerator::setMinCyclicBlendParameter(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != minCyclicBlendParameter) ? minCyclicBlendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'minCyclicBlendParameter' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getBlendParameter() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return blendParameter;
+}
+
+void hkbPoseMatchingGenerator::setBlendParameter(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != blendParameter) ? blendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'blendParameter' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getReferencePoseWeightThreshold() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return referencePoseWeightThreshold;
+}
+
+void hkbPoseMatchingGenerator::setReferencePoseWeightThreshold(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != referencePoseWeightThreshold) ? referencePoseWeightThreshold = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'referencePoseWeightThreshold' was not set!");
+}
+
+bool hkbPoseMatchingGenerator::swapChildren(int index1, int index2){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (children.size() > index1 && children.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+        auto gen1 = children.at(index1).data();
+        auto gen2 = children.at(index2).data();
+        children[index1] = HkxSharedPtr(gen2);
+        children[index2] = HkxSharedPtr(gen1);
+        setIsFileChanged(true);
+        return true;
+    }
+    return false;
+}
+
 bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
     std::lock_guard <std::mutex> guard(mutex);
     if (obj){
         if (obj->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
             if (index >= children.size() || index == -1){
                 children.append(HkxSharedPtr(obj));
-            }else if (index == 0 || !children.isEmpty()){
+            }else if (!index || !children.isEmpty()){
                 children.replace(index, HkxSharedPtr(obj));
             }
             return true;
@@ -81,6 +169,142 @@ bool hkbPoseMatchingGenerator::removeObjectAt(int index){
         return false;
     }
     return true;
+}
+
+void hkbPoseMatchingGenerator::updateChildIconNames() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < children.size(); i++){
+        if (children.at(i).data()){
+            static_cast<DataIconManager*>(children.at(i).data())->updateIconNames();
+        }
+    }
+}
+
+QString hkbPoseMatchingGenerator::getMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return mode;
+}
+
+void hkbPoseMatchingGenerator::setMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < Mode.size() && mode != Mode.at(index)) ? mode = Mode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'mode' was not set!");
+}
+
+int hkbPoseMatchingGenerator::getPelvisIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return pelvisIndex;
+}
+
+void hkbPoseMatchingGenerator::setPelvisIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != pelvisIndex && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? pelvisIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'pelvisIndex' was not set!");
+}
+
+int hkbPoseMatchingGenerator::getAnotherBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return anotherBoneIndex;
+}
+
+void hkbPoseMatchingGenerator::setAnotherBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != anotherBoneIndex && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? anotherBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'anotherBoneIndex' was not set!");
+}
+
+int hkbPoseMatchingGenerator::getOtherBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return otherBoneIndex;
+}
+
+void hkbPoseMatchingGenerator::setOtherBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != otherBoneIndex && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? otherBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'otherBoneIndex' was not set!");
+}
+
+int hkbPoseMatchingGenerator::getRootBoneIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rootBoneIndex;
+}
+
+void hkbPoseMatchingGenerator::setRootBoneIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rootBoneIndex && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? rootBoneIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rootBoneIndex' was not set!");
+}
+
+int hkbPoseMatchingGenerator::getStartMatchingEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startMatchingEventId;
+}
+
+void hkbPoseMatchingGenerator::setStartMatchingEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startMatchingEventId && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? startMatchingEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startMatchingEventId' was not set!");
+}
+
+int hkbPoseMatchingGenerator::getStartPlayingEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startPlayingEventId;
+}
+
+void hkbPoseMatchingGenerator::setStartPlayingEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startPlayingEventId && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? startPlayingEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startPlayingEventId' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getMinSwitchTimeFullError() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return minSwitchTimeFullError;
+}
+
+void hkbPoseMatchingGenerator::setMinSwitchTimeFullError(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != minSwitchTimeFullError) ? minSwitchTimeFullError = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'minSwitchTimeFullError' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getMinSwitchTimeNoError() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return minSwitchTimeNoError;
+}
+
+void hkbPoseMatchingGenerator::setMinSwitchTimeNoError(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != minSwitchTimeNoError) ? minSwitchTimeNoError = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'minSwitchTimeNoError' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getMinSpeedToSwitch() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return minSpeedToSwitch;
+}
+
+void hkbPoseMatchingGenerator::setMinSpeedToSwitch(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != minSpeedToSwitch) ? minSpeedToSwitch = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'minSpeedToSwitch' was not set!");
+}
+
+qreal hkbPoseMatchingGenerator::getBlendSpeed() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return blendSpeed;
+}
+
+void hkbPoseMatchingGenerator::setBlendSpeed(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != blendSpeed) ? blendSpeed = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'blendSpeed' was not set!");
+}
+
+hkQuadVariable hkbPoseMatchingGenerator::getWorldFromModelRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return worldFromModelRotation;
+}
+
+void hkbPoseMatchingGenerator::setWorldFromModelRotation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != worldFromModelRotation) ? worldFromModelRotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'worldFromModelRotation' was not set!");
+}
+
+hkbBlenderGeneratorChild *hkbPoseMatchingGenerator::getChildDataAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbBlenderGeneratorChild *child = nullptr;
+    (index >= 0 && index < children.size()) ? child = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data()) : NULL;
+    return child;
 }
 
 bool hkbPoseMatchingGenerator::hasChildren() const{
@@ -286,11 +510,7 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < children.size(); i++, j++){
             refString.append(children.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refString.append("\n");
-            }else{
-                refString.append(" ");
-            }
+            (!(j % 16)) ? refString.append("\n") : refString.append(" ");
         }
         if (children.size() > 0){
             if (refString.endsWith(" \0")){

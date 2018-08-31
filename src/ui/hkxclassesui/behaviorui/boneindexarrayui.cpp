@@ -13,7 +13,7 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-QStringList BoneIndexArrayUI::headerLabels = {
+const QStringList BoneIndexArrayUI::headerLabels = {
     "Bone Name",
     "Type",
     "Bone Index"
@@ -35,44 +35,42 @@ BoneIndexArrayUI::BoneIndexArrayUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BoneIndexArrayUI::connectSignals(){
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-}
-
-void BoneIndexArrayUI::disconnectSignals(){
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+void BoneIndexArrayUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+    }else{
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    }
 }
 
 void BoneIndexArrayUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_BONE_INDEX_ARRAY){
             bsData = static_cast<hkbBoneIndexArray *>(data);
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BoneIndexArrayUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("BoneIndexArrayUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::loadData(): The data passed to the UI is nullptr!!!");
+        LogFile::writeToLog("BoneIndexArrayUI::loadData(): The data passed to the UI is nullptr!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void BoneIndexArrayUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_RAGDOLL_BONE_ROW + bsData->boneIndices.size() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
-        QStringList bones = static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
-        for (auto i = ADD_RAGDOLL_BONE_ROW + 1, j = 0; j < bsData->boneIndices.size(); i++, j++){
-            temp = bsData->boneIndices.at(j);
+        auto numbones = bsData->getNumberOfBoneIndices();
+        auto temp = ADD_RAGDOLL_BONE_ROW + numbones + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
+        auto bones = static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
+        for (auto i = ADD_RAGDOLL_BONE_ROW + 1, j = 0; j < numbones; i++, j++){
+            temp = bsData->getBoneIndexAt(j);
             if (temp < bones.size() && temp >= 0){
                 setRowItems(i, bones.at(temp), "Remove", "Edit", "Double click to remove this ragdoll bone", VIEW_BONES_TABLE_TIP);
             }else{
@@ -80,9 +78,8 @@ void BoneIndexArrayUI::loadDynamicTableRows(){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("BoneIndexArrayUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
 }
 
 void BoneIndexArrayUI::setRowItems(int row, const QString & name, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
@@ -109,82 +106,75 @@ void BoneIndexArrayUI::connectToTables(GenericTableWidget *ragdollBones){
         connect(ragdollBones, SIGNAL(elementSelected(int,QString)), this, SLOT(setRagdollBone(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BoneIndexArrayUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BoneIndexArrayUI::viewSelectedChild(int row, int column){
-    int result = -1;
     if (bsData){
+        auto numbones = bsData->getNumberOfBoneIndices();
         if (row == ADD_RAGDOLL_BONE_ROW && column == NAME_COLUMN){
             addRagdollBone();
-        }else if (row > ADD_RAGDOLL_BONE_ROW && row < ADD_RAGDOLL_BONE_ROW + bsData->boneIndices.size() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
-            if (bsData->boneIndices.size() > result && result >= 0){
+        }else if (row > ADD_RAGDOLL_BONE_ROW && row < ADD_RAGDOLL_BONE_ROW + numbones + 1){
+            auto result = row - BASE_NUMBER_OF_ROWS;
+            if (numbones > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    emit viewRagdollBones(bsData->boneIndices.at(result) + 1);
+                    emit viewRagdollBones(bsData->getBoneIndexAt(result) + 1);
                 }else if (column == TYPE_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the ragdoll bone \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
                         removeRagdollBone(result);
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::viewSelectedChild(): Invalid index of bone to view!!");
+                LogFile::writeToLog("BoneIndexArrayUI::viewSelectedChild(): Invalid index of bone to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BoneIndexArrayUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
 void BoneIndexArrayUI::setRagdollBone(int index, const QString &name){
-    int row = table->currentRow() - BASE_NUMBER_OF_ROWS;
-    index--;
     if (bsData){
+        auto row = table->currentRow() - BASE_NUMBER_OF_ROWS;
         if (name != ""){
-            if (row >= 0 && row < bsData->boneIndices.size()){
+            if (row >= 0 && row < bsData->getNumberOfBoneIndices()){
                 if (index >= 0){
-                    bsData->boneIndices[row] = index;
-                    bsData->setIsFileChanged(true);
-                    if (table->item(table->currentRow(), NAME_COLUMN)){
-                        table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                    }else{
-                        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): Table row does not exist!!");
-                    }
+                    bsData->setBoneIndexAt(row, --index);
+                    auto item = table->item(table->currentRow(), NAME_COLUMN);
+                    (item) ? item->setText(name) : LogFile::writeToLog("BoneIndexArrayUI::setRagdollBone(): Table row does not exist!!");
                 }else{
                     removeRagdollBone(row);
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): Invalid bone index!!");
+                LogFile::writeToLog("BoneIndexArrayUI::setRagdollBone(): Invalid bone index!!");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): Bone name is an empty string!!");
+            LogFile::writeToLog("BoneIndexArrayUI::setRagdollBone(): Bone name is an empty string!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BoneIndexArrayUI::setRagdollBone(): The 'bsData' pointer is nullptr!!");
     }
 }
 
 void BoneIndexArrayUI::addRagdollBone(){
     if (bsData){
-        bsData->boneIndices.append(0);
-        bsData->setIsFileChanged(true);
+        bsData->addBoneIndex(0);
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::addRagdollBone(): The data is nullptr!!");
+        LogFile::writeToLog("BoneIndexArrayUI::addRagdollBone(): The data is nullptr!!");
     }
 }
 
 void BoneIndexArrayUI::removeRagdollBone(int index){
     if (bsData){
-        if (index < bsData->boneIndices.size() && index >= 0){
-            bsData->boneIndices.removeAt(index);
-            bsData->setIsFileChanged(true);
+        if (index < bsData->getNumberOfBoneIndices() && index >= 0){
+            bsData->removeBoneIndexAt(index);
         }else{
             WARNING_MESSAGE("BoneIndexArrayUI::removeRagdollBone(): Invalid index!!");
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::removeRagdollBone(): The data is nullptr!!");
+        LogFile::writeToLog("BoneIndexArrayUI::removeRagdollBone(): The data is nullptr!!");
     }
 }

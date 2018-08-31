@@ -15,6 +15,15 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    hkQuadVariable getRotationOut() const;
+    void setRotationOut(const hkQuadVariable &value);
+    hkQuadVariable getAxis() const;
+    void setAxis(const hkQuadVariable &value);
+    qreal getAngleDegrees() const;
+    void setAngleDegrees(const qreal &value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

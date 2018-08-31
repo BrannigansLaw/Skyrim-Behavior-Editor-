@@ -5,6 +5,8 @@
 
 class BehaviorFile;
 
+class hkbStringEventPayload;
+
 class hkbClipTriggerArray final: public HkxObject
 {
     friend class hkbClipGenerator;
@@ -49,9 +51,19 @@ private:
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
     void addTrigger(const HkTrigger & trigger = HkTrigger());
-    void setTriggerId(int index, int id);
-    void setLocalTime(int index, qreal time);
     void removeTrigger(int index);
+    void setTriggerIdAt(int index, int id);
+    void setPayloadAt(int index, hkbStringEventPayload *load);
+    void setLocalTimeAt(int index, qreal time);
+    void setRelativeToEndOfClipAt(int index, bool value);
+    void setAcyclicAt(int index, bool value);
+    void setIsAnnotationAt(int index, bool value);
+    int getTriggerIdAt(int index) const;
+    hkbStringEventPayload * getPayloadAt(int index) const;
+    qreal getLocalTimeAt(int index) const;
+    bool getRelativeToEndOfClipAt(int index) const;
+    bool getAcyclicAt(int index) const;
+    bool getIsAnnotationAt(int index) const;
 private:
     static uint refCount;
     static QString const classname;

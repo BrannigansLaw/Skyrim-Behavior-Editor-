@@ -27,7 +27,6 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
     QList <QGraphicsItem *> children;
     setFlags(QGraphicsItem::ItemIsSelectable);
     itemData->appendIcon(this);
-    //name = itemData->getName();
     if (parentItem()){
         children = parentItem()->childItems();
         if (indexToInsert > -1 && indexToInsert < children.size()){
@@ -360,37 +359,6 @@ int TreeGraphicsItem::getIconIndex(){
     return itemData->icons.indexOf(this);
 }
 
-//Returns the index that "this" should be inserted into it's associated DataIconManager's icon list...
-/*int TreeGraphicsItem::determineInsertionIndex() const{
-    QList <QGraphicsItem *> children;
-    QList <QGraphicsItem *> tempList;
-    TreeGraphicsItem *parent = nullptr;
-    TreeGraphicsItem *child = (TreeGraphicsItem *)this;
-    parent = (TreeGraphicsItem *)parentItem();
-    while (parent){
-        children = parent->childItems();
-        for (auto i = 0; i < children.size(); i++){
-            if (children.at(i) == child){
-                break;
-            }else if (((TreeGraphicsItem *)children.at(i))->hasSameData((TreeGraphicsItem *)this)){
-                return ((TreeGraphicsItem *)children.at(i))->getIconIndex();
-            }
-            children.removeAt(i);
-        }
-        while (!children.isEmpty()){
-            tempList.clear();
-            if (((TreeGraphicsItem *)children.first())->hasSameData((TreeGraphicsItem *)this)){
-                return ((TreeGraphicsItem *)children.first())->getIconIndex();
-            }
-            children.removeFirst();
-            children = tempList + children;
-        }
-        child = parent;
-        parent = (TreeGraphicsItem *)parent->parentItem();
-    }
-    return -1;
-}*/
-
 //Returns the first child of "this" whose data is equal to "data"...
 TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data){
     QList <QGraphicsItem *> children = childItems();
@@ -411,42 +379,6 @@ bool TreeGraphicsItem::isCircular(TreeGraphicsItem* itemtocheck) const{
         return static_cast<TreeGraphicsItem *>(parentItem())->isCircular(itemtocheck);
     }
 }
-
-/*TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data, int index){
-    //for when duplicates are allowed...
-    return nullptr;
-}*/
-
-/*Returns the icon that is closest to "this" that references "data"...
-TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
-    QList <QGraphicsItem *> children;
-    QList <QGraphicsItem *> tempList;
-    TreeGraphicsItem *parent = nullptr;
-    TreeGraphicsItem *child = nullptr;
-    parent = this;
-    while (parent){
-        children = parent->childItems();
-        for (auto i = 0; i < children.size(); i++){
-            if (children.at(i) == child){
-                break;
-            }else if (((TreeGraphicsItem *)children.at(i))->hasSameData(data)){
-                return ((TreeGraphicsItem *)children.at(i));
-            }
-            children.removeAt(i);
-        }
-        while (!children.isEmpty()){
-            tempList.clear();
-            if (((TreeGraphicsItem *)children.first())->hasSameData(data)){
-                return ((TreeGraphicsItem *)children.first());
-            }
-            children.removeFirst();
-            children = tempList + children;
-        }
-        child = parent;
-        parent = (TreeGraphicsItem *)parent->parentItem();
-    }
-    return nullptr;
-}*/
 
 TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
     QList <QGraphicsItem *> children;
@@ -537,5 +469,13 @@ QVector <TreeGraphicsItem *> TreeGraphicsItem::getAllIconsInBranch(TreeGraphicsI
         }
     }
     return list;
+}
+
+DataIconManager *TreeGraphicsItem::getItemData() const{
+    return itemData;
+}
+
+Qt::GlobalColor TreeGraphicsItem::getPenColor() const{
+    return penColor;
 }
 

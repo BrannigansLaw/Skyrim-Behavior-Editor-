@@ -55,8 +55,8 @@ private:
     void loadDynamicTableRows();
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        MAIN_WIDGET,
+        CHILD_WIDGET
     };
     enum Generator_Type {
         STATE_MACHINE,

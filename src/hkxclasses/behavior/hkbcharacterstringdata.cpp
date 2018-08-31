@@ -46,7 +46,7 @@ void hkbCharacterStringData::addAnimation(const QString & name){
     std::lock_guard <std::mutex> guard(mutex);
     if (!animationNames.contains(name, Qt::CaseInsensitive)){
         animationNames.append(name);
-        getParentFile()->setIsChanged(true);
+        setIsFileChanged(true);
     }else{
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": addAnimation()!\nAnimation: "+name+": already exists in the character file!!");
     }
@@ -102,6 +102,11 @@ int hkbCharacterStringData::getNumberOfAnimations() const{
 QString hkbCharacterStringData::getRigName() const{
     std::lock_guard <std::mutex> guard(mutex);
     return rigName;
+}
+
+void hkbCharacterStringData::setVariableNameAt(int index, const QString &name){
+    std::lock_guard <std::mutex> guard(mutex);
+    (characterPropertyNames.size() > index && index > -1) ? characterPropertyNames.replace(index, name), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'setVariableNameAt' failed!");
 }
 
 QString hkbCharacterStringData::getBehaviorFilename() const{
@@ -315,7 +320,7 @@ bool hkbCharacterStringData::link(){
 QString hkbCharacterStringData::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkstring = [&](const QStringList & list, const QString & fieldname){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i) == ""){

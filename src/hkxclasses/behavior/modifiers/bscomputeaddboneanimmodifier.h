@@ -15,6 +15,17 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    int getBoneIndex() const;
+    void setBoneIndex(int value);
+    hkQuadVariable getTranslationLSOut() const;
+    void setTranslationLSOut(const hkQuadVariable &value);
+    hkQuadVariable getRotationLSOut() const;
+    void setRotationLSOut(const hkQuadVariable &value);
+    hkQuadVariable getScaleLSOut() const;
+    void setScaleLSOut(const hkQuadVariable &value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

@@ -22,14 +22,14 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-QStringList ExpressionDataArrayUI::EventModeUI = {
+const QStringList ExpressionDataArrayUI::EventModeUI = {
     "EVENT_MODE_SEND_ONCE",
     "EVENT_MODE_SEND_ON_TRUE",
     "EVENT_MODE_SEND_ON_FALSE_TO_TRUE",
     "EVENT_MODE_SEND_EVERY_FRAME_ONCE_TRUE"
 };
 
-QStringList ExpressionDataArrayUI::headerLabels = {
+const QStringList ExpressionDataArrayUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -62,95 +62,76 @@ ExpressionDataArrayUI::ExpressionDataArrayUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 2);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ExpressionDataArrayUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(expression, SIGNAL(editingFinished()), this, SLOT(setExpression()), Qt::UniqueConnection);
-    connect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void ExpressionDataArrayUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(expression, SIGNAL(editingFinished()), this, SLOT(setExpression()));
-    disconnect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void ExpressionDataArrayUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(expression, SIGNAL(editingFinished()), this, SLOT(setExpression()), Qt::UniqueConnection);
+        connect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(expression, SIGNAL(editingFinished()), this, SLOT(setExpression()));
+        disconnect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void ExpressionDataArrayUI::loadData(BehaviorFile *parentFile, hkbExpressionDataArray::hkExpression *exp){
-    disconnectSignals();
-    QString text;
-    if (parentFile && expression){
+    toggleSignals(false);
+    if (parentFile && bsData){
         file = parentFile;
         bsData = exp;
         expression->setText(bsData->expression);
-        QString varName = file->getVariableNameAt(bsData->assignmentVariableIndex);
-        if (varName != ""){
-            table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(varName);
-        }else{
-            table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        text = file->getEventNameAt(bsData->assignmentEventIndex);
-        if (text != ""){
-            table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN)->setText(text);
-        }else{
-            table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        if (eventMode->count() == 0){
-            eventMode->insertItems(0, EventModeUI);
-        }
+        auto varName = file->getVariableNameAt(bsData->assignmentVariableIndex);
+        auto item = table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN);
+        (varName != "") ? item->setText(varName) : item->setText("NONE");
+        varName = file->getEventNameAt(bsData->assignmentEventIndex);
+        item = table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN);
+        (varName != "") ? item->setText(varName) : item->setText("NONE");
+        (!eventMode->count()) ? eventMode->insertItems(0, EventModeUI) : NULL;
         eventMode->setCurrentIndex(EventModeUI.indexOf(bsData->eventMode));
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::loadData(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::loadData(): Behavior file or data is null!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void ExpressionDataArrayUI::setExpression(){
     if (bsData && file){
-        if (bsData->expression != expression->text()){
-            bsData->expression = expression->text();
-            file->setIsChanged(true);
-        }
+        (bsData->expression != expression->text()) ? bsData->expression = expression->text(), file->setIsChanged(true) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::setExpression(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::setExpression(): Behavior file or data is null!!!");
     }
 }
 
 void ExpressionDataArrayUI::setEventMode(int index){
-    if (bsData){
-        bsData->eventMode = EventModeUI.at(index);
-        file->setIsChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::setEventMode(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->eventMode = EventModeUI.at(index), file->setIsChanged(true) : LogFile::writeToLog("ExpressionDataArrayUI::setEventMode(): The data is nullptr!!");
 }
 
 void ExpressionDataArrayUI::setAssignmentVariableIndex(int index, const QString & name){
     if (bsData && file){
-        index--;
-        if (bsData->assignmentVariableIndex != index){
+        if (bsData->assignmentVariableIndex != --index){
             bsData->assignmentVariableIndex = index;
             table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or data is null!!!");
     }
 }
 
 void ExpressionDataArrayUI::setAssignmentEventIndex(int index, const QString & name){
     if (bsData && file){
-        index--;
-        if (bsData->assignmentEventIndex != index){
+        if (bsData->assignmentEventIndex != --index){
             bsData->assignmentEventIndex = index;
             table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or data is null!!!");
     }
 }
 
@@ -162,27 +143,26 @@ void ExpressionDataArrayUI::viewSelectedChild(int row, int column){
             emit viewEvents(bsData->assignmentEventIndex + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void ExpressionDataArrayUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        index--;
-        if (index == bsData->assignmentEventIndex){
+        if (--index == bsData->assignmentEventIndex){
             table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void ExpressionDataArrayUI::variableRenamed(const QString & name, int index){
     if (bsData){
-        if (index == bsData->assignmentVariableIndex){
+        if (--index == bsData->assignmentVariableIndex){
             table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ExpressionDataArrayUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("ExpressionDataArrayUI::variableRenamed(): The data is nullptr!!");
     }
 }

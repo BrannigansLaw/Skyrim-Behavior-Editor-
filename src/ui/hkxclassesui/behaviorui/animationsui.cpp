@@ -18,7 +18,7 @@
 #include <QCoreApplication>
 #include <QFileDialog>
 
-QStringList AnimationsUI::headerLabels = {
+const QStringList AnimationsUI::headerLabels = {
     "Name",
     "Value"
 };
@@ -47,17 +47,41 @@ AnimationsUI::AnimationsUI(const QString &title)
     verLyt->addLayout(buttonLyt);
     verLyt->addLayout(stackLyt);
     setLayout(verLyt);
-    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()), Qt::UniqueConnection);
-    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()), Qt::UniqueConnection);
-    //connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)), Qt::UniqueConnection);
-    connect(animationUI, SIGNAL(returnToParent()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    toggleSignals(true);
+}
+
+void AnimationsUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()), Qt::UniqueConnection);
+        connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()), Qt::UniqueConnection);
+        //connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)), Qt::UniqueConnection);
+        connect(animationUI, SIGNAL(returnToParent()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    }else{
+        disconnect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()));
+        disconnect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()));
+        //disconnect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()));
+        disconnect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)));
+        disconnect(animationUI, SIGNAL(returnToParent()), this, SLOT(returnToTable()));
+    }
 }
 
 void AnimationsUI::viewAnimation(int row, int column){
-    if (column == 1 && animData && loadedData && loadedData->animationNames.size() > row && row >= 0){
-        animationUI->loadData(animData->findMotionData(row));
-        stackLyt->setCurrentIndex(ANIMATION_WIDGET);
+    if (column == 1){
+        if (animData){
+            if (loadedData){
+                if (loadedData->getNumberOfAnimations() > row && row >= 0){
+                    animationUI->loadData(animData->findMotionData(row));
+                    stackLyt->setCurrentIndex(ANIMATION_WIDGET);
+                }else{
+                    LogFile::writeToLog("AnimationsUI::viewAnimation(): Invalid row selected!!");
+                }
+            }else{
+                LogFile::writeToLog("AnimationsUI::viewAnimation(): loadedData is nullptr!!");
+            }
+        }else{
+            LogFile::writeToLog("AnimationsUI::viewAnimation(): animData is nullptr!!");
+        }
     }
 }
 
@@ -66,36 +90,39 @@ void AnimationsUI::returnToTable(){
 }
 
 void AnimationsUI::renameSelectedAnimation(){
-    /*QString newName = animationName->text();
-    table->item(table->currentRow(), 0)->setText(newName);
-    loadedData->animationNames[table->currentRow()] = newName;
-    loadedData->getParentFile()->toggleChanged(true);
-    emit animationNameChanged(newName, table->currentRow());*/
+    if (loadedData){
+        /*auto newName = animationName->text();
+        table->item(table->currentRow(), 0)->setText(newName);
+        loadedData->setAnimation(newName, table->currentRow());
+        emit animationNameChanged(newName, table->currentRow());*/
+    }else{
+        LogFile::writeToLog("AnimationsUI::viewAnimation(): loadedData is nullptr!!");
+    }
 }
 
 void AnimationsUI::loadData(HkxObject *data, ProjectAnimData *animdata){
-    if (data && data->getSignature() == HKB_CHARACTER_STRING_DATA){
-        loadedData = static_cast<hkbCharacterStringData *>(data);
-        animData = animdata;
-        int row;
-        for (auto i = 0; i < loadedData->animationNames.size(); i++){
-            row = table->rowCount();
-            if (table->rowCount() > i){
-                table->setRowHidden(i, false);
-                if (table->item(row, 0)){
-                    table->item(row, 0)->setText(loadedData->animationNames.at(i));
+    if (data){
+        if (data->getSignature() == HKB_CHARACTER_STRING_DATA){
+            loadedData = static_cast<hkbCharacterStringData *>(data);
+            animData = animdata;
+            auto animationNames = loadedData->getAnimationNames();
+            for (auto i = 0; i < animationNames.size(); i++){
+                auto row = table->rowCount();
+                if (table->rowCount() > i){
+                    table->setRowHidden(i, false);
+                    (table->item(row, 0)) ? table->item(row, 0)->setText(animationNames.at(i)) : table->setItem(row, 0, new QTableWidgetItem(animationNames.at(i)));
                 }else{
-                    table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.at(i)));
+                    table->setRowCount(row + 1);
+                    table->setItem(row, 0, new QTableWidgetItem(animationNames.at(i)));
+                    table->setItem(row, 1, new QTableWidgetItem("Edit"));
                 }
-            }else{
-                table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem("Edit"));
+            }
+            for (auto j = animationNames.size(); j < table->rowCount(); j++){
+                table->setRowHidden(j, true);
             }
         }
-        for (auto j = loadedData->animationNames.size(); j < table->rowCount(); j++){
-            table->setRowHidden(j, true);
-        }
+    }else{
+        LogFile::writeToLog("AnimationsUI::loadData(): The data is nullptr!!");
     }
 }
 
@@ -107,37 +134,30 @@ void AnimationsUI::clear(){
 
 void AnimationsUI::addAnimation(){
     if (loadedData){
-        QString filename = QFileDialog::getOpenFileName(this, tr("Open hkx animation file..."), loadedData->getParentFile()->fileName(), tr("hkx Files (*.hkx)"));
+        auto filename = QFileDialog::getOpenFileName(this, tr("Open hkx animation file..."), loadedData->getParentFile()->fileName(), tr("hkx Files (*.hkx)"));
         if (filename != "" && (filename.contains(loadedData->getParentFile()->fileName().section("/", 0, -3)+"/"+"animations", Qt::CaseInsensitive) || filename.contains("SharedKillMoves", Qt::CaseInsensitive)) && loadedData->getAnimationIndex(filename) == -1){
+            auto animationNames = loadedData->getAnimationNames();
+            auto row = table->rowCount();
             loadedData->addAnimation(filename.section("/", -2, -1).replace("/", "\\"));
-            animData->appendAnimation(new SkyrimAnimationMotionData(animData, loadedData->animationNames.size() - 1));  //Need to set duration later...
-            int row = table->rowCount();
+            animData->appendAnimation(new SkyrimAnimationMotionData(animData, animationNames.size() - 1));  //Need to set duration later...
             table->setRowCount(row + 1);
-            table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.last()));
+            table->setItem(row, 0, new QTableWidgetItem(animationNames.last()));
             table->setItem(row, 1, new QTableWidgetItem("Edit"));
-            if (stackLyt->currentIndex() == ANIMATION_WIDGET){
-                stackLyt->setCurrentIndex(TABLE_WIDGET);
-            }
+            (stackLyt->currentIndex() == ANIMATION_WIDGET) ? stackLyt->setCurrentIndex(TABLE_WIDGET) : NULL;
             table->setCurrentCell(row, 0);
             emit openAnimationFile(filename);
-            emit animationAdded(loadedData->animationNames.last());
+            emit animationAdded(animationNames.last());
         }
     }
 }
 
 void AnimationsUI::removeAnimation(){
     if (loadedData && !static_cast<CharacterFile *>(loadedData->getParentFile())->isAnimationUsed(table->item(table->currentRow(), table->currentColumn())->text())){
-        int index = table->currentRow();
-        if (!animData->removeAnimation(index)){
-            CRITICAL_ERROR_MESSAGE("AnimationsUI::removeAnimation(): Failed!");
-        }
+        auto index = table->currentRow();
+        (!animData->removeAnimation(index)) ? LogFile::writeToLog("AnimationsUI::removeAnimation(): Failed!") : NULL;
         loadedData->animationNames.removeAt(index);
-        if (index < table->rowCount()){
-            table->removeRow(index);
-        }
-        if (stackLyt->currentIndex() == ANIMATION_WIDGET){
-            stackLyt->setCurrentIndex(TABLE_WIDGET);
-        }
+        (index < table->rowCount()) ? table->removeRow(index) : NULL;
+        (stackLyt->currentIndex() == ANIMATION_WIDGET) ? stackLyt->setCurrentIndex(TABLE_WIDGET) : NULL;
         loadedData->setIsFileChanged(true);
         emit animationRemoved(index);
         table->setFocus();

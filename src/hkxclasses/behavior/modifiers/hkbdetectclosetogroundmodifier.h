@@ -3,6 +3,8 @@
 
 #include "hkbmodifier.h"
 
+class hkbStringEventPayload;
+
 class hkbDetectCloseToGroundModifier final: public hkbModifier
 {
     friend class DetectCloseToGroundModifierUI;
@@ -15,6 +17,23 @@ public:
     QString getName() const;
     static const QString getClassname();
 private:
+    void setName(const QString &newname);
+    bool getEnable() const;
+    void setEnable(bool value);
+    qreal getCloseToGroundHeight() const;
+    void setCloseToGroundHeight(const qreal &value);
+    qreal getRaycastDistanceDown() const;
+    void setRaycastDistanceDown(const qreal &value);
+    int getCollisionFilterInfo() const;
+    void setCollisionFilterInfo(int value);
+    int getBoneIndex() const;
+    void setBoneIndex(int value);
+    int getAnimBoneIndex() const;
+    void setAnimBoneIndex(int value);
+    int getCloseToGroundEventID() const;
+    void setCloseToGroundEventID(int value);
+    hkbStringEventPayload * getCloseToGroundEventPayload() const;
+    void setCloseToGroundEventPayload(hkbStringEventPayload *value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

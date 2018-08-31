@@ -17,35 +17,38 @@ class CheckBox;
 class QStackedLayout;
 class ProjectAnimData;
 
-class AnimationsUI: public QGroupBox
+class AnimationsUI final: public QGroupBox
 {
     Q_OBJECT
 public:
     AnimationsUI(const QString & title);
-    virtual ~AnimationsUI(){}
+    AnimationsUI& operator=(const AnimationsUI&) = delete;
+    AnimationsUI(const AnimationsUI &) = delete;
+    ~AnimationsUI() = default;
+public:
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data, ProjectAnimData *animdata);
     void clear();
+signals:
+    void openAnimationFile(const QString & filename);
+    void animationNameChanged(const QString & newName, int index);
+    void animationAdded(const QString & name);
+    void animationRemoved(int index);
 private slots:
     void addAnimation();
     void removeAnimation();
     void renameSelectedAnimation();
     void viewAnimation(int row, int column);
     void returnToTable();
-signals:
-    void openAnimationFile(const QString & filename);
-    void animationNameChanged(const QString & newName, int index);
-    void animationAdded(const QString & name);
-    void animationRemoved(int index);
 private:
-    AnimationsUI& operator=(const AnimationsUI&);
-    AnimationsUI(const AnimationsUI &);
+    void toggleSignals(bool toggleconnections);
 private:
     enum View {
-        TABLE_WIDGET = 0,
-        ANIMATION_WIDGET = 1
+        TABLE_WIDGET,
+        ANIMATION_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
     ProjectAnimData *animData;
@@ -57,4 +60,5 @@ private:
     QStackedLayout *stackLyt;
     SkyrimAnimationDataUI *animationUI;
 };
+
 #endif // ANIMATIONSUI_H

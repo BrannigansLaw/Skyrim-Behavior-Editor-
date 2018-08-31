@@ -116,6 +116,101 @@ bool hkbTransformVectorModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbTransformVectorModifier::getComputeOnModify() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return computeOnModify;
+}
+
+void hkbTransformVectorModifier::setComputeOnModify(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != computeOnModify) ? computeOnModify = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'computeOnModify' was not set!");
+}
+
+bool hkbTransformVectorModifier::getComputeOnActivate() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return computeOnActivate;
+}
+
+void hkbTransformVectorModifier::setComputeOnActivate(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != computeOnActivate) ? computeOnActivate = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'computeOnActivate' was not set!");
+}
+
+bool hkbTransformVectorModifier::getInverse() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return inverse;
+}
+
+void hkbTransformVectorModifier::setInverse(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != inverse) ? inverse = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'inverse' was not set!");
+}
+
+bool hkbTransformVectorModifier::getRotateOnly() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rotateOnly;
+}
+
+void hkbTransformVectorModifier::setRotateOnly(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rotateOnly) ? rotateOnly = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rotateOnly' was not set!");
+}
+
+hkQuadVariable hkbTransformVectorModifier::getVectorOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return vectorOut;
+}
+
+void hkbTransformVectorModifier::setVectorOut(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != vectorOut) ? vectorOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'vectorOut' was not set!");
+}
+
+hkQuadVariable hkbTransformVectorModifier::getVectorIn() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return vectorIn;
+}
+
+void hkbTransformVectorModifier::setVectorIn(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != vectorIn) ? vectorIn = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'vectorIn' was not set!");
+}
+
+hkQuadVariable hkbTransformVectorModifier::getTranslation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return translation;
+}
+
+void hkbTransformVectorModifier::setTranslation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != translation) ? translation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'translation' was not set!");
+}
+
+hkQuadVariable hkbTransformVectorModifier::getRotation() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rotation;
+}
+
+void hkbTransformVectorModifier::setRotation(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rotation) ? rotation = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rotation' was not set!");
+}
+
+bool hkbTransformVectorModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbTransformVectorModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbTransformVectorModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbTransformVectorModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -132,7 +227,7 @@ void hkbTransformVectorModifier::unlink(){
 QString hkbTransformVectorModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

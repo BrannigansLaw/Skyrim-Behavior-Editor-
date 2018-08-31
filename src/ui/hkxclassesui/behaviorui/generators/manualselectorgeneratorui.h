@@ -16,21 +16,27 @@ class ComboBox;
 class QGridLayout;
 class hkbVariableBindingSet;
 
-class ManualSelectorGeneratorUI: public QGroupBox
+class ManualSelectorGeneratorUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     ManualSelectorGeneratorUI();
-    virtual ~ManualSelectorGeneratorUI(){}
+    ManualSelectorGeneratorUI& operator=(const ManualSelectorGeneratorUI&) = delete;
+    ManualSelectorGeneratorUI(const ManualSelectorGeneratorUI &) = delete;
+    ~ManualSelectorGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setSelectedGeneratorIndex();
     void setCurrentGeneratorIndex();
     void setBindingVariable(int index, const QString & name);
@@ -38,22 +44,14 @@ private slots:
     void viewSelectedChild(int row, int column);
     void swapGeneratorIndices(int index1, int index2);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void removeGenerator(int index);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
     void addGenerator();
     void loadDynamicTableRows();
 private:
     enum Generator_Type {
-        NONE = 0,
+        NONE,
         STATE_MACHINE,
         MANUAL_SELECTOR_GENERATOR,
         BLENDER_GENERATOR,
@@ -68,8 +66,9 @@ private:
         BEHAVIOR_REFERENCE_GENERATOR,
         GAMEBYRO_SEQUENCE_GENERATOR
     };
-    static QStringList types;
-    static QStringList headerLabels;
+private:
+    static const QStringList types;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbManualSelectorGenerator *bsData;
     QGridLayout *topLyt;

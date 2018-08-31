@@ -60,7 +60,7 @@ bool BSCyclicBlendTransitionGenerator::insertObjectAt(int , DataIconManager *obj
 
 bool BSCyclicBlendTransitionGenerator::removeObjectAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    if (index == 0 || index == -1){
+    if (!index || index == -1){
         pBlenderGenerator = HkxSharedPtr();
         return true;
     }
@@ -69,29 +69,29 @@ bool BSCyclicBlendTransitionGenerator::removeObjectAt(int index){
 
 void BSCyclicBlendTransitionGenerator::setEBlendCurve(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index >= 0 && index < BlendCurve.size() && eBlendCurve != BlendCurve.at(index)) ? eBlendCurve = BlendCurve.at(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'eBlendCurve' was not set!");
+    (index >= 0 && index < BlendCurve.size() && eBlendCurve != BlendCurve.at(index)) ? eBlendCurve = BlendCurve.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'eBlendCurve' was not set!");
 }
 
 void BSCyclicBlendTransitionGenerator::setFTransitionDuration(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fTransitionDuration) ? fTransitionDuration = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fTransitionDuration' was not set!");
+    (value != fTransitionDuration) ? fTransitionDuration = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fTransitionDuration' was not set!");
 }
 
 void BSCyclicBlendTransitionGenerator::setFBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != fBlendParameter) ? fBlendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fBlendParameter' was not set!");
+    (value != fBlendParameter) ? fBlendParameter = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'fBlendParameter' was not set!");
 }
 
 void BSCyclicBlendTransitionGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 QString BSCyclicBlendTransitionGenerator::getBlenderGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
     QString genname("NONE");
-    hkbGenerator *gen = static_cast<hkbGenerator *>(pBlenderGenerator.data());
-    (gen) ? genname = gen->getName() : NULL;
+    auto gen = static_cast<hkbGenerator *>(pBlenderGenerator.data());
+    (gen) ? genname = gen->getName() : LogFile::writeToLog(getClassname()+" Cannot get child name!");
     return genname;
 }
 
@@ -388,7 +388,7 @@ void BSCyclicBlendTransitionGenerator::unlink(){
 QString BSCyclicBlendTransitionGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
         QString sigstring;
         if (sig != NULL_SIGNATURE)

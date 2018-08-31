@@ -47,6 +47,28 @@ private:
         int ankleIndex;
     };
 private:
+    qreal getRaycastDistanceUp() const;
+    void setRaycastDistanceUp(const qreal &value);
+    qreal getRaycastDistanceDown() const;
+    void setRaycastDistanceDown(const qreal &value);
+    qreal getOriginalGroundHeightMS() const;
+    void setOriginalGroundHeightMS(const qreal &value);
+    qreal getVerticalOffset() const;
+    void setVerticalOffset(const qreal &value);
+    int getCollisionFilterInfo() const;
+    void setCollisionFilterInfo(int value);
+    qreal getForwardAlignFraction() const;
+    void setForwardAlignFraction(const qreal &value);
+    qreal getSidewaysAlignFraction() const;
+    void setSidewaysAlignFraction(const qreal &value);
+    qreal getSidewaysSampleWidth() const;
+    void setSidewaysSampleWidth(const qreal &value);
+    bool getLockFeetWhenPlanted() const;
+    void setLockFeetWhenPlanted(bool value);
+    bool getUseCharacterUpVector() const;
+    void setUseCharacterUpVector(bool value);
+    bool getIsQuadrupedNarrow() const;
+    void setIsQuadrupedNarrow(bool value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();
@@ -54,6 +76,7 @@ private:
     void addLeg();
     void removeLegAt(int index);
     hkbFootIkDriverInfoLeg * getLegAt(int index);
+    int getNumberOfLegs() const;
 private:
     static uint refCount;
     static const QString classname;

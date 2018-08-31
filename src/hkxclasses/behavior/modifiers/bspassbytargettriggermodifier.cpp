@@ -2,6 +2,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSPassByTargetTriggerModifier::refCount = 0;
 
@@ -181,6 +182,71 @@ bool BSPassByTargetTriggerModifier::merge(HkxObject *recessiveObject){ //TO DO: 
     return false;
 }
 
+void BSPassByTargetTriggerModifier::setTriggerEventID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != triggerEvent.id && triggerEvent.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? triggerEvent.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'triggerEvent.id' was not set!");
+}
+
+void BSPassByTargetTriggerModifier::setTriggerEventPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(triggerEvent.payload.data())) ? triggerEvent.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'triggerEvent.payload' was not set!");
+}
+
+int BSPassByTargetTriggerModifier::getTriggerEventID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return triggerEvent.id;
+}
+
+hkbStringEventPayload *BSPassByTargetTriggerModifier::getTriggerEventPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(triggerEvent.payload.data());
+}
+
+hkQuadVariable BSPassByTargetTriggerModifier::getMovementDirection() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return movementDirection;
+}
+
+void BSPassByTargetTriggerModifier::setMovementDirection(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != movementDirection) ? movementDirection = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'movementDirection' was not set!");
+}
+
+qreal BSPassByTargetTriggerModifier::getRadius() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return radius;
+}
+
+void BSPassByTargetTriggerModifier::setRadius(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != radius) ? radius = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'radius' was not set!");
+}
+
+hkQuadVariable BSPassByTargetTriggerModifier::getTargetPosition() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return targetPosition;
+}
+
+void BSPassByTargetTriggerModifier::setTargetPosition(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != targetPosition) ? targetPosition = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'targetPosition' was not set!");
+}
+
+bool BSPassByTargetTriggerModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSPassByTargetTriggerModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSPassByTargetTriggerModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSPassByTargetTriggerModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -206,7 +272,7 @@ void BSPassByTargetTriggerModifier::unlink(){
 QString BSPassByTargetTriggerModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

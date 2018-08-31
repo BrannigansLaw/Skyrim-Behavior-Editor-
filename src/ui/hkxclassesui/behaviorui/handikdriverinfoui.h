@@ -17,16 +17,17 @@ class QGroupBox;
 class HandIkDriverInfoHandUI;
 class ComboBox;
 
-class HandIkDriverInfoUI: public QStackedWidget
+class HandIkDriverInfoUI final: public QStackedWidget
 {
     Q_OBJECT
-    //friend class HkDataUI;
 public:
     HandIkDriverInfoUI();
-    virtual ~HandIkDriverInfoUI(){}
+    HandIkDriverInfoUI& operator=(const HandIkDriverInfoUI&) = delete;
+    HandIkDriverInfoUI(const HandIkDriverInfoUI &) = delete;
+    ~HandIkDriverInfoUI() = default;
+public:
     void loadData(HkxObject *data);
     void loadBoneList(QStringList &bones);
-signals:
 private slots:
     void setFadeInOutCurve(int index);
     void addHand();
@@ -35,18 +36,17 @@ private slots:
     void returnToWidget();
 private:
     enum ACTIVE_WIDGET {
-        HAND_IK_DRIVER_INFO = 0,
-        HAND_IK_DRIVER_INFO_HAND = 1
+        HAND_IK_DRIVER_INFO,
+        HAND_IK_DRIVER_INFO_HAND
     };
-
-    static QStringList headerLabels1;
+private:
+    static const QStringList headerLabels1;
     hkbHandIkDriverInfo *bsData;
     QGroupBox *handDriverGB;
     HandIkDriverInfoHandUI *handUI;
     QGridLayout *footDriverLyt;
     QPushButton *addHandPB;
     QPushButton *removeHandPB;
-    //QStackedLayout *stackLyt;
     TableWidget *table;
     ComboBox *fadeInOutCurve;
 };

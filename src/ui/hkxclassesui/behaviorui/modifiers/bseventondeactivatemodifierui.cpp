@@ -25,7 +25,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSEventOnDeactivateModifierUI::headerLabels = {
+const QStringList BSEventOnDeactivateModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -62,20 +62,21 @@ BSEventOnDeactivateModifierUI::BSEventOnDeactivateModifierUI()
     table->setCellWidget(EVENT_PAYLOAD_ROW, VALUE_COLUMN, eventPayload);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void BSEventOnDeactivateModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void BSEventOnDeactivateModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void BSEventOnDeactivateModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void BSEventOnDeactivateModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
@@ -90,120 +91,90 @@ void BSEventOnDeactivateModifierUI::connectToTables(GenericTableWidget *variable
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSEventOnDeactivateModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_EVENT_ON_DEACTIVATE_MODIFIER){
             bsData = static_cast<BSEventOnDeactivateModifier *>(data);
-            hkbVariableBindingSet *varBind = nullptr;
-            hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            QString text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->event.id);
-            if (text != ""){
-                table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(text);
-            }else{
-                table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
-            }
-            if (payload){
-                eventPayload->setText(payload->getData());
-            }else{
-                eventPayload->setText("");
-            }
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            auto text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getEventID());
+            (text != "") ? table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(text) : table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
+            auto payload = static_cast<hkbStringEventPayload *>(bsData->getEventPayload());
+            (payload) ? eventPayload->setText(payload->getData()) : eventPayload->setText("");
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("BSEventOnDeactivateModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSEventOnDeactivateModifierUI::setName(){
+void BSEventOnDeactivateModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSEventOnDeactivateModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSEventOnDeactivateModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void BSEventOnDeactivateModifierUI::setEventId(int index, const QString & name){
     if (bsData){
-        index--;
-        if (bsData->event.id != index){
-            bsData->event.id = index;
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setEventID(index - 1);
+        table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::seteventId(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::seteventId(): The data is nullptr!!");
     }
 }
 
 void BSEventOnDeactivateModifierUI::setEventPayload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
+        auto payload = bsData->getEventPayload();
         if (eventPayload->text() != ""){
             if (payload){
-                payload->getData() = eventPayload->text();
+                payload->setData(eventPayload->text());
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventPayload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->event.payload = HkxSharedPtr(payload);
+                bsData->setEventPayload(payload);
             }
         }else{
-            bsData->event.payload = HkxSharedPtr();
+            bsData->setEventPayload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::seteventPayload(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::seteventPayload(): The data is nullptr!!");
     }
 }
 
 void BSEventOnDeactivateModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
-            default:
-                return;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             }
         }else if (column == VALUE_COLUMN && row == EVENT_ID_ROW){
-            emit viewEvents(bsData->event.id + 1, QString(), QStringList());
+            emit viewEvents(bsData->getEventID() + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -223,109 +194,42 @@ void BSEventOnDeactivateModifierUI::selectTableToView(bool viewisProperty, const
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSEventOnDeactivateModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        if (index == bsData->event.id){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->getEventID()) ? table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void BSEventOnDeactivateModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto bindIndex = bind->getVariableIndexOfBinding("enable");
+            (bindIndex == index) ? table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name) : NULL;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool BSEventOnDeactivateModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void BSEventOnDeactivateModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto isProperty = false;
+        auto row = table->currentRow();
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void BSEventOnDeactivateModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, "enable", VARIABLE_TYPE_BOOL, isProperty, table, bsData);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSEventOnDeactivateModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("BSEventOnDeactivateModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

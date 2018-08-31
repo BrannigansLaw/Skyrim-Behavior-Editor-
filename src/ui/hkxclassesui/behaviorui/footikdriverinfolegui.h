@@ -16,13 +16,15 @@ class QStackedLayout;
 class ComboBox;
 class QPushButton;
 
-class FootIkDriverInfoLegUI: public QGroupBox
+class FootIkDriverInfoLegUI final: public QGroupBox
 {
     Q_OBJECT
-    //friend class HkDataUI;
 public:
     FootIkDriverInfoLegUI();
-    virtual ~FootIkDriverInfoLegUI(){}
+    FootIkDriverInfoLegUI& operator=(const FootIkDriverInfoLegUI&) = delete;
+    FootIkDriverInfoLegUI(const FootIkDriverInfoLegUI &) = delete;
+    ~FootIkDriverInfoLegUI() = default;
+public:
     void loadData(hkbFootIkDriverInfoLeg *data);
     void loadBoneList(QStringList &bones);
 signals:
@@ -41,7 +43,7 @@ private slots:
     void setKneeIndex(int index);
     void setAnkleIndex(int index);
 private:
-    static QStringList headerLabels1;
+    static const QStringList headerLabels1;
     hkbFootIkDriverInfo::hkbFootIkDriverInfoLeg *bsData;
     QVBoxLayout *lyt;
     QStackedLayout *stackLyt;

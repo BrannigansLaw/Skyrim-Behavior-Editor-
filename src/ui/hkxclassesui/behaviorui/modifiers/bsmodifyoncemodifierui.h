@@ -15,36 +15,36 @@ class GenericTableWidget;
 class CheckBox;
 class hkbVariableBindingSet;
 
-class BSModifyOnceModifierUI: public QGroupBox
+class BSModifyOnceModifierUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BSModifyOnceModifierUI();
-    virtual ~BSModifyOnceModifierUI(){}
+    BSModifyOnceModifierUI& operator=(const BSModifyOnceModifierUI&) = delete;
+    BSModifyOnceModifierUI(const BSModifyOnceModifierUI &) = delete;
+    ~BSModifyOnceModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void variableRenamed(const QString & name, int index);
+    void modifierRenamed(const QString & name, int index);
+    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *variables, GenericTableWidget *properties);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void modifierNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewModifiers(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
+    void setEnable();
     void setModifier(int index, const QString & name);
     void setBindingVariable(int index, const QString & name);
     void viewSelected(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void variableRenamed(const QString & name, int index);
-    void modifierRenamed(const QString & name, int index);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
-    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *variables, GenericTableWidget *properties);
-    void setBehaviorView(BehaviorGraphView *view);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     BSModifyOnceModifier *bsData;
     QGridLayout *topLyt;

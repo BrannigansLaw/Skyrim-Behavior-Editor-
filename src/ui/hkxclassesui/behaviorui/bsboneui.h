@@ -17,13 +17,18 @@ class hkbVariableBindingSet;
 class QuadVariableWidget;
 class ComboBox;
 
-class BSBoneUI: public QGroupBox
+class BSBoneUI final: public QGroupBox
 {
     Q_OBJECT
     friend class BSLookAtModifierUI;
 public:
     BSBoneUI();
+    BSBoneUI& operator=(const BSBoneUI&) = delete;
+    BSBoneUI(const BSBoneUI &) = delete;
+    ~BSBoneUI() = default;
+public:
     void loadData(BehaviorFile *parentFile, BSLookAtModifier::BsBone *bon, BSLookAtModifier *par, int ind, bool isEyeBone);
+    void variableRenamed(const QString & name, int index);
 signals:
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -37,15 +42,11 @@ private slots:
     void setEnabled();
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void toggleSignals(bool toggleconnections);
     void setBindingVariable(int index, const QString & name);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void selectTableToView(bool viewproperties, const QString & path);
-    void variableRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorFile *file;
     BSLookAtModifier::BsBone *bsData;
     BSLookAtModifier *parent;

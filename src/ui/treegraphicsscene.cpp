@@ -140,7 +140,7 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
                 children = objects.first()->getChildren();
             }
             numChildren.first()--;
-            if (numChildren.first() == 0){
+            if (!numChildren.first()){
                 numChildren.removeFirst();
                 parentIcons.removeFirst();
             }

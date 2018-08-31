@@ -34,7 +34,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList DampingModifierUI::headerLabels = {
+const QStringList DampingModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -127,44 +127,45 @@ DampingModifierUI::DampingModifierUI()
     table->setCellWidget(PREVIOUS_ERROR_ROW, VALUE_COLUMN, previousError);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
+    toggleSignals(true);
 }
 
-void DampingModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(kP, SIGNAL(editingFinished()), this, SLOT(setKP()), Qt::UniqueConnection);
-    connect(kI, SIGNAL(editingFinished()), this, SLOT(setKI()), Qt::UniqueConnection);
-    connect(kD, SIGNAL(editingFinished()), this, SLOT(setKD()), Qt::UniqueConnection);
-    connect(enableScalarDamping, SIGNAL(released()), this, SLOT(setEnableScalarDamping()), Qt::UniqueConnection);
-    connect(enableVectorDamping, SIGNAL(released()), this, SLOT(setEnableVectorDamping()), Qt::UniqueConnection);
-    connect(rawValue, SIGNAL(editingFinished()), this, SLOT(setRawValue()), Qt::UniqueConnection);
-    connect(dampedValue, SIGNAL(editingFinished()), this, SLOT(setDampedValue()), Qt::UniqueConnection);
-    connect(rawVector, SIGNAL(editingFinished()), this, SLOT(setRawVector()), Qt::UniqueConnection);
-    connect(dampedVector, SIGNAL(editingFinished()), this, SLOT(setDampedVector()), Qt::UniqueConnection);
-    connect(vecErrorSum, SIGNAL(editingFinished()), this, SLOT(setVecErrorSum()), Qt::UniqueConnection);
-    connect(vecPreviousError, SIGNAL(editingFinished()), this, SLOT(setVecPreviousError()), Qt::UniqueConnection);
-    connect(errorSum, SIGNAL(editingFinished()), this, SLOT(setErrorSum()), Qt::UniqueConnection);
-    connect(previousError, SIGNAL(editingFinished()), this, SLOT(setPreviousError()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-}
-
-void DampingModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(kP, SIGNAL(editingFinished()), this, SLOT(setKP()));
-    disconnect(kI, SIGNAL(editingFinished()), this, SLOT(setKI()));
-    disconnect(kD, SIGNAL(editingFinished()), this, SLOT(setKD()));
-    disconnect(enableScalarDamping, SIGNAL(released()), this, SLOT(setEnableScalarDamping()));
-    disconnect(enableVectorDamping, SIGNAL(released()), this, SLOT(setEnableVectorDamping()));
-    disconnect(rawValue, SIGNAL(editingFinished()), this, SLOT(setRawValue()));
-    disconnect(dampedValue, SIGNAL(editingFinished()), this, SLOT(setDampedValue()));
-    disconnect(rawVector, SIGNAL(editingFinished()), this, SLOT(setRawVector()));
-    disconnect(dampedVector, SIGNAL(editingFinished()), this, SLOT(setDampedVector()));
-    disconnect(vecErrorSum, SIGNAL(editingFinished()), this, SLOT(setVecErrorSum()));
-    disconnect(vecPreviousError, SIGNAL(editingFinished()), this, SLOT(setVecPreviousError()));
-    disconnect(errorSum, SIGNAL(editingFinished()), this, SLOT(setErrorSum()));
-    disconnect(previousError, SIGNAL(editingFinished()), this, SLOT(setPreviousError()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+void DampingModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(kP, SIGNAL(editingFinished()), this, SLOT(setKP()), Qt::UniqueConnection);
+        connect(kI, SIGNAL(editingFinished()), this, SLOT(setKI()), Qt::UniqueConnection);
+        connect(kD, SIGNAL(editingFinished()), this, SLOT(setKD()), Qt::UniqueConnection);
+        connect(enableScalarDamping, SIGNAL(released()), this, SLOT(setEnableScalarDamping()), Qt::UniqueConnection);
+        connect(enableVectorDamping, SIGNAL(released()), this, SLOT(setEnableVectorDamping()), Qt::UniqueConnection);
+        connect(rawValue, SIGNAL(editingFinished()), this, SLOT(setRawValue()), Qt::UniqueConnection);
+        connect(dampedValue, SIGNAL(editingFinished()), this, SLOT(setDampedValue()), Qt::UniqueConnection);
+        connect(rawVector, SIGNAL(editingFinished()), this, SLOT(setRawVector()), Qt::UniqueConnection);
+        connect(dampedVector, SIGNAL(editingFinished()), this, SLOT(setDampedVector()), Qt::UniqueConnection);
+        connect(vecErrorSum, SIGNAL(editingFinished()), this, SLOT(setVecErrorSum()), Qt::UniqueConnection);
+        connect(vecPreviousError, SIGNAL(editingFinished()), this, SLOT(setVecPreviousError()), Qt::UniqueConnection);
+        connect(errorSum, SIGNAL(editingFinished()), this, SLOT(setErrorSum()), Qt::UniqueConnection);
+        connect(previousError, SIGNAL(editingFinished()), this, SLOT(setPreviousError()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(kP, SIGNAL(editingFinished()), this, SLOT(setKP()));
+        disconnect(kI, SIGNAL(editingFinished()), this, SLOT(setKI()));
+        disconnect(kD, SIGNAL(editingFinished()), this, SLOT(setKD()));
+        disconnect(enableScalarDamping, SIGNAL(released()), this, SLOT(setEnableScalarDamping()));
+        disconnect(enableVectorDamping, SIGNAL(released()), this, SLOT(setEnableVectorDamping()));
+        disconnect(rawValue, SIGNAL(editingFinished()), this, SLOT(setRawValue()));
+        disconnect(dampedValue, SIGNAL(editingFinished()), this, SLOT(setDampedValue()));
+        disconnect(rawVector, SIGNAL(editingFinished()), this, SLOT(setRawVector()));
+        disconnect(dampedVector, SIGNAL(editingFinished()), this, SLOT(setDampedVector()));
+        disconnect(vecErrorSum, SIGNAL(editingFinished()), this, SLOT(setVecErrorSum()));
+        disconnect(vecPreviousError, SIGNAL(editingFinished()), this, SLOT(setVecPreviousError()));
+        disconnect(errorSum, SIGNAL(editingFinished()), this, SLOT(setErrorSum()));
+        disconnect(previousError, SIGNAL(editingFinished()), this, SLOT(setPreviousError()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
+    }
 }
 
 void DampingModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
@@ -176,328 +177,161 @@ void DampingModifierUI::connectToTables(GenericTableWidget *variables, GenericTa
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void DampingModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_DAMPING_MODIFIER){
-            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbDampingModifier *>(data);
             name->setText(bsData->getName());
-            enable->setChecked(bsData->enable);
-            kP->setValue(bsData->kP);
-            kI->setValue(bsData->kI);
-            kD->setValue(bsData->kD);
-            enableScalarDamping->setChecked(bsData->enableScalarDamping);
-            enableVectorDamping->setChecked(bsData->enableVectorDamping);
-            rawValue->setValue(bsData->rawValue);
-            dampedValue->setValue(bsData->dampedValue);
-            rawVector->setValue(bsData->rawVector);
-            dampedVector->setValue(bsData->dampedVector);
-            vecErrorSum->setValue(bsData->vecErrorSum);
-            vecPreviousError->setValue(bsData->vecPreviousError);
-            errorSum->setValue(bsData->errorSum);
-            previousError->setValue(bsData->previousError);
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(KP_ROW, BINDING_COLUMN, varBind, "kP");
-                loadBinding(KI_ROW, BINDING_COLUMN, varBind, "kI");
-                loadBinding(KD_ROW, BINDING_COLUMN, varBind, "kD");
-                loadBinding(ENABLE_SCALAR_DAMPING_ROW, BINDING_COLUMN, varBind, "enableScalarDamping");
-                loadBinding(ENABLE_VECTOR_DAMPING_ROW, BINDING_COLUMN, varBind, "enableVectorDamping");
-                loadBinding(RAW_VALUE_ROW, BINDING_COLUMN, varBind, "rawValue");
-                loadBinding(DAMPED_VALUE_ROW, BINDING_COLUMN, varBind, "dampedValue");
-                loadBinding(RAW_VECTOR_ROW, BINDING_COLUMN, varBind, "rawVector");
-                loadBinding(DAMPED_VECTOR_ROW, BINDING_COLUMN, varBind, "dampedVector");
-                loadBinding(VEC_ERROR_SUM_ROW, BINDING_COLUMN, varBind, "vecErrorSum");
-                loadBinding(VEC_PREVIOUS_ERROR_ROW, BINDING_COLUMN, varBind, "vecPreviousError");
-                loadBinding(ERROR_SUM_ROW, BINDING_COLUMN, varBind, "errorSum");
-                loadBinding(PREVIOUS_ERROR_ROW, BINDING_COLUMN, varBind, "previousError");
-            }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(KP_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(KI_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(KD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ENABLE_SCALAR_DAMPING_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ENABLE_VECTOR_DAMPING_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(RAW_VALUE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DAMPED_VALUE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(RAW_VECTOR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(DAMPED_VECTOR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VEC_ERROR_SUM_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(VEC_PREVIOUS_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ERROR_SUM_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(PREVIOUS_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            enable->setChecked(bsData->getEnable());
+            kP->setValue(bsData->getKP());
+            kI->setValue(bsData->getKI());
+            kD->setValue(bsData->getKD());
+            enableScalarDamping->setChecked(bsData->getEnableScalarDamping());
+            enableVectorDamping->setChecked(bsData->getEnableVectorDamping());
+            rawValue->setValue(bsData->getRawValue());
+            dampedValue->setValue(bsData->getDampedValue());
+            rawVector->setValue(bsData->getRawVector());
+            dampedVector->setValue(bsData->getDampedVector());
+            vecErrorSum->setValue(bsData->getVecErrorSum());
+            vecPreviousError->setValue(bsData->getVecPreviousError());
+            errorSum->setValue(bsData->getErrorSum());
+            previousError->setValue(bsData->getPreviousError());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+            UIHelper::loadBinding(KP_ROW, BINDING_COLUMN, varBind, "kP", table, bsData);
+            UIHelper::loadBinding(KI_ROW, BINDING_COLUMN, varBind, "kI", table, bsData);
+            UIHelper::loadBinding(KD_ROW, BINDING_COLUMN, varBind, "kD", table, bsData);
+            UIHelper::loadBinding(ENABLE_SCALAR_DAMPING_ROW, BINDING_COLUMN, varBind, "enableScalarDamping", table, bsData);
+            UIHelper::loadBinding(ENABLE_VECTOR_DAMPING_ROW, BINDING_COLUMN, varBind, "enableVectorDamping", table, bsData);
+            UIHelper::loadBinding(RAW_VALUE_ROW, BINDING_COLUMN, varBind, "rawValue", table, bsData);
+            UIHelper::loadBinding(DAMPED_VALUE_ROW, BINDING_COLUMN, varBind, "dampedValue", table, bsData);
+            UIHelper::loadBinding(RAW_VECTOR_ROW, BINDING_COLUMN, varBind, "rawVector", table, bsData);
+            UIHelper::loadBinding(DAMPED_VECTOR_ROW, BINDING_COLUMN, varBind, "dampedVector", table, bsData);
+            UIHelper::loadBinding(VEC_ERROR_SUM_ROW, BINDING_COLUMN, varBind, "vecErrorSum", table, bsData);
+            UIHelper::loadBinding(VEC_PREVIOUS_ERROR_ROW, BINDING_COLUMN, varBind, "vecPreviousError", table, bsData);
+            UIHelper::loadBinding(ERROR_SUM_ROW, BINDING_COLUMN, varBind, "errorSum", table, bsData);
+            UIHelper::loadBinding(PREVIOUS_ERROR_ROW, BINDING_COLUMN, varBind, "previousError", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE("DampingModifierUI::loadData(): The data is an incorrect type!!");
+            LogFile::writeToLog("DampingModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::loadData(): The data is nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::loadData(): The data is nullptr!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void DampingModifierUI::setName(){
+void DampingModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void DampingModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("DampingModifierUI::setEnable(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setKP(){
-    if (bsData){
-        if (bsData->kP != kP->value()){
-            bsData->kP = kP->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setkP(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setKP(kP->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setKP(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setKI(){
-    if (bsData){
-        if (bsData->kI != kI->value()){
-            bsData->kI = kI->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setkI(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setKI(kI->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setKI(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setKD(){
-    if (bsData){
-        if (bsData->kD != kD->value()){
-            bsData->kD = kD->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setkD(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setKD(kD->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setKD(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setEnableScalarDamping(){
-    if (bsData){
-        bsData->enableScalarDamping = enableScalarDamping->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setenableScalarDamping(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnableScalarDamping(enableScalarDamping->isChecked()) : LogFile::writeToLog("DampingModifierUI::setEnableScalarDamping(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setEnableVectorDamping(){
-    if (bsData){
-        bsData->enableVectorDamping = enableVectorDamping->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setenableVectorDamping(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnableVectorDamping(enableVectorDamping->isChecked()) : LogFile::writeToLog("DampingModifierUI::setEnableVectorDamping(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setRawValue(){
-    if (bsData){
-        if (bsData->rawValue != rawValue->value()){
-            bsData->rawValue = rawValue->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setrawValue(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRawValue(rawValue->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setRawValue(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setDampedValue(){
-    if (bsData){
-        if (bsData->dampedValue != dampedValue->value()){
-            bsData->dampedValue = dampedValue->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setdampedValue(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDampedValue(dampedValue->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setDampedValue(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setRawVector(){
-    if (bsData){
-        if (bsData->rawVector != rawVector->value()){
-            bsData->rawVector = rawVector->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setrawVector(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setRawVector(rawVector->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setRawVector(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setDampedVector(){
-    if (bsData){
-        if (bsData->dampedVector != dampedVector->value()){
-            bsData->dampedVector = dampedVector->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setdampedVector(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setDampedVector(dampedVector->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setDampedVector(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setVecErrorSum(){
-    if (bsData){
-        if (bsData->vecErrorSum != vecErrorSum->value()){
-            bsData->vecErrorSum = vecErrorSum->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setvecErrorSum(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVecErrorSum(vecErrorSum->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setVecErrorSum(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setVecPreviousError(){
-    if (bsData){
-        if (bsData->vecPreviousError != vecPreviousError->value()){
-            bsData->vecPreviousError = vecPreviousError->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setvecPreviousError(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setVecPreviousError(vecPreviousError->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setVecPreviousError(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setErrorSum(){
-    if (bsData){
-        if (bsData->errorSum != errorSum->value()){
-            bsData->errorSum = errorSum->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::seterrorSum(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setErrorSum(errorSum->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setErrorSum(): The data is nullptr!!");
 }
 
 void DampingModifierUI::setPreviousError(){
-    if (bsData){
-        if (bsData->previousError != previousError->value()){
-            bsData->previousError = previousError->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setpreviousError(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPreviousError(previousError->value()) : LogFile::writeToLog("ComputeDirectionModifierUI::setPreviousError(): The data is nullptr!!");
 }
 
 void DampingModifierUI::viewSelected(int row, int column){
     if (bsData){
-        bool isProperty = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case ENABLE_ROW:
-                if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enable");
-                break;
+                checkisproperty(ENABLE_ROW, "enable"); break;
             case KP_ROW:
-                if (table->item(KP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "kP");
-                break;
+                checkisproperty(KP_ROW, "kP"); break;
             case KI_ROW:
-                if (table->item(KI_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "kI");
-                break;
+                checkisproperty(KI_ROW, "kI"); break;
             case KD_ROW:
-                if (table->item(KD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "kD");
-                break;
+                checkisproperty(KD_ROW, "kD"); break;
             case ENABLE_SCALAR_DAMPING_ROW:
-                if (table->item(ENABLE_SCALAR_DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enableScalarDamping");
-                break;
+                checkisproperty(ENABLE_SCALAR_DAMPING_ROW, "enableScalarDamping"); break;
             case ENABLE_VECTOR_DAMPING_ROW:
-                if (table->item(ENABLE_VECTOR_DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "enableVectorDamping");
-                break;
+                checkisproperty(ENABLE_VECTOR_DAMPING_ROW, "enableVectorDamping"); break;
             case RAW_VALUE_ROW:
-                if (table->item(RAW_VALUE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "rawValue");
-                break;
+                checkisproperty(RAW_VALUE_ROW, "rawValue"); break;
             case DAMPED_VALUE_ROW:
-                if (table->item(DAMPED_VALUE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "dampedValue");
-                break;
+                checkisproperty(DAMPED_VALUE_ROW, "dampedValue"); break;
             case RAW_VECTOR_ROW:
-                if (table->item(RAW_VECTOR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "rawVector");
-                break;
+                checkisproperty(RAW_VECTOR_ROW, "rawVector"); break;
             case DAMPED_VECTOR_ROW:
-                if (table->item(DAMPED_VECTOR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "dampedVector");
-                break;
+                checkisproperty(DAMPED_VECTOR_ROW, "dampedVector"); break;
             case VEC_ERROR_SUM_ROW:
-                if (table->item(VEC_ERROR_SUM_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "vecErrorSum");
-                break;
+                checkisproperty(VEC_ERROR_SUM_ROW, "vecErrorSum"); break;
             case VEC_PREVIOUS_ERROR_ROW:
-                if (table->item(VEC_PREVIOUS_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "vecPreviousError");
-                break;
+                checkisproperty(VEC_PREVIOUS_ERROR_ROW, "vecPreviousError"); break;
             case ERROR_SUM_ROW:
-                if (table->item(ERROR_SUM_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "errorSum");
-                break;
+                checkisproperty(ERROR_SUM_ROW, "errorSum"); break;
             case PREVIOUS_ERROR_ROW:
-                if (table->item(PREVIOUS_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    isProperty = true;
-                }
-                selectTableToView(isProperty, "previousError");
-                break;
-            default:
-                return;
+                checkisproperty(PREVIOUS_ERROR_ROW, "previousError"); break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -517,228 +351,78 @@ void DampingModifierUI::selectTableToView(bool viewisProperty, const QString & p
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void DampingModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("kP");
-            if (bindIndex == index){
-                table->item(KP_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("kI");
-            if (bindIndex == index){
-                table->item(KI_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("kD");
-            if (bindIndex == index){
-                table->item(KD_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("enableScalarDamping");
-            if (bindIndex == index){
-                table->item(ENABLE_SCALAR_DAMPING_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("enableVectorDamping");
-            if (bindIndex == index){
-                table->item(ENABLE_VECTOR_DAMPING_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("rawValue");
-            if (bindIndex == index){
-                table->item(RAW_VALUE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("dampedValue");
-            if (bindIndex == index){
-                table->item(DAMPED_VALUE_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("rawVector");
-            if (bindIndex == index){
-                table->item(RAW_VECTOR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("dampedVector");
-            if (bindIndex == index){
-                table->item(DAMPED_VECTOR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("vecErrorSum");
-            if (bindIndex == index){
-                table->item(VEC_ERROR_SUM_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("vecPreviousError");
-            if (bindIndex == index){
-                table->item(VEC_PREVIOUS_ERROR_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("errorSum");
-            if (bindIndex == index){
-                table->item(ERROR_SUM_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("previousError");
-            if (bindIndex == index){
-                table->item(PREVIOUS_ERROR_ROW, BINDING_COLUMN)->setText(name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("kP", KP_ROW);
+            setname("kI", KI_ROW);
+            setname("kD", KD_ROW);
+            setname("enableScalarDamping", ENABLE_SCALAR_DAMPING_ROW);
+            setname("enableVectorDamping", ENABLE_VECTOR_DAMPING_ROW);
+            setname("rawValue", RAW_VALUE_ROW);
+            setname("dampedValue", DAMPED_VALUE_ROW);
+            setname("rawVector", RAW_VECTOR_ROW);
+            setname("dampedVector", DAMPED_VECTOR_ROW);
+            setname("vecErrorSum", VEC_ERROR_SUM_ROW);
+            setname("vecPreviousError", VEC_PREVIOUS_ERROR_ROW);
+            setname("errorSum", ERROR_SUM_ROW);
+            setname("previousError", PREVIOUS_ERROR_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
-}
-
-bool DampingModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("DampingModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("DampingModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void DampingModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case KP_ROW:
-            if (table->item(KP_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "kP", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(KP_ROW, "kP", VARIABLE_TYPE_REAL); break;
         case KI_ROW:
-            if (table->item(KI_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "kI", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(KI_ROW, "kI", VARIABLE_TYPE_REAL); break;
         case KD_ROW:
-            if (table->item(KD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "kD", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(KD_ROW, "kD", VARIABLE_TYPE_REAL); break;
         case ENABLE_SCALAR_DAMPING_ROW:
-            if (table->item(ENABLE_SCALAR_DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enableScalarDamping", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_SCALAR_DAMPING_ROW, "enableScalarDamping", VARIABLE_TYPE_BOOL); break;
         case ENABLE_VECTOR_DAMPING_ROW:
-            if (table->item(ENABLE_VECTOR_DAMPING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enableVectorDamping", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_VECTOR_DAMPING_ROW, "enableVectorDamping", VARIABLE_TYPE_BOOL); break;
         case RAW_VALUE_ROW:
-            if (table->item(RAW_VALUE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "rawValue", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(RAW_VALUE_ROW, "rawValue", VARIABLE_TYPE_REAL); break;
         case DAMPED_VALUE_ROW:
-            if (table->item(DAMPED_VALUE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "dampedValue", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(DAMPED_VALUE_ROW, "dampedValue", VARIABLE_TYPE_REAL); break;
         case RAW_VECTOR_ROW:
-            if (table->item(RAW_VECTOR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "rawVector", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(RAW_VECTOR_ROW, "rawVector", VARIABLE_TYPE_VECTOR4); break;
         case DAMPED_VECTOR_ROW:
-            if (table->item(DAMPED_VECTOR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "dampedVector", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(DAMPED_VECTOR_ROW, "dampedVector", VARIABLE_TYPE_VECTOR4); break;
         case VEC_ERROR_SUM_ROW:
-            if (table->item(VEC_ERROR_SUM_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "vecErrorSum", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(VEC_ERROR_SUM_ROW, "vecErrorSum", VARIABLE_TYPE_VECTOR4); break;
         case VEC_PREVIOUS_ERROR_ROW:
-            if (table->item(VEC_PREVIOUS_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "vecPreviousError", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(VEC_PREVIOUS_ERROR_ROW, "vecPreviousError", VARIABLE_TYPE_VECTOR4); break;
         case ERROR_SUM_ROW:
-            if (table->item(ERROR_SUM_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "errorSum", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ERROR_SUM_ROW, "errorSum", VARIABLE_TYPE_REAL); break;
         case PREVIOUS_ERROR_ROW:
-            if (table->item(PREVIOUS_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "previousError", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
-        }
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::setBindingVariable(): The data is nullptr!!");
-    }
-}
-
-void DampingModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("DampingModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            checkisproperty(PREVIOUS_ERROR_ROW, "previousError", VARIABLE_TYPE_REAL); break;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DampingModifierUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("DampingModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }

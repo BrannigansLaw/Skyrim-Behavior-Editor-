@@ -2,6 +2,8 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/hkbboneindexarray.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 
 uint BSRagdollContactListenerModifier::refCount = 0;
 
@@ -184,6 +186,51 @@ bool BSRagdollContactListenerModifier::merge(HkxObject *recessiveObject){ //TO D
     }
 }
 
+void BSRagdollContactListenerModifier::setBones(hkbBoneIndexArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    bones = HkxSharedPtr(value), setIsFileChanged(true);
+}
+
+hkbBoneIndexArray *BSRagdollContactListenerModifier::getBones() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbBoneIndexArray *>(bones.data());
+}
+
+void BSRagdollContactListenerModifier::setContactEventID(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != contactEvent.id && contactEvent.id < static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()) ? contactEvent.id = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'contactEvent.id' was not set!");
+}
+
+void BSRagdollContactListenerModifier::setContactEventPayload(hkbStringEventPayload *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != static_cast<hkbStringEventPayload *>(contactEvent.payload.data())) ? contactEvent.payload = HkxSharedPtr(value), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'contactEvent.payload' was not set!");
+}
+
+int BSRagdollContactListenerModifier::getContactEventID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return contactEvent.id;
+}
+
+hkbStringEventPayload *BSRagdollContactListenerModifier::getContactEventPayload() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStringEventPayload *>(contactEvent.payload.data());
+}
+
+bool BSRagdollContactListenerModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSRagdollContactListenerModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSRagdollContactListenerModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSRagdollContactListenerModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
@@ -216,7 +263,7 @@ void BSRagdollContactListenerModifier::unlink(){
 QString BSRagdollContactListenerModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

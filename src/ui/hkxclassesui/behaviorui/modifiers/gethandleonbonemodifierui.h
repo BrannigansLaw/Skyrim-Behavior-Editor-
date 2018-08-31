@@ -16,36 +16,35 @@ class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
 
-class GetHandleOnBoneModifierUI: QGroupBox
+class GetHandleOnBoneModifierUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     GetHandleOnBoneModifierUI();
-    virtual ~GetHandleOnBoneModifierUI(){}
+    GetHandleOnBoneModifierUI& operator=(const GetHandleOnBoneModifierUI&) = delete;
+    GetHandleOnBoneModifierUI(const GetHandleOnBoneModifierUI &) = delete;
+    ~GetHandleOnBoneModifierUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties);
+    void variableRenamed(const QString & name, int index);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void modifierNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setEnable();
-    void setLocalFrameName(const QString &name);
+    void setLocalFrameName(int index);
     void setRagdollBoneIndex(int index);
     void setAnimationBoneIndex(int index);
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties);
-    void variableRenamed(const QString & name, int index);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     hkbGetHandleOnBoneModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

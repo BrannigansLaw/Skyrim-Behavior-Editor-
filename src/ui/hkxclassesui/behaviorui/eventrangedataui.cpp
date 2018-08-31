@@ -26,7 +26,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList EventRangeDataUI::headerLabels = {
+const QStringList EventRangeDataUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -68,164 +68,60 @@ EventRangeDataUI::EventRangeDataUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void EventRangeDataUI::connectSignals(){
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(upperBound, SIGNAL(editingFinished()), this, SLOT(setUpperBound()), Qt::UniqueConnection);
-    connect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)), Qt::UniqueConnection);
-    connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void EventRangeDataUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(upperBound, SIGNAL(editingFinished()), this, SLOT(setUpperBound()));
-    disconnect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)));
-    disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void EventRangeDataUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+        connect(upperBound, SIGNAL(editingFinished()), this, SLOT(setUpperBound()), Qt::UniqueConnection);
+        connect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)), Qt::UniqueConnection);
+        connect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+        disconnect(upperBound, SIGNAL(editingFinished()), this, SLOT(setUpperBound()));
+        disconnect(eventMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventMode(int)));
+        disconnect(payload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void EventRangeDataUI::loadData(BehaviorFile *parentFile, hkbEventRangeDataArray::hkbEventRangeData *ranges, hkbEventRangeDataArray *par, int index){
-    disconnectSignals();
-    QString text;
+    toggleSignals(false);
     if (parentFile && ranges && par && index > -1){
         parent = par;
         rangeIndex = index;
         file = parentFile;
         bsData = ranges;
-        text = file->getEventNameAt(ranges->event.id);
-        if (text == ""){
-            if (ranges->event.id != -1){
-                WARNING_MESSAGE("EventRangeDataUI::loadData(): Invalid event id!!!");
-            }
-            text = "NONE";
-        }
-        QString eventName = file->getEventNameAt(bsData->event.id);
-        if (eventName != ""){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(eventName);
-        }else{
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        if (ranges->event.payload.data()){
-            payload->setText(static_cast<hkbStringEventPayload *>(ranges->event.payload.data())->getData());
-        }else{
-            payload->setText("");
-        }
+        auto item = table->item(EVENT_ID_ROW, VALUE_COLUMN);
+        auto eventName = file->getEventNameAt(bsData->event.id);
+        (eventName != "") ? item->setText(eventName) : item->setText("NONE");
+        (ranges->event.payload.data()) ? payload->setText(static_cast<hkbStringEventPayload *>(ranges->event.payload.data())->getData()) : payload->setText("");
         upperBound->setValue(bsData->upperBound);
-        if (eventMode->count() == 0){
-            eventMode->insertItems(0, bsData->EventRangeMode);
-        }
+        (!eventMode->count()) ? eventMode->insertItems(0, bsData->EventRangeMode) : NULL;
         eventMode->setCurrentIndex(bsData->EventRangeMode.indexOf(bsData->eventMode));
-        /*hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-        if (varBind){
-            loadBinding(UPPER_BOUND_ROW, BINDING_COLUMN, varBind, "eventData:"+QString::number(rangeIndex)+"/upperBound");
-            loadBinding(EVENT_MODE_ROW, BINDING_COLUMN, varBind, "eventData:"+QString::number(rangeIndex)+"/eventMode");
-        }else{
-            table->item(UPPER_BOUND_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(EVENT_MODE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }*/
     }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::loadData(): Behavior file, bind or event data is null!!!");
+        LogFile::writeToLog("EventRangeDataUI::loadData(): Behavior file, bind or data is null!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
-
-/*void EventRangeDataUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(file)->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
-                }
-            }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("EventRangeDataUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-bool EventRangeDataUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(file);
-                parent->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->toggleChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
-}
-
-void EventRangeDataUI::setBindingVariable(int index, const QString & name){
-    if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
-        switch (row){
-        case UPPER_BOUND_ROW:
-            if (table->item(UPPER_BOUND_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "eventData:"+QString::number(rangeIndex)+"/upperBound", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
-        }
-        file->toggleChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setBindingVariable(): The data is nullptr!!");
-    }
-}*/
 
 void EventRangeDataUI::setEventId(int index, const QString & name){
     if (bsData && file){
-        index--;
-        if (bsData->event.id != index){
+        if (bsData->event.id != --index){
             bsData->event.id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setEvent(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("EventRangeDataUI::setEvent(): Behavior file or data is null!!!");
     }
 }
 
 void EventRangeDataUI::setEventPayload(){
-    hkbStringEventPayload *payloadData;
     if (bsData && file){
-        payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
+        auto payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
         if (payload->text() != ""){
             if (payloadData){
                 if (payloadData->getData() != payload->text()){
@@ -234,104 +130,44 @@ void EventRangeDataUI::setEventPayload(){
                     return;
                 }
             }else{
-                payloadData = new hkbStringEventPayload(file, payload->text());
-                bsData->event.payload = HkxSharedPtr(payloadData);
+                bsData->event.payload = HkxSharedPtr(new hkbStringEventPayload(file, payload->text()));
             }
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
         file->setIsChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setEventPayload(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("EventRangeDataUI::setEventPayload(): Behavior file or data is null!!!");
     }
 }
 
 void EventRangeDataUI::setUpperBound(){
     if (bsData && file){
-        if (bsData->upperBound != upperBound->value()){
-            bsData->upperBound = upperBound->value();
-            file->setIsChanged(true);
-        }
+        (bsData->upperBound != upperBound->value()) ? bsData->upperBound = upperBound->value(), file->setIsChanged(true) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setupperBound(): Behavior file or event data is null!!!");
+        LogFile::writeToLog("EventRangeDataUI::setupperBound(): Behavior file or data is null!!!");
     }
 }
 
 void EventRangeDataUI::setEventMode(int index){
-    if (bsData){
-        bsData->eventMode = bsData->EventRangeMode.at(index);
-        file->setIsChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setEventMode(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->eventMode = bsData->EventRangeMode.at(index), file->setIsChanged(true) : LogFile::writeToLog("EventRangeDataUI::setEventMode(): The data is nullptr!!");
 }
 
 void EventRangeDataUI::viewSelectedChild(int row, int column){
     if (bsData){
-        /*bool properties = false;
-        if (column == BINDING_COLUMN){
-            switch (row){
-            case UPPER_BOUND_ROW:
-                if (table->item(UPPER_BOUND_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "eventData:"+QString::number(rangeIndex)+"/upperBound");
-                break;
-            }
-        }else */if (row == EVENT_ID_ROW && column == VALUE_COLUMN){
-                emit viewEvents(bsData->event.id + 1, QString(), QStringList());
-            }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::viewSelectedChild(): The data is nullptr!!");
-    }
-}
-
-/*void EventRangeDataUI::selectTableToView(bool viewproperties, const QString & path){
-    if (bsData){
-        if (viewproperties){
-            if (parent->getVariableBindingSetData()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData())->getVariableIndexOfBinding(path) + 1);
-            }else{
-                emit viewProperties(0, QString(), QStringList());
-            }
-        }else{
-            if (parent->getVariableBindingSetData()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData())->getVariableIndexOfBinding(path) + 1);
-            }else{
-                emit viewVariables(0, QString(), QStringList());
-            }
+        if (row == EVENT_ID_ROW && column == VALUE_COLUMN){
+            emit viewEvents(bsData->event.id + 1, QString(), QStringList());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("EventRangeDataUI::viewSelectedChild(): The data is nullptr!!");
     }
-}*/
+}
 
 void EventRangeDataUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (index == bsData->event.id){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
+        (index == bsData->event.id) ? table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("EventRangeDataUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
-/*void EventRangeDataUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("EventRangeDataUI::variableRenamed(): The new variable name is the empty string!!");
-    }
-    if (bsData){
-        index--;
-        bind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
-        if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("eventData:"+QString::number(rangeIndex)+"/upperBound");
-            if (bindIndex == index){
-                table->item(UPPER_BOUND_ROW, BINDING_COLUMN)->setText(name);
-            }
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::variableRenamed(): The data is nullptr!!");
-    }
-}*/

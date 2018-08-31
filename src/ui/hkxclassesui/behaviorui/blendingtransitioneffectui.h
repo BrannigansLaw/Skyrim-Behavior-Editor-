@@ -18,22 +18,25 @@ class CheckBox;
 class QPushButton;
 class hkbVariableBindingSet;
 
-class BlendingTransitionEffectUI: public QGroupBox
+class BlendingTransitionEffectUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
     friend class TransitionsUI;
 public:
     BlendingTransitionEffectUI();
-    virtual ~BlendingTransitionEffectUI(){}
+    BlendingTransitionEffectUI& operator=(const BlendingTransitionEffectUI&) = delete;
+    BlendingTransitionEffectUI(const BlendingTransitionEffectUI &) = delete;
+    ~BlendingTransitionEffectUI() = default;
+public:
     void loadData(HkxObject *data);
+    void variableRenamed(const QString & name, int index);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void transitionEffectRenamed(const QString & name);
     void returnToParent();
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setBindingVariable(int index, const QString & name);
     void setSelfTransitionMode(int index);
     void setEventMode(int index);
@@ -46,14 +49,11 @@ private slots:
     void toggleIgnoreToWorldFromModelFlag();
     void viewSelectedChild(int row, int column);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    void variableRenamed(const QString & name, int index);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void setFlag(CheckBox *flagcheckbox, QString &flags, const QString &flagtocheck);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     hkbBlendingTransitionEffect *bsData;
     QGridLayout *topLyt;
     QPushButton *returnPB;

@@ -70,7 +70,7 @@ void BehaviorGraphUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_BEHAVIOR_GRAPH){
             bsData = static_cast<hkbBehaviorGraph *>(data);
             name->setText(bsData->getName());
-            (variableMode->count() == 0) ? variableMode->insertItems(0, bsData->VariableMode) : NULL;
+            (!variableMode->count()) ? variableMode->insertItems(0, bsData->VariableMode) : NULL;
             variableMode->setCurrentIndex(bsData->VariableMode.indexOf(bsData->getVariableMode()));
             table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getRootGeneratorName());
         }else{

@@ -36,7 +36,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList StateUI::headerLabels = {
+const QStringList StateUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -81,7 +81,6 @@ StateUI::StateUI()
     table->setItem(ENABLE_ROW, NAME_COLUMN, new TableWidgetItem("enable"));
     table->setItem(ENABLE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    //table->setItem(ENABLE_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
     table->setItem(GENERATOR_ROW, NAME_COLUMN, new TableWidgetItem("generator"));
     table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
@@ -106,87 +105,77 @@ StateUI::StateUI()
     addWidget(groupBox);
     addWidget(eventUI);
     addWidget(transitionUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void StateUI::connectSignals(){
-    connect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)), Qt::UniqueConnection);
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)), Qt::UniqueConnection);
-    connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(eventUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
-}
-
-void StateUI::disconnectSignals(){
-    disconnect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)));
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)));
-    disconnect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(eventUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
+void StateUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)), Qt::UniqueConnection);
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)), Qt::UniqueConnection);
+        connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(eventUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)));
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)));
+        disconnect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(eventUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+        disconnect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+        disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+        disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
+    }
 }
 
 void StateUI::variableTableElementSelected(int index, const QString &name){
     if (bsData){
         switch (currentIndex()){
         case TRANSITION_WIDGET:
-            transitionUI->variableTableElementSelected(index, name);
-            break;
+            transitionUI->variableTableElementSelected(index, name); break;
         default:
-            CRITICAL_ERROR_MESSAGE("StateUI::variableTableElementSelected(): Event relayed to wrong widget!!");
-            return;
+            LogFile::writeToLog("StateUI::variableTableElementSelected(): Event relayed to wrong widget!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::variableTableElementSelected(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::variableTableElementSelected(): The data is nullptr!!");
     }
 }
 
 void StateUI::loadData(HkxObject *data, int stateindex){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
     if (data && data->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
         bsData = static_cast<hkbStateMachineStateInfo *>(data);
         stateIndex = stateindex;
         name->setText(bsData->getName());
-        stateId->setValue(bsData->stateId);
-        probability->setValue(bsData->probability);
-        enable->setChecked(bsData->enable);
-        if (bsData->generator.data()){
-            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
-        }else{
-            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
-        }
+        stateId->setValue(bsData->getStateId());
+        probability->setValue(bsData->getProbability());
+        enable->setChecked(bsData->getEnable());
+        table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getGeneratorName());
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::loadData(): The data is nullptr or an incorrect type!!");
+        LogFile::writeToLog("StateUI::loadData(): The data is nullptr or an incorrect type!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void StateUI::loadDynamicTableRows(){
     if (bsData){
-        hkbStateMachineEventPropertyArray *events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-        int temp;
-        if (events){
-            temp = ADD_ENTER_EVENT_ROW + events->events.size() + 1 - exitEventsButtonRow;
-        }else{
-            temp = INITIAL_EXIT_EVENT_ROW - exitEventsButtonRow;
-        }
+        auto events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
+        auto temp = -1;
+        (events) ? temp = ADD_ENTER_EVENT_ROW + events->events.size() + 1 - exitEventsButtonRow : temp = INITIAL_EXIT_EVENT_ROW - exitEventsButtonRow;
         if (temp > 0){
             for (auto i = 0; i < temp; i++){
                 table->insertRow(exitEventsButtonRow);
@@ -201,11 +190,7 @@ void StateUI::loadDynamicTableRows(){
             }
         }
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-        if (events){
-            temp = exitEventsButtonRow + events->events.size() + 1 - transitionsButtonRow;
-        }else{
-            temp = exitEventsButtonRow + 1 - transitionsButtonRow;
-        }
+        (events) ? temp = exitEventsButtonRow + events->events.size() + 1 - transitionsButtonRow : temp = exitEventsButtonRow + 1 - transitionsButtonRow;
         if (temp > 0){
             for (auto i = 0; i < temp; i++){
                 table->insertRow(transitionsButtonRow);
@@ -217,64 +202,33 @@ void StateUI::loadDynamicTableRows(){
                 transitionsButtonRow--;
             }
         }
-        QString eventName;
+        auto setupeventrows = [&](int start, int end){
+            if (events){
+                for (auto i = start, j = 0; i < end, j < events->events.size(); i++, j++){
+                    auto eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
+                    if (eventName != ""){
+                        UIHelper::setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this event", "Double click to edit this event", table);
+                    }else{
+                        LogFile::writeToLog("StateUI::loadDynamicTableRows(): Invalid event name!!!");
+                    }
+                }
+            }
+        };
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-        if (events){
-            for (auto i = INITIAL_EXIT_EVENT_ROW, j = 0; i < exitEventsButtonRow, j < events->events.size(); i++, j++){
-                eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
-                if (eventName != ""){
-                    setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this enter event", "Double click to edit this enter event");
-                }else{
-                    CRITICAL_ERROR_MESSAGE("StateUI::loadDynamicTableRows(): Invalid event name!!!");
-                }
-            }
-        }
+        setupeventrows(INITIAL_EXIT_EVENT_ROW, exitEventsButtonRow);
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-        if (events){
-            for (auto i = exitEventsButtonRow + 1, j = 0; i < transitionsButtonRow, j < events->events.size(); i++, j++){
-                eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
-                if (eventName != ""){
-                    setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this exit event", "Double click to edit this exit event");
-                }else{
-                    CRITICAL_ERROR_MESSAGE("StateUI::loadDynamicTableRows(): Invalid event name!!!");
-                }
-            }
-        }
-        hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
+        setupeventrows(exitEventsButtonRow + 1, transitionsButtonRow);
+        auto trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (trans && trans->getSignature() == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
             table->setRowCount(transitionsButtonRow + trans->getNumTransitions() + 1);
             for (auto i = transitionsButtonRow + 1, j = 0; i < table->rowCount(), j < trans->getNumTransitions(); i++, j++){
-                setRowItems(i, trans->getTransitionNameAt(j), trans->getClassname(), "Remove", "Edit", "Double click to remove this transition", "Double click to edit this transition");
+                UIHelper::setRowItems(i, trans->getTransitionNameAt(j), trans->getClassname(), "Remove", "Edit", "Double click to remove this transition", "Double click to edit this transition", table);
             }
         }else{
             table->setRowCount(transitionsButtonRow + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::loadDynamicTableRows(): The data is nullptr!!");
-    }
-}
-
-
-void StateUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
+        LogFile::writeToLog("StateUI::loadDynamicTableRows(): The data is nullptr!!");
     }
 }
 
@@ -282,11 +236,9 @@ void StateUI::eventTableElementSelected(int index, const QString &name){
     index--;
     switch (currentIndex()){
     case EVENT_PAYLOAD_WIDGET:
-        eventUI->setEvent(index, name);
-        break;
+        eventUI->setEvent(index, name); break;
     case TRANSITION_WIDGET:
-        transitionUI->eventTableElementSelected(index, name);
-        break;
+        transitionUI->eventTableElementSelected(index, name); break;
     default:
         WARNING_MESSAGE("StateUI::eventTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -296,8 +248,7 @@ void StateUI::eventTableElementSelected(int index, const QString &name){
 void StateUI::generatorTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setGenerator(index, name);
-        break;
+        setGenerator(index, name); break;
     default:
         WARNING_MESSAGE("StateUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -312,20 +263,18 @@ void StateUI::connectToTables(GenericTableWidget *generators, GenericTableWidget
         connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("StateUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
-void StateUI::setName(){
+void StateUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            bsData->setIsFileChanged(true);
-            emit stateNameChanged(name->text(), stateIndex);
-            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit stateNameChanged(name->text(), stateIndex);
+        emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -333,7 +282,6 @@ void StateUI::setStateId(int id){
     if (bsData){
         if (bsData->setStateId(id)){
             emit stateIdChanged(stateIndex, bsData->stateId, bsData->getName());
-            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!");
             disconnect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)));
@@ -341,162 +289,111 @@ void StateUI::setStateId(int id){
             connect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)), Qt::UniqueConnection);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::setStateId(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::setStateId(): The data is nullptr!!");
     }
 }
 
 void StateUI::setProbability(){
-    if (bsData){
-        if (bsData->probability != probability->value()){
-            bsData->probability = probability->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::setProbability(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setProbability(probability->value()) : LogFile::writeToLog("StateUI::setProbability(): The data is nullptr!!");
 }
 
 void StateUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
+    (bsData) ? bsData->setProbability(enable->isChecked()) : LogFile::writeToLog("StateUI::setEnable(): The data is nullptr!!");
+}
+
+void StateUI::addEvent(HkxSharedPtr & eventarray){  //Make sure bsData is not nullptr before using this function!!
+    auto events = static_cast<hkbStateMachineEventPropertyArray *>(eventarray.data());
+    if (!events){
+        events = new hkbStateMachineEventPropertyArray(bsData->getParentFile(), -1);
+        eventarray = HkxSharedPtr(events);
+    }
+    events->addEvent();
+    loadDynamicTableRows();
+}
+
+void StateUI::removeEvent(HkxSharedPtr & eventarray, int index){  //Make sure bsData is not nullptr before using this function!!
+    auto events = static_cast<hkbStateMachineEventPropertyArray *>(eventarray.data());
+    if (events){
+        if (index < events->getNumOfEvents() && index >= 0){
+            events->removeEvent(index);
+            (!events->getNumOfEvents()) ? eventarray = HkxSharedPtr() : NULL;
+            loadDynamicTableRows();
+        }else{
+            WARNING_MESSAGE("StateUI::removeEvent(): Invalid row index selected!!");
+        }
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::setEnable(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::removeEvent(): Event data is nullptr!!");
     }
 }
 
 void StateUI::addEnterEvent(){
-    hkbStateMachineEventPropertyArray *enterEvents = nullptr;
-    if (bsData){
-        enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-        if (!enterEvents){
-            enterEvents = new hkbStateMachineEventPropertyArray(bsData->getParentFile(), -1);
-            bsData->enterNotifyEvents = HkxSharedPtr(enterEvents);
-        }
-        enterEvents->addEvent();
-        enterEvents->events.last().id = 0;
-        loadDynamicTableRows();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::addEnterEvent(): The data is nullptr!!");
-    }
+    (bsData) ? addEvent(bsData->enterNotifyEvents) : LogFile::writeToLog("StateUI::addEnterEvent(): The data is nullptr!!");
 }
 
 void StateUI::removeEnterEvent(int index){
-    hkbStateMachineEventPropertyArray *events = nullptr;
-    if (bsData){
-        events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-        if (events){
-            if (index < events->events.size() && index >= 0){
-                events->removeEvent(index);
-                if (events->events.isEmpty()){
-                    bsData->enterNotifyEvents = HkxSharedPtr();
-                }
-            }else{
-                WARNING_MESSAGE("StateUI::removeEnterEvent(): Invalid row index selected!!");
-                return;
-            }
-        }else{
-            WARNING_MESSAGE("StateUI::removeEnterEvent(): Event data is nullptr!!");
-            return;
-        }
-        loadDynamicTableRows();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::removeEnterEvent(): The data is nullptr!!");
-    }
+    (bsData) ? removeEvent(bsData->enterNotifyEvents, index) : LogFile::writeToLog("StateUI::removeEnterEvent(): The data is nullptr!!");
 }
 
 void StateUI::addExitEvent(){
-    hkbStateMachineEventPropertyArray *exitEvents = nullptr;
-    if (bsData){
-        exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-        if (!exitEvents){
-            exitEvents = new hkbStateMachineEventPropertyArray(bsData->getParentFile(), -1);
-            bsData->exitNotifyEvents = HkxSharedPtr(exitEvents);
-        }
-        exitEvents->addEvent();
-        exitEvents->events.last().id = 0;
-        loadDynamicTableRows();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::addExitEvent(): The data is nullptr!!");
-    }
+    (bsData) ? addEvent(bsData->exitNotifyEvents) : LogFile::writeToLog("StateUI::addExitEvent(): The data is nullptr!!");
 }
 
 void StateUI::removeExitEvent(int index){
-    hkbStateMachineEventPropertyArray *events = nullptr;
-    if (bsData){
-        events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-        if (events){
-            if (index < events->events.size() && index >= 0){
-                events->removeEvent(index);
-                if (events->events.isEmpty()){
-                    bsData->exitNotifyEvents = HkxSharedPtr();
-                }
-            }else{
-                WARNING_MESSAGE("StateUI::removeExitEvent(): Invalid row index selected!!");
-                return;
-            }
-        }else{
-            WARNING_MESSAGE("StateUI::removeExitEvent(): Event data is nullptr!!");
-            return;
-        }
-        loadDynamicTableRows();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::removeExitEvent(): The data is nullptr!!");
-    }
+    (bsData) ? removeEvent(bsData->exitNotifyEvents, index) : LogFile::writeToLog("StateUI::removeExitEvent(): The data is nullptr!!");
 }
 
 void StateUI::addTransition(){
-    hkbStateMachineTransitionInfoArray *trans = nullptr;
     if (bsData){
-        trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
+        auto trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (!trans){
             trans = new hkbStateMachineTransitionInfoArray(bsData->getParentFile(), bsData->getParentStateMachine(), -1);
             bsData->transitions = HkxSharedPtr(trans);
         }
         trans->addTransition();
         loadDynamicTableRows();
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::addTransition(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::addTransition(): The data is nullptr!!");
     }
 }
 
 void StateUI::removeTransition(int index){
-    hkbStateMachineTransitionInfoArray *trans = nullptr;
     if (bsData){
-        trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
+        auto trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (trans){
             if (index < trans->getNumTransitions() && index >= 0){
                 trans->removeTransition(index);
-                if (trans->getNumTransitions() == 0){
-                    bsData->transitions = HkxSharedPtr();
-                }
+                (!trans->getNumTransitions()) ? bsData->transitions = HkxSharedPtr() : NULL;
+                loadDynamicTableRows();
             }else{
                 WARNING_MESSAGE("StateUI::removeTransition(): Invalid row index selected!!");
-                return;
             }
         }else{
             WARNING_MESSAGE("StateUI::removeTransition(): Transition data is nullptr!!");
-            return;
         }
-        loadDynamicTableRows();
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::removeTransition(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::removeTransition(): The data is nullptr!!");
     }
 }
 
 void StateUI::viewSelectedChild(int row, int column){
-    int result;
-    int count = 0;
-    hkbStateMachineTransitionInfoArray *trans = nullptr;
-    hkbStateMachineEventPropertyArray *enterEvents = nullptr;
-    hkbStateMachineEventPropertyArray *exitEvents = nullptr;
+    auto result = 0;
+    auto count = 0;
     if (bsData){
+        auto viewevent = [&](hkbStateMachineEventPropertyArray *eventarray, int eventrow){
+            result = row - eventrow - 1;
+            if (eventarray->events.size() > result && result >= 0){
+                if (column == VALUE_COLUMN){
+                    eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &eventarray->events[result]);
+                    setCurrentIndex(EVENT_PAYLOAD_WIDGET);
+                }else if (column == BINDING_COLUMN){
+                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the event \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
+                        removeEnterEvent(result);
+                    }
+                }
+            }else{
+                LogFile::writeToLog("StateUI::viewSelectedChild(): Invalid index of child to view!!");
+            }
+        };
         if (row == GENERATOR_ROW && column == VALUE_COLUMN){
             QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
             emit viewGenerators(bsData->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
@@ -507,46 +404,18 @@ void StateUI::viewSelectedChild(int row, int column){
         }else if (row == transitionsButtonRow && column == NAME_COLUMN){
             addTransition();
         }else if (row > ADD_ENTER_EVENT_ROW && row < exitEventsButtonRow){
-            enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-            result = row - ADD_ENTER_EVENT_ROW - 1;
-            if (enterEvents->events.size() > result && result >= 0){
-                if (column == VALUE_COLUMN){
-                    eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &enterEvents->events[result]);
-                    setCurrentIndex(EVENT_PAYLOAD_WIDGET);
-                }else if (column == BINDING_COLUMN){
-                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the enter event \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
-                        removeEnterEvent(result);
-                    }
-                }
-            }else{
-                CRITICAL_ERROR_MESSAGE("StateUI::viewSelectedChild(): Invalid index of child to view!!");
-            }
+            auto enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
+            viewevent(enterEvents, ADD_ENTER_EVENT_ROW);
         }else if (row > exitEventsButtonRow && row < transitionsButtonRow){
-            exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-            result = row - exitEventsButtonRow - 1;
-            if (exitEvents->events.size() > result && result >= 0){
-                if (column == VALUE_COLUMN){
-                    eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &exitEvents->events[result]);
-                    setCurrentIndex(EVENT_PAYLOAD_WIDGET);
-                }else if (column == BINDING_COLUMN){
-                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the exit event \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
-                        removeExitEvent(result);
-                    }
-                }
-            }else{
-                CRITICAL_ERROR_MESSAGE("StateUI::viewSelectedChild(): Invalid index of child to view!!");
-            }
+            auto exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
+            viewevent(exitEvents, exitEventsButtonRow);
         }else if (row > exitEventsButtonRow && row < table->rowCount()){
-            enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-            if (enterEvents){
-                count = enterEvents->events.size();
-            }
-            exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-            if (exitEvents){
-                count = count + exitEvents->events.size();
-            }
+            auto enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
+            (enterEvents) ? count = enterEvents->events.size() : NULL;
+            auto exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
+            (exitEvents) ? count = count + exitEvents->events.size() : NULL;
             result = row - BASE_NUMBER_OF_ROWS - count;
-            trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
+            auto trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
             if (trans && result < trans->getNumTransitions() && result >= 0){
                 if (column == VALUE_COLUMN){
                     transitionUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), bsData->getParentStateMachine(), trans->getTransitionAt(result), result);
@@ -557,50 +426,16 @@ void StateUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("StateUI::viewSelectedChild(): Invalid index of child to view!!");
+                LogFile::writeToLog("StateUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void StateUI::setGenerator(int index, const QString & name){
-    hkbStateMachine *gen = nullptr;
-    DataIconManager *ptr = nullptr;
-    if (bsData){
-        if (behaviorView){
-            gen = static_cast<hkbStateMachine *>(bsData->getParentStateMachine());
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-            if (ptr){
-                if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                    return;
-                }else if (!gen){
-                    CRITICAL_ERROR_MESSAGE("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!");
-                    return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), 0, ptr, false)){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                    return;
-                }
-            }else{
-                if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), stateIndex);
-                }else{
-                    CRITICAL_ERROR_MESSAGE("StateUI::setGenerator(): The selected icon is nullptr!!");
-                    return;
-                }
-            }
-            behaviorView->removeGeneratorData();
-            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-            emit returnToParent(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE("StateUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::setGenerator(): The 'bsData' pointer is nullptr!!");
-    }
+    UIHelper::setGenerator(index, name, bsData, static_cast<hkbGenerator *>(bsData->generator.data()), NULL_SIGNATURE, HkxObject::TYPE_GENERATOR, table, behaviorView, GENERATOR_ROW, VALUE_COLUMN);
 }
 
 void StateUI::setBehaviorView(BehaviorGraphView *view){
@@ -609,13 +444,10 @@ void StateUI::setBehaviorView(BehaviorGraphView *view){
 
 void StateUI::transitionRenamed(const QString &name, int index){
     if (bsData){
-        if (table->item(transitionsButtonRow + index + 1, NAME_COLUMN)){
-            table->item(transitionsButtonRow + index + 1, NAME_COLUMN)->setText(name);
-        }else{
-            CRITICAL_ERROR_MESSAGE("StateUI::transitionRenamed(): Invalid row selected!!");
-        }
+        auto item = table->item(transitionsButtonRow + index + 1, NAME_COLUMN);
+        (item) ? item->setText(name) : LogFile::writeToLog("StateUI::transitionRenamed(): Invalid row selected!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::transitionRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::transitionRenamed(): The data is nullptr!!");
     }
 }
 
@@ -628,7 +460,7 @@ void StateUI::eventRenamed(const QString & name, int index){
         }
         loadDynamicTableRows(); //Inefficient...
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("StateUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -639,8 +471,12 @@ void StateUI::generatorRenamed(const QString & name, int index){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("StateUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("StateUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
+}
+
+void StateUI::setReturnPushButonVisability(bool visible){
+    returnPB->setVisible(visible);
 }
 
 void StateUI::returnToWidget(){

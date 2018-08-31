@@ -12,10 +12,9 @@ HkxXmlReader::HkxXmlReader(HkxFile *file)
 }
 
 bool HkxXmlReader::parse(){
-    QByteArray line;
-    HkxXmlParseLine result = NoError;
+    auto result = NoError;
     if (hkxXmlFile->open(QIODevice::ReadOnly)){
-        line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
+        auto line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
         lineNumber = 1;
         isEOF = false;
         if (line == "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" || line == "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
@@ -62,7 +61,7 @@ int HkxXmlReader::readElementTag(const QByteArray & line, int startIndex, bool i
             elementList.append(Element(tag));
         }
         if (startIndex < line.size()){
-            if (line.at(startIndex++) == '>'){
+            if (line.at(startIndex) == '>'){
                 if (!isEndTag && startIndex < line.size() && (line.at(startIndex) == '\n' || line.at(startIndex) == '\r')){
                     indexOfElemTags.append(elementList.size() - 1);
                     elementList.last().isContainedOnOneLine = false;
@@ -82,8 +81,9 @@ int HkxXmlReader::readAttribute(const QByteArray & line, int startIndex){
     auto readvalue = [&](QByteArray & string){
         auto index = 0;
         for (; startIndex < line.size(); startIndex++, index++){
-            if (line.at(startIndex) == '='){
+            if (line.at(startIndex) == '=' || line.at(startIndex) == '\"'){
                 startIndex++;
+                break;
             }else{
                 if (index >= string.size()){
                     string.append(QByteArray(string.size() * 2, '\0'));
@@ -101,9 +101,10 @@ int HkxXmlReader::readAttribute(const QByteArray & line, int startIndex){
             return OrphanedAttribute;
         }
         elementList.last().attributeList.append(attribute);
+        ++startIndex;
         readvalue(value);
         elementList.last().attributeList.last().value = value;
-        if (++startIndex < line.size()){
+        if (startIndex < line.size()){
             if (line.at(startIndex) == '>'){
                 return startIndex - 1;
             }else if (line.at(startIndex) == ' '){
@@ -185,7 +186,7 @@ int HkxXmlReader::skipComment(const QByteArray & line, int index){
 }
 
 HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
-    QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
+    auto line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
     lineNumber++;
     if (line.isEmpty()){
         isEOF = true;

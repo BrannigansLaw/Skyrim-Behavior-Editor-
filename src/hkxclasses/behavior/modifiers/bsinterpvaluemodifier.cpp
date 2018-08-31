@@ -100,6 +100,61 @@ bool BSInterpValueModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+qreal BSInterpValueModifier::getGain() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return gain;
+}
+
+void BSInterpValueModifier::setGain(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != gain) ? gain = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'gain' was not set!");
+}
+
+qreal BSInterpValueModifier::getResult() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return result;
+}
+
+void BSInterpValueModifier::setResult(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != result) ? result = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'result' was not set!");
+}
+
+qreal BSInterpValueModifier::getTarget() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return target;
+}
+
+void BSInterpValueModifier::setTarget(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != target) ? target = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'target' was not set!");
+}
+
+qreal BSInterpValueModifier::getSource() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return source;
+}
+
+void BSInterpValueModifier::setSource(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != source) ? source = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'source' was not set!");
+}
+
+bool BSInterpValueModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void BSInterpValueModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void BSInterpValueModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool BSInterpValueModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -116,7 +171,7 @@ void BSInterpValueModifier::unlink(){
 QString BSInterpValueModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");

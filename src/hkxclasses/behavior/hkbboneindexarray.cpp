@@ -62,11 +62,7 @@ bool hkbBoneIndexArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < boneIndices.size(); i++, j++){
             bones.append(QString::number(boneIndices.at(i)));
-            if (j % 16 == 0){
-                bones.append("\n");
-            }else{
-                bones.append(" ");
-            }
+            (!(j % 16)) ? bones.append("\n") : bones.append(" ");
         }
         if (boneIndices.size() > 0){
             if (bones.endsWith(" \0")){
@@ -90,6 +86,34 @@ QVector<HkxObject *> hkbBoneIndexArray::getChildrenOtherTypes() const{
     QVector <HkxObject *> list;
     (getVariableBindingSetData()) ? list.append(getVariableBindingSetData()) : NULL;
     return list;
+}
+
+int hkbBoneIndexArray::getNumberOfBoneIndices() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return boneIndices.size();
+}
+
+int hkbBoneIndexArray::getBoneIndexAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    if (index >= 0 && index < boneIndices.size()){
+        return boneIndices.at(index);
+    }
+    return -1;
+}
+
+void hkbBoneIndexArray::setBoneIndexAt(int index, int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < boneIndices.size() && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)) ? boneIndices[index] = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getParentFilename()+": "+getClassname()+": failed to set boneIndices!");
+}
+
+void hkbBoneIndexArray::addBoneIndex(int indexvalue){
+    std::lock_guard <std::mutex> guard(mutex);
+    boneIndices.append(indexvalue), getParentFile()->setIsChanged(true);
+}
+
+void hkbBoneIndexArray::removeBoneIndexAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < boneIndices.size()) ? boneIndices.removeAt(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getParentFilename()+": "+getClassname()+": failed to remove boneIndices!");
 }
 
 bool hkbBoneIndexArray::link(){

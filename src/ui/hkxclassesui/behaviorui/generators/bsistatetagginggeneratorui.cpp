@@ -147,10 +147,10 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
 
 void BSiStateTaggingGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        auto isProperty = false;
         auto row = table->currentRow();
         auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
-            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
             UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
         };
         switch (row){
@@ -186,9 +186,9 @@ void BSiStateTaggingGeneratorUI::selectTableToView(bool viewproperties, const QS
 
 void BSiStateTaggingGeneratorUI::viewSelected(int row, int column){
     if (bsData){
-        auto properties = false;
         auto checkisproperty = [&](int row, const QString & fieldname){
-            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
             selectTableToView(properties, fieldname);
         };
         if (column == BINDING_COLUMN){

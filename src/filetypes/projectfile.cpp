@@ -168,7 +168,7 @@ bool ProjectFile::addObjectToFile(HkxObject *obj, long ref){
 
 bool ProjectFile::parse(){
     //std::lock_guard <std::mutex> guard(mutex);
-    long index = 2;
+    auto index = 2L;
     auto ok = false;
     HkxSignature signature;
     QByteArray value;
@@ -220,7 +220,7 @@ bool ProjectFile::link(){
         LogFile::writeToLog("ProjectFile: link() failed!\nThe root object of this project file failed to link to it's children!");
         return false;
     }
-    if (!projectData || !projectData->link()){
+    if (!projectData.data() || !projectData->link()){
         LogFile::writeToLog("ProjectFile: link() failed!\nprojectData failed to link to it's children!");
         return false;
     }

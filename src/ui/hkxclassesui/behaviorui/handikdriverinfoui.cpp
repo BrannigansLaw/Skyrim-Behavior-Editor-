@@ -16,11 +16,8 @@
 #include <QLineEdit>
 
 #define BASE_NUMBER_OF_ROWS 1
-/*
- * HandIkDriverInfoUI
- */
 
-QStringList HandIkDriverInfoUI::headerLabels1 = {
+const QStringList HandIkDriverInfoUI::headerLabels1 = {
     "Name",
     "Type",
     "Value"
@@ -56,74 +53,82 @@ HandIkDriverInfoUI::HandIkDriverInfoUI()
 }
 
 void HandIkDriverInfoUI::loadData(HkxObject *data){
-    if (data && data->getSignature() == HKB_HAND_IK_DRIVER_INFO){
-        bsData = static_cast<hkbHandIkDriverInfo *>(data);
-        if (fadeInOutCurve->count() <= 0){
-            fadeInOutCurve->addItems(bsData->BlendCurve);
-        }
-        fadeInOutCurve->setCurrentIndex(bsData->BlendCurve.indexOf(bsData->fadeInOutCurve));
-        for (auto i = 0, k = 0; i < bsData->hands.size(); i++){
-            k = i + BASE_NUMBER_OF_ROWS;
-            if (k >= table->rowCount()){
-                table->setRowCount(table->rowCount() + 1);
-                table->setItem(k, 0, new QTableWidgetItem("Hand "+QString::number(i)));
-                table->setItem(k, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
-                table->setItem(k, 2, new QTableWidgetItem("Edit"));
-            }else{
-                table->setRowHidden(k, false);
-                table->item(k, 0)->setText("Hand "+QString::number(i));
-                table->item(k, 1)->setText("hkbHandIkDriverInfoHand");
+    if (data){
+        if (data->getSignature() == HKB_HAND_IK_DRIVER_INFO){
+            bsData = static_cast<hkbHandIkDriverInfo *>(data);
+            (fadeInOutCurve->count() <= 0) ? fadeInOutCurve->addItems(bsData->BlendCurve) : NULL;
+            fadeInOutCurve->setCurrentIndex(bsData->BlendCurve.indexOf(bsData->getFadeInOutCurve()));
+            for (auto i = 0, k = 0; i < bsData->hands.size(); i++){
+                k = i + BASE_NUMBER_OF_ROWS;
+                if (k >= table->rowCount()){
+                    table->setRowCount(table->rowCount() + 1);
+                    table->setItem(k, 0, new QTableWidgetItem("Hand "+QString::number(i)));
+                    table->setItem(k, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
+                    table->setItem(k, 2, new QTableWidgetItem("Edit"));
+                }else{
+                    table->setRowHidden(k, false);
+                    table->item(k, 0)->setText("Hand "+QString::number(i));
+                    table->item(k, 1)->setText("hkbHandIkDriverInfoHand");
+                }
             }
+            for (auto j = bsData->getNumberOfHands() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
+                table->setRowHidden(j, true);
+            }
+        }else{
+            LogFile::writeToLog("HandIkDriverInfoUI::loadData(): The data is an incorrect type!!");
         }
-        for (auto j = bsData->hands.size() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
-            table->setRowHidden(j, true);
-        }
+    }else{
+        LogFile::writeToLog("HandIkDriverInfoUI::loadData(): The data is nullptr!!");
     }
 }
 
 void HandIkDriverInfoUI::setFadeInOutCurve(int index){
-    if (bsData){
-        bsData->fadeInOutCurve = fadeInOutCurve->itemText(index);
-        bsData->setIsFileChanged(true);
-    }
+    (bsData) ? bsData->fadeInOutCurve = fadeInOutCurve->itemText(index), bsData->setIsFileChanged(true) : LogFile::writeToLog("HandIkDriverInfoUI: fadeInOutCurve was not set!!");
 }
 
 void HandIkDriverInfoUI::addHand(){
     if (bsData){
         bsData->addHand();
-        int result = BASE_NUMBER_OF_ROWS + bsData->hands.size();
+        auto result = BASE_NUMBER_OF_ROWS + bsData->getNumberOfHands();
         if (result >= table->rowCount()){
-            result--;
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(result, 0, new QTableWidgetItem("Hand "+QString::number(bsData->hands.size() - 1)));
+            table->setItem(--result, 0, new QTableWidgetItem("Hand "+QString::number(bsData->getNumberOfHands() - 1)));
             table->setItem(result, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
             table->setItem(result, 2, new QTableWidgetItem("Edit"));
         }else{
-            result--;
-            table->setRowHidden(result, false);
-            table->item(result, 0)->setText("Hand "+QString::number(bsData->hands.size() - 1));
+            table->setRowHidden(--result, false);
+            table->item(result, 0)->setText("Hand "+QString::number(bsData->getNumberOfHands() - 1));
             table->item(result, 1)->setText("hkbHandIkDriverInfoHand");
         }
-        bsData->setIsFileChanged(true);
+    }else{
+        LogFile::writeToLog("HandIkDriverInfoUI::loadData(): The data is nullptr!!");
     }
 }
 
 void HandIkDriverInfoUI::removeSelectedHand(){
-    int result = table->currentRow() - BASE_NUMBER_OF_ROWS;
-    if (bsData && result < bsData->hands.size()){
-        bsData->removeHandAt(result);
-        delete table->takeItem(table->currentRow(), 0);
-        delete table->takeItem(table->currentRow(), 1);
-        delete table->takeItem(table->currentRow(), 2);
-        table->removeRow(table->currentRow());
+    if (bsData){
+        auto result = table->currentRow() - BASE_NUMBER_OF_ROWS;
+        if (result < bsData->hands.size() && result >= 0){
+            bsData->removeHandAt(result);
+            delete table->takeItem(table->currentRow(), 0);
+            delete table->takeItem(table->currentRow(), 1);
+            delete table->takeItem(table->currentRow(), 2);
+            table->removeRow(table->currentRow());
+        }
+    }else{
+        LogFile::writeToLog("HandIkDriverInfoUI::loadData(): The data is nullptr!!");
     }
 }
 
 void HandIkDriverInfoUI::viewSelectedHand(int row, int column){
-    int result = row - BASE_NUMBER_OF_ROWS;
-    if (bsData && bsData->hands.size() > result && column == 2){
-        handUI->loadData((hkbHandIkDriverInfoHand *)bsData->getHandAt(result), bsData);
-        setCurrentIndex(HAND_IK_DRIVER_INFO_HAND);
+    if (bsData){
+        auto result = row - BASE_NUMBER_OF_ROWS;
+        if (bsData->getNumberOfHands() > result && result >= 0 && column == 2){
+            handUI->loadData((hkbHandIkDriverInfoHand *)bsData->getHandAt(result), bsData);
+            setCurrentIndex(HAND_IK_DRIVER_INFO_HAND);
+        }
+    }else{
+        LogFile::writeToLog("HandIkDriverInfoUI::loadData(): The data is nullptr!!");
     }
 }
 

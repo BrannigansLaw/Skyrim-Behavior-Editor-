@@ -37,31 +37,21 @@ ProjectUI::ProjectUI(ProjectFile *file)
       initializeWithCharacterData(new CheckBox("Use Character Events/Variables"))
 {
     animationCacheUI->setWindowTitle("Project Animation Cache Data!");
-    if (file){
-        fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath));
-    }else{
-        fileView->setRootIndex(fileSys->setRootPath(QDir::currentPath()));
-    }
+    (file) ? fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath)) : fileView->setRootIndex(fileSys->setRootPath(QDir::currentPath()));
     fileSys->setFilter(QDir::NoDotAndDotDot | QDir::Files);
-    QStringList filters;
-    filters << "*.hkx";
+    QStringList filters("*.hkx");
     fileSys->setNameFilters(filters);
     fileSys->setNameFilterDisables(false);
     fileView->setModel(fileSys);
-    //fileView->setMaximumSize(100, 400);
-    //lyt->setSizeConstraint(QLayout::SetNoConstraint);
-    //fileView->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum, QSizePolicy::CheckBox));
     lyt->addWidget(addBehaviorFile, 0, 0, 1, 1);
-    //lyt->addWidget(initializeWithCharacterData, 0, 1, 1, 1);
     lyt->addWidget(fileView, 1, 0, 2, 1);
     lyt->addWidget(characterProperties, 0, 2, 4, 1);
     lyt->addWidget(skeleton, 0, 4, 4, 1);
     lyt->addWidget(animationCacheUI, 0, 6, 6, 2);
-    QHBoxLayout *layout = new QHBoxLayout;
+    auto layout = new QHBoxLayout;
     layout->addWidget(enableFootIKCB);
     layout->addWidget(enableHandIKCB);
     lyt->addLayout(layout, 3, 0, 1, 1);
-    //lyt->addWidget(enableHandIKCB, 3, 1, 1, 1);
     lyt->addWidget(footIK, 4, 0, 2, 1);
     lyt->addWidget(handIK, 4, 2, 2, 1);
     lyt->addWidget(animations, 4, 4, 2, 1);
@@ -72,11 +62,6 @@ ProjectUI::ProjectUI(ProjectFile *file)
     connect(addBehaviorFile, SIGNAL(released()), this, SLOT(addNewBehaviorFile()), Qt::UniqueConnection);
     connect(animations, SIGNAL(openAnimationFile(QString)), this, SIGNAL(openAnimation(QString)), Qt::UniqueConnection);
     connect(animations, SIGNAL(animationRemoved(int)), this, SIGNAL(animationRemoved(int)), Qt::UniqueConnection);
-}
-
-ProjectUI::~ProjectUI()
-{
-    //
 }
 
 void ProjectUI::setFilePath(const QString & path){
@@ -103,64 +88,44 @@ void ProjectUI::setDisabled(bool disable){
 
 void ProjectUI::setProject(ProjectFile *file){
     project = file;
-    if (project){
-        fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath+"/"+project->getBehaviorDirectoryName()));
-    }
+    (project) ? fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath+"/"+project->getBehaviorDirectoryName())) : NULL;
 }
 
 void ProjectUI::loadData(){
-    QStringList bonenames;
-    HkxObject *footik;
-    HkxObject *handik;
-    hkaSkeleton *skeletondata;
     if (project){
         setTitle(project->fileName());
         characterProperties->loadData(project->getCharacterData());
         animations->loadData(project->getCharacterStringData(), project->getAnimDataAt(project->getProjectName()));
-        skeletondata = project->getSkeleton();
+        auto skeletondata = project->getSkeleton();
         skeleton->loadData(skeletondata);
-        footik = project->getFootIkDriverInfo();
-        if (footik){
-            footIK->loadData(footik);
-            enableFootIKCB->setChecked(true);
-        }else{
-            footIK->setDisabled(true);
-        }
-        bonenames = skeletondata->getBoneNames();
+        auto footik = project->getFootIkDriverInfo();
+        (footik) ? footIK->loadData(footik), enableFootIKCB->setChecked(true) : footIK->setDisabled(true);
+        auto bonenames = skeletondata->getBoneNames();
         footIK->loadBoneList(bonenames);
-        handik = project->getHandIkDriverInfo();
-        if (handik){
-            handIK->loadData(handik);
-            enableHandIKCB->setChecked(true);
-        }else{
-            handIK->setDisabled(true);
-        }
+        auto handik = project->getHandIkDriverInfo();
+        (handik) ? handIK->loadData(handik), enableHandIKCB->setChecked(true) : handIK->setDisabled(true);
         handIK->loadBoneList(bonenames);
         animationCacheUI->loadData(project);
+    }else{
+        LogFile::writeToLog("ProjectUI: project is nullptr!!");
     }
 }
 
 void ProjectUI::toggleFootIK(bool toggle){
     footIK->setEnabled(toggle);
     if (project){
-        if (toggle){
-            project->addFootIK();
-            footIK->loadData(project->getFootIkDriverInfo());
-        }else{
-            project->disableFootIK();
-        }
+        (toggle) ? project->addFootIK(), footIK->loadData(project->getFootIkDriverInfo()) : project->disableFootIK();
+    }else{
+        LogFile::writeToLog("ProjectUI: project is nullptr!!");
     }
 }
 
 void ProjectUI::toggleHandIK(bool toggle){
     handIK->setEnabled(toggle);
     if (project){
-        if (toggle){
-            project->addHandIK();
-            handIK->loadData(project->getHandIkDriverInfo());
-        }else{
-            project->disableHandIK();
-        }
+        (toggle) ? project->addHandIK(), handIK->loadData(project->getHandIkDriverInfo()) : project->disableHandIK();
+    }else{
+        LogFile::writeToLog("ProjectUI: project is nullptr!!");
     }
 }
 
@@ -168,7 +133,6 @@ void ProjectUI::addNewBehaviorFile(){
     emit addBehavior(initializeWithCharacterData->isChecked());
 }
 
-AnimationsUI *ProjectUI::getAnimations() const
-{
+AnimationsUI *ProjectUI::getAnimations() const{
     return animations;
 }

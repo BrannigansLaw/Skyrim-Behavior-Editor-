@@ -44,7 +44,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSLookAtModifierUI::headerLabels = {
+const QStringList BSLookAtModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -165,135 +165,107 @@ BSLookAtModifierUI::BSLookAtModifierUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(boneUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSLookAtModifierUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(lookAtTarget, SIGNAL(released()), this, SLOT(setLookAtTarget()), Qt::UniqueConnection);
-    connect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()), Qt::UniqueConnection);
-    connect(limitAngleThresholdDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleThresholdDegrees()), Qt::UniqueConnection);
-    connect(continueLookOutsideOfLimit, SIGNAL(released()), this, SLOT(setContinueLookOutsideOfLimit()), Qt::UniqueConnection);
-    connect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()), Qt::UniqueConnection);
-    connect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()), Qt::UniqueConnection);
-    connect(useBoneGains, SIGNAL(released()), this, SLOT(setUseBoneGains()), Qt::UniqueConnection);
-    connect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()), Qt::UniqueConnection);
-    connect(targetOutsideLimits, SIGNAL(released()), this, SLOT(setTargetOutsideLimits()), Qt::UniqueConnection);
-    connect(targetOutOfLimitEventPayload, SIGNAL(editingFinished()), this, SLOT(setTargetOutOfLimitEventPayload()), Qt::UniqueConnection);
-    connect(lookAtCamera, SIGNAL(released()), this, SLOT(setLookAtCamera()), Qt::UniqueConnection);
-    connect(lookAtCameraX, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraX()), Qt::UniqueConnection);
-    connect(lookAtCameraY, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraY()), Qt::UniqueConnection);
-    connect(lookAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraZ()), Qt::UniqueConnection);
-    connect(boneUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(boneUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(boneUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void BSLookAtModifierUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(lookAtTarget, SIGNAL(released()), this, SLOT(setLookAtTarget()));
-    disconnect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()));
-    disconnect(limitAngleThresholdDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleThresholdDegrees()));
-    disconnect(continueLookOutsideOfLimit, SIGNAL(released()), this, SLOT(setContinueLookOutsideOfLimit()));
-    disconnect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()));
-    disconnect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()));
-    disconnect(useBoneGains, SIGNAL(released()), this, SLOT(setUseBoneGains()));
-    disconnect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()));
-    disconnect(targetOutsideLimits, SIGNAL(released()), this, SLOT(setTargetOutsideLimits()));
-    disconnect(targetOutOfLimitEventPayload, SIGNAL(editingFinished()), this, SLOT(setTargetOutOfLimitEventPayload()));
-    disconnect(lookAtCamera, SIGNAL(released()), this, SLOT(setLookAtCamera()));
-    disconnect(lookAtCameraX, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraX()));
-    disconnect(lookAtCameraY, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraY()));
-    disconnect(lookAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraZ()));
-    disconnect(boneUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(boneUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
-    disconnect(boneUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void BSLookAtModifierUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
+        connect(lookAtTarget, SIGNAL(released()), this, SLOT(setLookAtTarget()), Qt::UniqueConnection);
+        connect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()), Qt::UniqueConnection);
+        connect(limitAngleThresholdDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleThresholdDegrees()), Qt::UniqueConnection);
+        connect(continueLookOutsideOfLimit, SIGNAL(released()), this, SLOT(setContinueLookOutsideOfLimit()), Qt::UniqueConnection);
+        connect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()), Qt::UniqueConnection);
+        connect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()), Qt::UniqueConnection);
+        connect(useBoneGains, SIGNAL(released()), this, SLOT(setUseBoneGains()), Qt::UniqueConnection);
+        connect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()), Qt::UniqueConnection);
+        connect(targetOutsideLimits, SIGNAL(released()), this, SLOT(setTargetOutsideLimits()), Qt::UniqueConnection);
+        connect(targetOutOfLimitEventPayload, SIGNAL(editingFinished()), this, SLOT(setTargetOutOfLimitEventPayload()), Qt::UniqueConnection);
+        connect(lookAtCamera, SIGNAL(released()), this, SLOT(setLookAtCamera()), Qt::UniqueConnection);
+        connect(lookAtCameraX, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraX()), Qt::UniqueConnection);
+        connect(lookAtCameraY, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraY()), Qt::UniqueConnection);
+        connect(lookAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraZ()), Qt::UniqueConnection);
+        connect(boneUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+        connect(boneUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(boneUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+        disconnect(lookAtTarget, SIGNAL(released()), this, SLOT(setLookAtTarget()));
+        disconnect(limitAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleDegrees()));
+        disconnect(limitAngleThresholdDegrees, SIGNAL(editingFinished()), this, SLOT(setLimitAngleThresholdDegrees()));
+        disconnect(continueLookOutsideOfLimit, SIGNAL(released()), this, SLOT(setContinueLookOutsideOfLimit()));
+        disconnect(onGain, SIGNAL(editingFinished()), this, SLOT(setOnGain()));
+        disconnect(offGain, SIGNAL(editingFinished()), this, SLOT(setOffGain()));
+        disconnect(useBoneGains, SIGNAL(released()), this, SLOT(setUseBoneGains()));
+        disconnect(targetLocation, SIGNAL(editingFinished()), this, SLOT(setTargetLocation()));
+        disconnect(targetOutsideLimits, SIGNAL(released()), this, SLOT(setTargetOutsideLimits()));
+        disconnect(targetOutOfLimitEventPayload, SIGNAL(editingFinished()), this, SLOT(setTargetOutOfLimitEventPayload()));
+        disconnect(lookAtCamera, SIGNAL(released()), this, SLOT(setLookAtCamera()));
+        disconnect(lookAtCameraX, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraX()));
+        disconnect(lookAtCameraY, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraY()));
+        disconnect(lookAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraZ()));
+        disconnect(boneUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+        disconnect(boneUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+        disconnect(boneUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void BSLookAtModifierUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
     if (data && data->getSignature() == BS_LOOK_AT_MODIFIER){
         bsData = static_cast<BSLookAtModifier *>(data);
-        hkbVariableBindingSet *varBind = nullptr;
-        hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->payload.data());
         name->setText(bsData->getName());
-        enable->setChecked(bsData->enable);
-        lookAtTarget->setChecked(bsData->lookAtTarget);
-        limitAngleDegrees->setValue(bsData->limitAngleDegrees);
-        limitAngleThresholdDegrees->setValue(bsData->limitAngleThresholdDegrees);
-        continueLookOutsideOfLimit->setChecked(bsData->continueLookOutsideOfLimit);
-        onGain->setValue(bsData->onGain);
-        offGain->setValue(bsData->offGain);
-        useBoneGains->setChecked(bsData->useBoneGains);
-        targetLocation->setValue(bsData->targetLocation);
-        targetOutsideLimits->setChecked(bsData->targetOutsideLimits);
-        QString text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->id);
-        if (text != ""){
-            table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(text);
-        }else{
-            table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
-        }
-        if (payload){
-            targetOutOfLimitEventPayload->setText(payload->getData());
-        }else{
-            targetOutOfLimitEventPayload->setText("");
-        }
-        lookAtCamera->setChecked(bsData->lookAtCamera);
-        lookAtCameraX->setValue(bsData->lookAtCameraX);
-        lookAtCameraY->setValue(bsData->lookAtCameraY);
-        lookAtCameraZ->setValue(bsData->lookAtCameraZ);
-        varBind = bsData->getVariableBindingSetData();
-        if (varBind){
-            loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-            loadBinding(LOOK_AT_TARGET_ROW, BINDING_COLUMN, varBind, "lookAtTarget");
-            loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees");
-            loadBinding(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleThresholdDegrees");
-            loadBinding(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, BINDING_COLUMN, varBind, "continueLookOutsideOfLimit");
-            loadBinding(ON_GAIN_ROW, BINDING_COLUMN, varBind, "onGain");
-            loadBinding(OFF_GAIN_ROW, BINDING_COLUMN, varBind, "offGain");
-            loadBinding(USE_BONE_GAINS_ROW, BINDING_COLUMN, varBind, "useBoneGains");
-            loadBinding(TARGET_LOCATION_ROW, BINDING_COLUMN, varBind, "targetLocation");
-            loadBinding(TARGET_OUTSIDE_LIMITS_ROW, BINDING_COLUMN, varBind, "targetOutsideLimits");
-            loadBinding(LOOK_AT_CAMERA_ROW, BINDING_COLUMN, varBind, "lookAtCamera");
-            loadBinding(LOOK_AT_CAMERA_X_ROW, BINDING_COLUMN, varBind, "lookAtCameraX");
-            loadBinding(LOOK_AT_CAMERA_Y_ROW, BINDING_COLUMN, varBind, "lookAtCameraY");
-            loadBinding(LOOK_AT_CAMERA_Z_ROW, BINDING_COLUMN, varBind, "lookAtCameraZ");
-        }else{
-            table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LOOK_AT_TARGET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(ON_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(OFF_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(USE_BONE_GAINS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(TARGET_OUTSIDE_LIMITS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LOOK_AT_CAMERA_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LOOK_AT_CAMERA_X_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LOOK_AT_CAMERA_Y_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            table->item(LOOK_AT_CAMERA_Z_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }
+        enable->setChecked(bsData->getEnable());
+        lookAtTarget->setChecked(bsData->getLookAtTarget());
+        limitAngleDegrees->setValue(bsData->getLimitAngleDegrees());
+        limitAngleThresholdDegrees->setValue(bsData->getLimitAngleThresholdDegrees());
+        continueLookOutsideOfLimit->setChecked(bsData->getContinueLookOutsideOfLimit());
+        onGain->setValue(bsData->getOnGain());
+        offGain->setValue(bsData->getOffGain());
+        useBoneGains->setChecked(bsData->getUseBoneGains());
+        targetLocation->setValue(bsData->getTargetLocation());
+        targetOutsideLimits->setChecked(bsData->getTargetOutsideLimits());
+        auto text = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->getId());
+        (text != "") ? table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(text) : table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
+        auto payload = bsData->getPayload();
+        (payload) ? targetOutOfLimitEventPayload->setText(payload->getData()) : targetOutOfLimitEventPayload->setText("");
+        lookAtCamera->setChecked(bsData->getLookAtCamera());
+        lookAtCameraX->setValue(bsData->getLookAtCameraX());
+        lookAtCameraY->setValue(bsData->getLookAtCameraY());
+        lookAtCameraZ->setValue(bsData->getLookAtCameraZ());
+        auto varBind = bsData->getVariableBindingSetData();
+        UIHelper::loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable", table, bsData);
+        UIHelper::loadBinding(LOOK_AT_TARGET_ROW, BINDING_COLUMN, varBind, "lookAtTarget", table, bsData);
+        UIHelper::loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees", table, bsData);
+        UIHelper::loadBinding(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleThresholdDegrees", table, bsData);
+        UIHelper::loadBinding(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, BINDING_COLUMN, varBind, "continueLookOutsideOfLimit", table, bsData);
+        UIHelper::loadBinding(ON_GAIN_ROW, BINDING_COLUMN, varBind, "onGain", table, bsData);
+        UIHelper::loadBinding(OFF_GAIN_ROW, BINDING_COLUMN, varBind, "offGain", table, bsData);
+        UIHelper::loadBinding(USE_BONE_GAINS_ROW, BINDING_COLUMN, varBind, "useBoneGains", table, bsData);
+        UIHelper::loadBinding(TARGET_LOCATION_ROW, BINDING_COLUMN, varBind, "targetLocation", table, bsData);
+        UIHelper::loadBinding(TARGET_OUTSIDE_LIMITS_ROW, BINDING_COLUMN, varBind, "targetOutsideLimits", table, bsData);
+        UIHelper::loadBinding(LOOK_AT_CAMERA_ROW, BINDING_COLUMN, varBind, "lookAtCamera", table, bsData);
+        UIHelper::loadBinding(LOOK_AT_CAMERA_X_ROW, BINDING_COLUMN, varBind, "lookAtCameraX", table, bsData);
+        UIHelper::loadBinding(LOOK_AT_CAMERA_Y_ROW, BINDING_COLUMN, varBind, "lookAtCameraY", table, bsData);
+        UIHelper::loadBinding(LOOK_AT_CAMERA_Z_ROW, BINDING_COLUMN, varBind, "lookAtCameraZ", table, bsData);
         if (boneList.isEmpty()){
-            boneList.append("None");
-            boneList = boneList + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+            boneList = QStringList("None") + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadData(): The data is nullptr or an incorrect type!!");
+        LogFile::writeToLog("BSLookAtModifierUI::loadData(): The data is nullptr or an incorrect type!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void BSLookAtModifierUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_BONE_ROW + bsData->getNumberOfBones() + 1 - eyeBoneButtonRow;
+        auto temp = ADD_BONE_ROW + bsData->getNumberOfBones() + 1 - eyeBoneButtonRow;
         if (temp > 0){
             for (auto i = 0; i < temp; i++){
                 table->insertRow(eyeBoneButtonRow);
@@ -305,364 +277,157 @@ void BSLookAtModifierUI::loadDynamicTableRows(){
                 eyeBoneButtonRow--;
             }
         }
+        auto setupbonerows = [&](int start, int end, const QVector <BSLookAtModifier::BsBone> & bones){
+            for (auto i = start, j = 0; i < end, j < bones.size(); i++, j++){
+                if (bones.at(j).index >= 0 && bones.at(j).index < boneList.size()){
+                    UIHelper::setRowItems(i, boneList.at(bones.at(j).index + 1), "BsBone", "Remove", "Edit", "Double click to remove this bone", "Double click to edit this bone", table);
+                }else{
+                    LogFile::writeToLog("BSLookAtModifierUI::loadDynamicTableRows(): Bone index out of range!!");
+                }
+            }
+        };
         eyeBoneButtonRow = ADD_BONE_ROW + bsData->getNumberOfBones() + 1;
-        for (auto i = INITIAL_ADD_EYE_BONE_ROW, j = 0; i < eyeBoneButtonRow, j < bsData->getNumberOfBones(); i++, j++){
-            if (bsData->bones.at(j).index > -2 && bsData->bones.at(j).index < boneList.size()){
-                setRowItems(i, boneList.at(bsData->bones.at(j).index + 1), "BsBone", "Remove", "Edit", "Double click to remove this bone", "Double click to edit this bone");
-            }else{
-                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadDynamicTableRows(): Bone index out of range!!");
-            }
-        }
+        setupbonerows(INITIAL_ADD_EYE_BONE_ROW, eyeBoneButtonRow, bsData->bones);
         table->setRowCount(eyeBoneButtonRow + bsData->getNumberOfEyeBones() + 1);
-        for (auto i = eyeBoneButtonRow + 1, j = 0; i < table->rowCount(), j < bsData->getNumberOfEyeBones(); i++, j++){
-            if (bsData->eyeBones.at(j).index > -2 && bsData->eyeBones.at(j).index < boneList.size()){
-                setRowItems(i, boneList.at(bsData->eyeBones.at(j).index + 1), "BsBone", "Remove", "Edit", "Double click to remove this eye bone", "Double click to edit this eye bone");
-            }else{
-                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadDynamicTableRows(): Eye bone index out of range!!");
-            }
-        }
+        setupbonerows(eyeBoneButtonRow + 1, table->rowCount(), bsData->eyeBones);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadDynamicTableRows(): The data is nullptr!!");
-    }
-    //table->setSortingEnabled(true);
-}
-
-void BSLookAtModifierUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
+        LogFile::writeToLog("BSLookAtModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
 }
 
-void BSLookAtModifierUI::setName(){
+void BSLookAtModifierUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->getName() != name->text()){
-            bsData->getName() = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->setIsFileChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::setName(): The data is nullptr!!");
     }
 }
 
 void BSLookAtModifierUI::setEnable(){
-    if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setEnable(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnable(enable->isChecked()) : LogFile::writeToLog("BSLookAtModifierUI::setEnable(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setLookAtTarget(){
-    if (bsData){
-        bsData->lookAtTarget = lookAtTarget->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtTarget(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLookAtTarget(lookAtTarget->isChecked()) : LogFile::writeToLog("BSLookAtModifierUI::setLookAtTarget(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setLimitAngleDegrees(){
-    if (bsData){
-        if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
-            bsData->limitAngleDegrees = limitAngleDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLimitAngleDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleDegrees(limitAngleDegrees->value()) : LogFile::writeToLog("BSLookAtModifierUI::setLimitAngleDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setLimitAngleThresholdDegrees(){
-    if (bsData){
-        if (bsData->limitAngleThresholdDegrees != limitAngleThresholdDegrees->value()){
-            bsData->limitAngleThresholdDegrees = limitAngleThresholdDegrees->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLimitAngleThresholdDegrees(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLimitAngleThresholdDegrees(limitAngleThresholdDegrees->value()) : LogFile::writeToLog("BSLookAtModifierUI::setLimitAngleThresholdDegrees(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setContinueLookOutsideOfLimit(){
-    if (bsData){
-        bsData->continueLookOutsideOfLimit = continueLookOutsideOfLimit->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setContinueLookOutsideOfLimit(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setContinueLookOutsideOfLimit(continueLookOutsideOfLimit->isChecked()) : LogFile::writeToLog("BSLookAtModifierUI::setContinueLookOutsideOfLimit(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setOnGain(){
-    if (bsData){
-        if (bsData->onGain != onGain->value()){
-            bsData->onGain = onGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setOnGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOnGain(onGain->value()) : LogFile::writeToLog("BSLookAtModifierUI::setOnGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setOffGain(){
-    if (bsData){
-        if (bsData->offGain != offGain->value()){
-            bsData->offGain = offGain->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setOffGain(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setOffGain(offGain->value()) : LogFile::writeToLog("BSLookAtModifierUI::setOffGain(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setUseBoneGains(){
-    if (bsData){
-        bsData->useBoneGains = useBoneGains->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setUseBoneGains(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setUseBoneGains(useBoneGains->isChecked()) : LogFile::writeToLog("BSLookAtModifierUI::setUseBoneGains(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setTargetLocation(){
-    if (bsData){
-        if (bsData->targetLocation != targetLocation->value()){
-            bsData->targetLocation = targetLocation->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setTargetLocation(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetLocation(targetLocation->value()) : LogFile::writeToLog("BSLookAtModifierUI::setTargetLocation(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setTargetOutsideLimits(){
-    if (bsData){
-        bsData->targetOutsideLimits = targetOutsideLimits->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setTargetOutsideLimits(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setTargetOutsideLimits(targetOutsideLimits->isChecked()) : LogFile::writeToLog("BSLookAtModifierUI::setTargetOutsideLimits(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setTargetOutOfLimitEventId(int index, const QString &name){
     if (bsData){
-        bsData->id = index - 1;
+        bsData->setId(index - 1);
         table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("StateMachineUI::setTargetOutOfLimitEventId(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::setTargetOutOfLimitEventId(): The data is nullptr!!");
     }
 }
 
 void BSLookAtModifierUI::setTargetOutOfLimitEventPayload(){
-    hkbStringEventPayload *payload;
     if (bsData){
-        payload = static_cast<hkbStringEventPayload *>(bsData->payload.data());
+        auto payloaddata = bsData->getPayload();
         if (targetOutOfLimitEventPayload->text() != ""){
-            if (payload){
-                payload->getData() = targetOutOfLimitEventPayload->text();
+            if (payloaddata){
+                payloaddata->setData(targetOutOfLimitEventPayload->text());
             }else{
-                payload = new hkbStringEventPayload(bsData->getParentFile(), targetOutOfLimitEventPayload->text());
-                //bsData->getParentFile()->addObjectToFile(payload, -1);
-                bsData->payload = HkxSharedPtr(payload);
+                payloaddata = new hkbStringEventPayload(bsData->getParentFile(), targetOutOfLimitEventPayload->text());
+                bsData->setPayload(payloaddata);
             }
         }else{
-            bsData->payload = HkxSharedPtr();
+            bsData->setPayload(nullptr);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setTargetOutOfLimitEventPayload(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::setTargetOutOfLimitEventPayload(): The data is nullptr!!");
     }
 }
 
 void BSLookAtModifierUI::setLookAtCamera(){
-    if (bsData){
-        bsData->lookAtCamera = lookAtCamera->isChecked();
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCamera(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLookAtCamera(lookAtCamera->isChecked()) : LogFile::writeToLog("BSLookAtModifierUI::setLookAtCamera(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setLookAtCameraX(){
-    if (bsData){
-        if (bsData->lookAtCameraX != lookAtCameraX->value()){
-            bsData->lookAtCameraX = lookAtCameraX->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCameraX(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLookAtCameraX(lookAtCameraX->value()) : LogFile::writeToLog("BSLookAtModifierUI::setLookAtCameraX(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setLookAtCameraY(){
-    if (bsData){
-        if (bsData->lookAtCameraY != lookAtCameraY->value()){
-            bsData->lookAtCameraY = lookAtCameraY->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCameraY(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setLookAtCameraY(lookAtCameraY->value()) : LogFile::writeToLog("BSLookAtModifierUI::setLookAtCameraY(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setLookAtCameraZ(){
-    if (bsData){
-        if (bsData->lookAtCameraZ != lookAtCameraZ->value()){
-            bsData->lookAtCameraZ = lookAtCameraZ->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCameraZ(): The data is nullptr!!");
-    }
-}
-
-bool BSLookAtModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
+    (bsData) ? bsData->setLookAtCameraZ(lookAtCameraZ->value()) : LogFile::writeToLog("BSLookAtModifierUI::setLookAtCameraZ(): The 'bsData' pointer is nullptr!!");
 }
 
 void BSLookAtModifierUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case ENABLE_ROW:
-            if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(ENABLE_ROW, "enable", VARIABLE_TYPE_BOOL); break;
         case LOOK_AT_TARGET_ROW:
-            if (table->item(LOOK_AT_TARGET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "lookAtTarget", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(LOOK_AT_TARGET_ROW, "lookAtTarget", VARIABLE_TYPE_BOOL); break;
         case LIMIT_ANGLE_DEGREES_ROW:
-            if (table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_DEGREES_ROW, "limitAngleDegrees", VARIABLE_TYPE_REAL); break;
         case LIMIT_ANGLE_THRESHOLD_DEGREES_ROW:
-            if (table->item(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "limitAngleThresholdDegrees", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, "limitAngleThresholdDegrees", VARIABLE_TYPE_REAL); break;
         case CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW:
-            if (table->item(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "continueLookOutsideOfLimit", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, "continueLookOutsideOfLimit", VARIABLE_TYPE_BOOL); break;
         case ON_GAIN_ROW:
-            if (table->item(ON_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "onGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ON_GAIN_ROW, "onGain", VARIABLE_TYPE_REAL); break;
         case OFF_GAIN_ROW:
-            if (table->item(OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "offGain", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(OFF_GAIN_ROW, "offGain", VARIABLE_TYPE_REAL); break;
         case USE_BONE_GAINS_ROW:
-            if (table->item(USE_BONE_GAINS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "useBoneGains", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(USE_BONE_GAINS_ROW, "useBoneGains", VARIABLE_TYPE_REAL); break;
         case TARGET_LOCATION_ROW:
-            if (table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetLocation", VARIABLE_TYPE_VECTOR4, isProperty);
-            break;
+            checkisproperty(TARGET_LOCATION_ROW, "targetLocation", VARIABLE_TYPE_VECTOR4); break;
         case TARGET_OUTSIDE_LIMITS_ROW:
-            if (table->item(TARGET_OUTSIDE_LIMITS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "targetOutsideLimits", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(TARGET_OUTSIDE_LIMITS_ROW, "targetOutsideLimits", VARIABLE_TYPE_BOOL); break;
         case LOOK_AT_CAMERA_ROW:
-            if (table->item(LOOK_AT_CAMERA_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "lookAtCamera", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(LOOK_AT_CAMERA_ROW, "lookAtCamera", VARIABLE_TYPE_BOOL); break;
         case LOOK_AT_CAMERA_X_ROW:
-            if (table->item(LOOK_AT_CAMERA_X_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "lookAtCameraX", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LOOK_AT_CAMERA_X_ROW, "lookAtCameraX", VARIABLE_TYPE_REAL); break;
         case LOOK_AT_CAMERA_Y_ROW:
-            if (table->item(LOOK_AT_CAMERA_Y_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "lookAtCameraY", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(LOOK_AT_CAMERA_Y_ROW, "lookAtCameraY", VARIABLE_TYPE_REAL); break;
         case LOOK_AT_CAMERA_Z_ROW:
-            if (table->item(LOOK_AT_CAMERA_Z_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "lookAtCameraZ", VARIABLE_TYPE_REAL, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(LOOK_AT_CAMERA_Z_ROW, "lookAtCameraZ", VARIABLE_TYPE_REAL); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -682,103 +447,65 @@ void BSLookAtModifierUI::selectTableToView(bool viewproperties, const QString & 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSLookAtModifierUI::viewSelectedChild(int row, int column){
-    int result;
-    bool properties = false;
     if (bsData){
+        auto result = row - BASE_NUMBER_OF_ROWS + 1;
+        auto loadboneui = [&](QVector <BSLookAtModifier::BsBone> & bones, int numbones){
+            if (numbones > result && result >= 0 && result < boneList.size()){
+                if (column == VALUE_COLUMN){
+                    boneUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &bones[result], bsData, result, false);
+                    setCurrentIndex(BONE_UI_WIDGET);
+                }else if (column == BINDING_COLUMN){
+                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the bone \""+boneList.at(bones.at(result).index + 1)+"\"?") == QMessageBox::Yes){
+                        removeBone(result);
+                    }
+                }
+            }else{
+                LogFile::writeToLog("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
+            }
+        };
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            bool properties;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
+            selectTableToView(properties, fieldname);
+        };
         if (row < ADD_BONE_ROW && row >= 0){
             if (column == VALUE_COLUMN && row == TARGET_OUT_OF_LIMIT_EVENT_ID_ROW){
-                emit viewEvents(bsData->id + 1, QString(), QStringList());
+                emit viewEvents(bsData->getId() + 1, QString(), QStringList());
             }else if (column == BINDING_COLUMN){
                 switch (row){
                 case ENABLE_ROW:
-                    if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "enable");
-                    break;
+                    checkisproperty(ENABLE_ROW, "enable"); break;
                 case LOOK_AT_TARGET_ROW:
-                    if (table->item(LOOK_AT_TARGET_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "lookAtTarget");
-                    break;
+                    checkisproperty(LOOK_AT_TARGET_ROW, "lookAtTarget"); break;
                 case LIMIT_ANGLE_DEGREES_ROW:
-                    if (table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "limitAngleDegrees");
-                    break;
+                    checkisproperty(LIMIT_ANGLE_DEGREES_ROW, "limitAngleDegrees"); break;
                 case LIMIT_ANGLE_THRESHOLD_DEGREES_ROW:
-                    if (table->item(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "limitAngleThresholdDegrees");
-                    break;
+                    checkisproperty(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, "limitAngleThresholdDegrees"); break;
                 case CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW:
-                    if (table->item(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "continueLookOutsideOfLimit");
-                    break;
+                    checkisproperty(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, "continueLookOutsideOfLimit"); break;
                 case ON_GAIN_ROW:
-                    if (table->item(ON_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "onGain");
-                    break;
+                    checkisproperty(ON_GAIN_ROW, "onGain"); break;
                 case OFF_GAIN_ROW:
-                    if (table->item(OFF_GAIN_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "offGain");
-                    break;
+                    checkisproperty(OFF_GAIN_ROW, "offGain"); break;
                 case USE_BONE_GAINS_ROW:
-                    if (table->item(USE_BONE_GAINS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "useBoneGains");
-                    break;
+                    checkisproperty(USE_BONE_GAINS_ROW, "useBoneGains"); break;
                 case TARGET_LOCATION_ROW:
-                    if (table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "targetLocation");
-                    break;
+                    checkisproperty(TARGET_LOCATION_ROW, "targetLocation"); break;
                 case TARGET_OUTSIDE_LIMITS_ROW:
-                    if (table->item(TARGET_OUTSIDE_LIMITS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "targetOutsideLimits");
-                    break;
+                    checkisproperty(TARGET_OUTSIDE_LIMITS_ROW, "targetOutsideLimits"); break;
                 case LOOK_AT_CAMERA_ROW:
-                    if (table->item(LOOK_AT_CAMERA_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "lookAtCamera");
-                    break;
+                    checkisproperty(LOOK_AT_CAMERA_ROW, "lookAtCamera"); break;
                 case LOOK_AT_CAMERA_X_ROW:
-                    if (table->item(LOOK_AT_CAMERA_X_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "lookAtCameraX");
-                    break;
+                    checkisproperty(LOOK_AT_CAMERA_X_ROW, "lookAtCameraX"); break;
                 case LOOK_AT_CAMERA_Y_ROW:
-                    if (table->item(LOOK_AT_CAMERA_Y_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "lookAtCameraY");
-                    break;
+                    checkisproperty(LOOK_AT_CAMERA_Y_ROW, "lookAtCameraY"); break;
                 case LOOK_AT_CAMERA_Z_ROW:
-                    if (table->item(LOOK_AT_CAMERA_Z_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "lookAtCameraZ");
-                    break;
+                    checkisproperty(LOOK_AT_CAMERA_Z_ROW, "lookAtCameraZ"); break;
                 }
             }
         }else if (row == ADD_BONE_ROW && column == NAME_COLUMN){
@@ -787,89 +514,41 @@ void BSLookAtModifierUI::viewSelectedChild(int row, int column){
             addEyeBone();
         }else if (row > ADD_BONE_ROW && row < eyeBoneButtonRow){
             result = row - BASE_NUMBER_OF_ROWS + 1;
-            if (bsData->getNumberOfBones() > result && result >= 0){
-                if (column == VALUE_COLUMN){
-                    boneUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &bsData->bones[result], bsData, result, false);
-                    setCurrentIndex(BONE_UI_WIDGET);
-                }else if (column == BINDING_COLUMN){
-                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the bone \""+boneList.at(bsData->bones.at(result).index + 1)+"\"?") == QMessageBox::Yes){    //Unsafe...
-                        removeBone(result);
-                    }
-                }
-            }else{
-                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
-            }
+            loadboneui(bsData->getBones(), bsData->getNumberOfBones());
         }else if (row > eyeBoneButtonRow && row < table->rowCount()){
             result = row - BASE_NUMBER_OF_ROWS - bsData->getNumberOfBones();
-            if (result < bsData->getNumberOfEyeBones() && result >= 0){
-                if (column == VALUE_COLUMN){
-                    boneUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &bsData->eyeBones[result], bsData, result, true);
-                    setCurrentIndex(BONE_UI_WIDGET);
-                }else if (column == BINDING_COLUMN){
-                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the eye bone \""+boneList.at(bsData->eyeBones.at(result).index + 1)+"\"?") == QMessageBox::Yes){    //Unsafe...
-                        removeEyeBone(result);
-                    }
-                }
-            }else{
-                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
-            }
+            loadboneui(bsData->getEyeBones(), bsData->getNumberOfEyeBones());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void BSLookAtModifierUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     case BONE_UI_WIDGET:
-        boneUI->setBindingVariable(index, name);
-        break;
+        boneUI->setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("BSLookAtModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
 }
 
 void BSLookAtModifierUI::addBone(){
-    if (bsData){
-        bsData->bones.append(BSLookAtModifier::BsBone());
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::addBone(): The data or behavior graph pointer is nullptr!!");
-    }
+    (bsData) ? bsData->addBone(), loadDynamicTableRows() : LogFile::writeToLog("BSLookAtModifierUI::addBone(): The data is nullptr!!");
 }
 
 void BSLookAtModifierUI::removeBone(int index){
-    if (bsData){
-        if (index >= 0 && index < bsData->bones.size()){
-            bsData->bones.removeAt(index);
-        }
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::removeBone(): The data or behavior graph pointer is nullptr!!");
-    }
+    (bsData) ? bsData->removeBone(index), loadDynamicTableRows() : LogFile::writeToLog("BSLookAtModifierUI::removeBone(): The data is nullptr!!");
 }
 
 void BSLookAtModifierUI::removeEyeBone(int index){
-    if (bsData){
-        if (index >= 0 && index < bsData->eyeBones.size()){
-            bsData->eyeBones.removeAt(index);
-        }
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::removeEyeBone(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->removeEyeBone(index), loadDynamicTableRows() : LogFile::writeToLog("BSLookAtModifierUI::removeEyeBone(): The data is nullptr!!");
 }
 
 void BSLookAtModifierUI::addEyeBone(){
-    if (bsData){
-        bsData->eyeBones.append(BSLookAtModifier::BsBone());
-        loadDynamicTableRows();
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::addEyeBone(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->addEyeBone(), loadDynamicTableRows() : LogFile::writeToLog("BSLookAtModifierUI::addEyeBone(): The data is nullptr!!");
 }
 
 void BSLookAtModifierUI::returnToWidget(){
@@ -889,79 +568,36 @@ void BSLookAtModifierUI::connectToTables(GenericTableWidget *variables, GenericT
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSLookAtModifierUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("BSLookAtModifierUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
-        bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("enable");
-            if (bindIndex == index){
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("lookAtTarget");
-            if (bindIndex == index){
-                table->item(LOOK_AT_TARGET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleDegrees");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("limitAngleThresholdDegrees");
-            if (bindIndex == index){
-                table->item(LIMIT_ANGLE_THRESHOLD_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("continueLookOutsideOfLimit");
-            if (bindIndex == index){
-                table->item(CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("onGain");
-            if (bindIndex == index){
-                table->item(ON_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("offGain");
-            if (bindIndex == index){
-                table->item(OFF_GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("useBoneGains");
-            if (bindIndex == index){
-                table->item(USE_BONE_GAINS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetLocation");
-            if (bindIndex == index){
-                table->item(TARGET_LOCATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("targetOutsideLimits");
-            if (bindIndex == index){
-                table->item(TARGET_OUTSIDE_LIMITS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("lookAtCamera");
-            if (bindIndex == index){
-                table->item(LOOK_AT_CAMERA_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("lookAtCameraX");
-            if (bindIndex == index){
-                table->item(LOOK_AT_CAMERA_X_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("lookAtCameraY");
-            if (bindIndex == index){
-                table->item(LOOK_AT_CAMERA_Y_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("lookAtCameraZ");
-            if (bindIndex == index){
-                table->item(LOOK_AT_CAMERA_Z_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("enable", ENABLE_ROW);
+            setname("lookAtTarget", LOOK_AT_TARGET_ROW);
+            setname("limitAngleDegrees", LIMIT_ANGLE_DEGREES_ROW);
+            setname("limitAngleThresholdDegrees", LIMIT_ANGLE_THRESHOLD_DEGREES_ROW);
+            setname("continueLookOutsideOfLimit", CONTINUE_LOOK_OUTSIDE_OF_LIMIT_ROW);
+            setname("onGain", ON_GAIN_ROW);
+            setname("offGain", OFF_GAIN_ROW);
+            setname("useBoneGains", USE_BONE_GAINS_ROW);
+            setname("targetLocation", TARGET_LOCATION_ROW);
+            setname("targetOutsideLimits", TARGET_OUTSIDE_LIMITS_ROW);
+            setname("lookAtCamera", LOOK_AT_CAMERA_ROW);
+            setname("lookAtCameraX", LOOK_AT_CAMERA_X_ROW);
+            setname("lookAtCameraY", LOOK_AT_CAMERA_Y_ROW);
+            setname("lookAtCameraZ", LOOK_AT_CAMERA_Z_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
@@ -969,49 +605,9 @@ void BSLookAtModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            if (index == bsData->id){
-                table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            }
+            (index == bsData->getId()) ? table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name) : NULL;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSLookAtModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
-
-void BSLookAtModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-void BSLookAtModifierUI::loadTableValue(int row, const QString &value){
-    if (table->item(row, VALUE_COLUMN)){
-        if (value != ""){
-            table->item(row, VALUE_COLUMN)->setText(value);
-        }else{
-            table->item(row, VALUE_COLUMN)->setText("NONE");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadTableValue(): There is no table item here!!");
-    }
-}
-

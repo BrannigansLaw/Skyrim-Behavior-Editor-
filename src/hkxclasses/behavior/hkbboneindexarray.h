@@ -14,6 +14,11 @@ public:
     hkbBoneIndexArray(const hkbBoneIndexArray &) = delete;
     ~hkbBoneIndexArray();
 private:
+    void addBoneIndex(int indexvalue = 0);
+    void removeBoneIndexAt(int index);
+    int getNumberOfBoneIndices() const;
+    void setBoneIndexAt(int index, int value);
+    int getBoneIndexAt(int index) const;
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     //QString evaluateDataValidity();

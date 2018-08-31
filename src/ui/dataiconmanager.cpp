@@ -23,15 +23,25 @@ bool DataIconManager::hasIcons() const{
             return true;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DataIconManager::hasIcons(): 'icons' is empty!!!");
+        LogFile::writeToLog("DataIconManager::hasIcons(): 'icons' is empty!!!");
     }
     return false;
 }
 
+int DataIconManager::getNumberOfIcons() const{
+    return icons.size();
+}
+
+TreeGraphicsItem *DataIconManager::getFirstIcon() const{
+    if (!icons.isEmpty()){
+        return icons.first();
+    }
+    return nullptr;
+}
+
 void DataIconManager::updateIconNames(){
-    //icons.first()->scene()->update();
     for (auto i = 0; i < icons.size(); i++){
-        icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
+        icons.at(i)->update();
     }
 }
 
@@ -89,13 +99,12 @@ void DataIconManager::setIconValidity(bool valid){
             icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
         }
     };
-    valid ? setoutlinecolor(Qt::black) : setoutlinecolor(Qt::red);
+    (valid) ? setoutlinecolor(Qt::black) : setoutlinecolor(Qt::red);
 }
 
 void DataIconManager::setFocusOnTopIcon(){
-    TreeGraphicsItem *icon;
     if (!icons.isEmpty()){
-        icon = icons.first();
+        auto icon = icons.first();
         if (icon && icon->scene() && !icon->scene()->views().isEmpty()){
             icon = icons.first();
             static_cast<BehaviorGraphView *>(icon->scene()->views().first())->centerOn(icon);
@@ -123,26 +132,24 @@ bool DataIconManager::isCircularLoop() const{
 
 void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
     if (!getIsMerged() && recessiveobj){
-        DataIconManager *recobj = static_cast<DataIconManager *>(recessiveobj);
-        QVector <DataIconManager *> domchildren = getChildren();
-        QVector <DataIconManager *> recchildren = recobj->getChildren();
-        QVector <DataIconManager *> tempchildren;
+        auto recobj = static_cast<DataIconManager *>(recessiveobj);
+        auto domchildren = getChildren();
+        auto recchildren = recobj->getChildren();
         DataIconManager *domchild;
         DataIconManager *recchild;
-        DataIconManager *obj;
-        DataIconManager *tempchild;
         HkxSignature domsig;
         HkxSignature recsig;
-        HkxSignature tempsig;
         bool found;
-        QVector <DataIconManager *> objects;
         QVector <DataIconManager *> children;
-        if (getVariableBindingSetData()){
-            getVariableBindingSet()->merge(recobj->getVariableBindingSetData());
-        }else if (recobj->getVariableBindingSetData()){
-            getVariableBindingSet() = HkxSharedPtr(recobj->getVariableBindingSetData());
-            recobj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-            getParentFile()->addObjectToFile(recobj->getVariableBindingSetData(), -1);
+        auto domvarbind = getVariableBindingSetData();
+        auto recvarbind = recobj->getVariableBindingSetData();
+        if (domvarbind){
+            domvarbind->merge(recvarbind);
+        }else if (recvarbind){
+            getVariableBindingSet() = HkxSharedPtr(recvarbind);
+            auto parfile = static_cast<BehaviorFile *>(getParentFile());
+            recobj->fixMergedIndices(parfile);
+            parfile->addObjectToFile(recvarbind, -1);
         }
         for (auto i = 0; i < domchildren.size(); i++){
             found = false;
@@ -159,10 +166,10 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
             if (!found){
                 for (auto j = recchildren.size() - 1; j >= 0; j--){
                     recchild = recchildren.at(j);
-                    tempchildren = recchild->getChildren();
+                    auto tempchildren = recchild->getChildren();
                     for (auto k = 0; k < tempchildren.size(); k++){
-                        tempsig = tempchildren.at(k)->getSignature();
-                        tempchild = tempchildren.at(k);
+                        auto tempsig = tempchildren.at(k)->getSignature();
+                        auto tempchild = tempchildren.at(k);
                         if ((domsig == tempsig) && ((domchild->getName() == tempchild->getName())/* || //For FNIS problem in mt_behavior NPC_TurnLeft90
                                                   (domsig == HKB_CLIP_GENERATOR && !QString::compare(static_cast<hkbClipGenerator *>(domchild)->getAnimationName().section("\\", -1, -1),
                                                                                                      static_cast<hkbClipGenerator *>(tempchild)->getAnimationName().section("\\", -1, -1), Qt::CaseInsensitive))*/))
@@ -182,9 +189,9 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
                                     tempchild->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
                                     getParentFile()->addObjectToFile(tempchild, -1);
                                     getParentFile()->addObjectToFile(tempchild->getVariableBindingSetData(), -1);
-                                    objects = static_cast<DataIconManager *>(tempchild)->getChildren();
+                                    auto objects = static_cast<DataIconManager *>(tempchild)->getChildren();
                                     while (!objects.isEmpty()){
-                                        obj = objects.last();
+                                        auto obj = objects.last();
                                         if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(obj)){
                                             obj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
                                             obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
@@ -207,51 +214,34 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
         }
         setIsMerged(true);
     }else{
-        //LogFile::writeToLog("DataIconManager::injectWhileMerging() hkbGenerator: nullptr!");
+        LogFile::writeToLog("DataIconManager::injectWhileMerging() hkbGenerator: nullptr!");
     }
 }
 
 TreeGraphicsItem * DataIconManager::reconnectToNext(){
-    TreeGraphicsItem *iconToBeRemoved = nullptr;
-    QList <QGraphicsItem *> children;
     if (!icons.isEmpty()){
         if (icons.size() > 1){
-            iconToBeRemoved = icons.at(1);
-            //icons.removeAt(1);
+            auto iconToBeRemoved = icons.at(1);
             if (iconToBeRemoved){
                 if (iconToBeRemoved->parentItem() && icons.first()){
-                    children = iconToBeRemoved->parentItem()->childItems();
+                    auto children = iconToBeRemoved->parentItem()->childItems();
                     icons.first()->setParent((TreeGraphicsItem *)iconToBeRemoved->parentItem(), children.indexOf(iconToBeRemoved));
                     return iconToBeRemoved;
                 }
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
+        LogFile::writeToLog("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
     }
     return nullptr;
 }
 
 void DataIconManager::appendIcon(TreeGraphicsItem *icon){
-    //int index = -1;
     if (icon){
-        if (icons.isEmpty() || !icons.contains(icon)){
-            /*if (icons.size() > 1){
-                index = icon->determineInsertionIndex();
-                if (index > -1 && index < icons.size()){
-                    icons.insert(index, icon);
-                    return;
-                }
-            }*/
-            icons.append(icon);
-        }
+        (icons.isEmpty() || !icons.contains(icon)) ? icons.append(icon) : LogFile::writeToLog("DataIconManager::appendIcon(): icon was not appended!!!");
     }
 }
 
 void DataIconManager::removeIcon(TreeGraphicsItem *icon){
-    if (!icons.isEmpty()){
-        icons.removeAll(icon);
-    }else{
-        CRITICAL_ERROR_MESSAGE("DataIconManager::removeIcon(): 'icons' is empty!!!");
-    }
+    (!icons.isEmpty()) ? icons.removeAll(icon) : LogFile::writeToLog("DataIconManager::removeIcon(): 'icons' is empty!!!");
 }

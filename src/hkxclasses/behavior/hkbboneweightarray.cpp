@@ -19,6 +19,11 @@ hkbBoneWeightArray::hkbBoneWeightArray(HkxFile *parent, long ref, int size)
     refCount++;
 }
 
+void hkbBoneWeightArray::setBoneWeightAt(int index, int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < boneWeights.size() && value < static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()) ? boneWeights[index] = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getParentFilename()+": "+getClassname()+": failed to set boneWeights!");
+}
+
 void hkbBoneWeightArray::copyBoneWeights(const hkbBoneWeightArray *other){
     std::lock_guard <std::mutex> guard(mutex);
     boneWeights.resize(other->getBoneWeightsSize());
@@ -86,11 +91,7 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < boneWeights.size(); i++, j++){
             bones.append(QString::number(boneWeights.at(i), char('f'), 6));
-            if (j % 16 == 0){
-                bones.append("\n");
-            }else{
-                bones.append(" ");
-            }
+            (!(j % 16)) ? bones.append("\n") : bones.append(" ");
         }
         if (boneWeights.size() > 0){
             if (bones.endsWith(" \0")){

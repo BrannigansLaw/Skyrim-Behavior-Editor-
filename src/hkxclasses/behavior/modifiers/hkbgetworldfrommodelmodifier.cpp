@@ -88,6 +88,41 @@ bool hkbGetWorldFromModelModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+hkQuadVariable hkbGetWorldFromModelModifier::getRotationOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return rotationOut;
+}
+
+void hkbGetWorldFromModelModifier::setRotationOut(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != rotationOut) ? rotationOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'rotationOut' was not set!");
+}
+
+hkQuadVariable hkbGetWorldFromModelModifier::getTranslationOut() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return translationOut;
+}
+
+void hkbGetWorldFromModelModifier::setTranslationOut(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != translationOut) ? translationOut = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'translationOut' was not set!");
+}
+
+bool hkbGetWorldFromModelModifier::getEnable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enable;
+}
+
+void hkbGetWorldFromModelModifier::setEnable(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enable) ? enable = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'enable' was not set!");
+}
+
+void hkbGetWorldFromModelModifier::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbGetWorldFromModelModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
@@ -104,7 +139,7 @@ void hkbGetWorldFromModelModifier::unlink(){
 QString hkbGetWorldFromModelModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");

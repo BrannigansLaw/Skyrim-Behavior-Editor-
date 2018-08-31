@@ -143,7 +143,7 @@ bool hkbProjectStringData::link(){
 QString hkbProjectStringData::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     auto checkstring = [&](const QStringList & list, const QString & fieldname){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i) == ""){

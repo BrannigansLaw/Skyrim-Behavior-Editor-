@@ -276,10 +276,10 @@ void BlenderGeneratorUI::loadDynamicTableRows(){
 
 void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        auto isProperty = false;
         auto row = table->currentRow();
         auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
-            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            bool isProperty;
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : isProperty = false;
             UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
         };
         switch (row){
@@ -381,6 +381,8 @@ void BlenderGeneratorUI::swapGeneratorIndices(int index1, int index2){
         index2 = index2 - BASE_NUMBER_OF_ROWS;
         if (!bsData->swapChildren(index1, index2)){
             WARNING_MESSAGE("Cannot swap these rows!!");
+        }else{  //TO DO: check if necessary...
+            (behaviorView->getSelectedItem()) ? behaviorView->getSelectedItem()->reorderChildren() : LogFile::writeToLog("BlenderGeneratorUI::swapGeneratorIndices(): No item selected!!");
         }
     }else{
         LogFile::writeToLog("BlenderGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
@@ -388,9 +390,8 @@ void BlenderGeneratorUI::swapGeneratorIndices(int index1, int index2){
 }
 
 void BlenderGeneratorUI::addChildWithGenerator(){
-    Generator_Type typeEnum;
     if (bsData && behaviorView){
-        typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
+        auto typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
         behaviorView->appendBlenderGeneratorChild();
         switch (typeEnum){
         case STATE_MACHINE:
@@ -425,14 +426,13 @@ void BlenderGeneratorUI::addChildWithGenerator(){
         }
         loadDynamicTableRows();
     }else{
-        LogFile::writeToLog("BlenderGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::addChild(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::removeChild(int index){
-    hkbBlenderGeneratorChild *child = nullptr;
     if (bsData && behaviorView){
-        child = bsData->getChildDataAt(index);
+        auto child = bsData->getChildDataAt(index);
         if (child){
             behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->getChildren().first()), index);
             behaviorView->removeObjects();
@@ -441,14 +441,14 @@ void BlenderGeneratorUI::removeChild(int index){
         }
         loadDynamicTableRows();
     }else{
-        LogFile::writeToLog("BlenderGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::removeChild(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::viewSelectedChild(int row, int column){
     auto checkisproperty = [&](int row, const QString & fieldname){
-        auto properties = false;
-        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+        bool properties;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : properties = false;
         selectTableToView(properties, fieldname);
     };
     if (bsData){

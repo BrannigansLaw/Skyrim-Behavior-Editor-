@@ -174,7 +174,7 @@ bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
     if (obj && obj->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
         if (index >= states.size() || index == -1){
             states.append(HkxSharedPtr(obj));
-        }else if (index == 0 || !states.isEmpty()){
+        }else if (!index || !states.isEmpty()){
             states.replace(index, HkxSharedPtr(obj));
         }
         return true;
@@ -475,6 +475,129 @@ hkbStateMachine *hkbStateMachine::getNestedStateMachineNoLock(ulong stateId) con
     return nullptr;
 }
 
+bool hkbStateMachine::swapChildren(int index1, int index2){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (states.size() > index1 && states.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+        auto gen1 = states.at(index1).data();
+        auto gen2 = states.at(index2).data();
+        states[index1] = HkxSharedPtr(gen2);
+        states[index2] = HkxSharedPtr(gen1);
+        setIsFileChanged(true);
+        return true;
+    }
+    return false;
+}
+
+int hkbStateMachine::getEventToSendWhenStateOrTransitionChangesID() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToSendWhenStateOrTransitionChanges.id;
+}
+
+void hkbStateMachine::setSelfTransitionMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < SelfTransitionMode.size() && selfTransitionMode != SelfTransitionMode.at(index)) ? selfTransitionMode = SelfTransitionMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'selfTransitionMode' was not set!");
+}
+
+QString hkbStateMachine::getSelfTransitionMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return selfTransitionMode;
+}
+
+QString hkbStateMachine::getStartStateMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startStateMode;
+}
+
+void hkbStateMachine::setStartStateMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < StartStateMode.size() && startStateMode != StartStateMode.at(index)) ? startStateMode = StartStateMode.at(index), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startStateMode' was not set!");
+}
+
+ushort hkbStateMachine::getMaxSimultaneousTransitions() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return maxSimultaneousTransitions;
+}
+
+void hkbStateMachine::setMaxSimultaneousTransitions(const ushort &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != maxSimultaneousTransitions) ? maxSimultaneousTransitions = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'maxSimultaneousTransitions' was not set!");
+}
+
+bool hkbStateMachine::getWrapAroundStateId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return wrapAroundStateId;
+}
+
+void hkbStateMachine::setWrapAroundStateId(bool value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != wrapAroundStateId) ? wrapAroundStateId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'wrapAroundStateId' was not set!");
+}
+
+int hkbStateMachine::getSyncVariableIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return syncVariableIndex;
+}
+
+void hkbStateMachine::setSyncVariableIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != syncVariableIndex) ? syncVariableIndex = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'syncVariableIndex' was not set!");
+}
+
+int hkbStateMachine::getTransitionToNextLowerStateEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return transitionToNextLowerStateEventId;
+}
+
+void hkbStateMachine::setTransitionToNextLowerStateEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != transitionToNextLowerStateEventId) ? transitionToNextLowerStateEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'transitionToNextLowerStateEventId' was not set!");
+}
+
+int hkbStateMachine::getTransitionToNextHigherStateEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return transitionToNextHigherStateEventId;
+}
+
+void hkbStateMachine::setTransitionToNextHigherStateEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != transitionToNextHigherStateEventId) ? transitionToNextHigherStateEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'transitionToNextHigherStateEventId' was not set!");
+}
+
+int hkbStateMachine::getRandomTransitionEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return randomTransitionEventId;
+}
+
+void hkbStateMachine::setRandomTransitionEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != randomTransitionEventId) ? randomTransitionEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'randomTransitionEventId' was not set!");
+}
+
+int hkbStateMachine::getReturnToPreviousStateEventId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return returnToPreviousStateEventId;
+}
+
+void hkbStateMachine::setReturnToPreviousStateEventId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != returnToPreviousStateEventId) ? returnToPreviousStateEventId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'returnToPreviousStateEventId' was not set!");
+}
+
+int hkbStateMachine::getStartStateId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startStateId;
+}
+
+void hkbStateMachine::setStartStateId(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startStateId && value < states.size() && value > -1) ? startStateId = value, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'startStateId' was not set!");
+}
+
+void hkbStateMachine::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, setIsFileChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
@@ -584,11 +707,7 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0, j = 1; i < states.size(); i++, j++){
             refString.append(states.at(i)->getReferenceString());
-            if (j % 16 == 0){
-                refString.append("\n");
-            }else{
-                refString.append(" ");
-            }
+            (!(j % 16)) ? refString.append("\n") : refString.append(" ");
         }
         if (states.size() > 0){
             if (refString.endsWith(" \0")){
@@ -665,7 +784,7 @@ void hkbStateMachine::unlink(){
 QString hkbStateMachine::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (states.isEmpty()){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": states is empty!");

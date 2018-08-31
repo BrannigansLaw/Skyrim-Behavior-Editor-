@@ -13,7 +13,7 @@
 #include <QHeaderView>
 #include <QCoreApplication>
 
-QStringList EventsUI::headerLabels = {
+const QStringList EventsUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -59,16 +59,12 @@ EventsUI::EventsUI(const QString &title)
 }
 
 void EventsUI::viewEvent(int row, int column){
-    hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-    if (column == 2 && loadedData && loadedData->eventInfos.size() > row && events->eventNames.size() > row){
+    if (column == 2 && loadedData && loadedData->eventInfos.size() > row){
+        auto events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
         disconnect(eventName, 0, this, 0);
         disconnect(flag, 0, this, 0);
-        eventName->setText(events->eventNames.at(row));
-        if (loadedData->eventInfos.at(row) == "FLAG_SYNC_POINT"){
-            flag->setChecked(true);
-        }else{
-            flag->setChecked(false);
-        }
+        eventName->setText(events->getEventNameAt(row));
+        (loadedData->getEventInfoAt(row) == "FLAG_SYNC_POINT") ? flag->setChecked(true) : flag->setChecked(false);
         connect(flag, SIGNAL(released()), this, SLOT(setBoolVariableValue()), Qt::UniqueConnection);
         connect(eventName, SIGNAL(editingFinished()), this, SLOT(renameSelectedEvent()), Qt::UniqueConnection);
         stackLyt->setCurrentIndex(EVENT_WIDGET);
@@ -80,44 +76,49 @@ void EventsUI::returnToTable(){
 }
 
 void EventsUI::setBoolVariableValue(){
-    loadedData->setEventFlagAt(table->currentRow(), flag->isChecked());
-    loadedData->setIsFileChanged(true);
+    if (loadedData){
+        loadedData->setEventFlagAt(table->currentRow(), flag->isChecked());
+        loadedData->setIsFileChanged(true);
+    }else{
+        LogFile::writeToLog("EventsUI: loadedData is nullptr!!");
+    }
 }
 
 void EventsUI::renameSelectedEvent(){
-    QString newName = eventName->text();
-    table->item(table->currentRow(), 0)->setText(newName);
-    loadedData->setEventNameAt(table->currentRow(), newName);
-    loadedData->setIsFileChanged(true);
-    emit eventNameChanged(newName, table->currentRow());
+    if (loadedData){
+        auto newName = eventName->text();
+        table->item(table->currentRow(), 0)->setText(newName);
+        loadedData->setEventNameAt(table->currentRow(), newName);
+        loadedData->setIsFileChanged(true);
+        emit eventNameChanged(newName, table->currentRow());
+    }else{
+        LogFile::writeToLog("EventsUI: loadedData is nullptr!!");
+    }
 }
 
 void EventsUI::loadData(HkxObject *data){
-    if (data && data->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
-        loadedData = static_cast<hkbBehaviorGraphData *>(data);
-        int row;
-        hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        if (events){
-            for (auto i = 0; i < events->eventNames.size(); i++){
-                row = table->rowCount();
+    if (data){
+        if (data->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
+            loadedData = static_cast<hkbBehaviorGraphData *>(data);
+            auto eventNames = loadedData->getEventNames();
+            for (auto i = 0; i < eventNames.size(); i++){
+                auto row = table->rowCount();
                 if (table->rowCount() > i){
                     table->setRowHidden(i, false);
-                    if (table->item(row, 0)){
-                        table->item(row, 0)->setText(events->eventNames.at(i));
-                    }else{
-                        table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
-                    }
+                    (table->item(row, 0)) ? table->item(row, 0)->setText(eventNames.at(i)) : table->setItem(row, 0, new QTableWidgetItem(eventNames.at(i)));
                 }else{
                     table->setRowCount(row + 1);
-                    table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
+                    table->setItem(row, 0, new QTableWidgetItem(eventNames.at(i)));
                     table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
                     table->setItem(row, 2, new QTableWidgetItem("Edit"));
                 }
             }
-            for (auto j = events->eventNames.size(); j < table->rowCount(); j++){
+            for (auto j = eventNames.size(); j < table->rowCount(); j++){
                 table->setRowHidden(j, true);
             }
         }
+    }else{
+        LogFile::writeToLog("EventsUI: loadedData is nullptr!!");
     }
 }
 
@@ -131,33 +132,29 @@ void EventsUI::clear(){
 void EventsUI::addEvent(){
     if (loadedData){
         loadedData->addEvent();
-        hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        int row = table->rowCount();
+        auto row = table->rowCount();
+        auto event = loadedData->getEventNames().last();
         table->setRowCount(row + 1);
-        table->setItem(row, 0, new QTableWidgetItem(events->eventNames.last()));
+        table->setItem(row, 0, new QTableWidgetItem(event));
         table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
         table->setItem(row, 2, new QTableWidgetItem("Edit"));
-        if (stackLyt->currentIndex() == EVENT_WIDGET){
-            stackLyt->setCurrentIndex(TABLE_WIDGET);
-        }
+        (stackLyt->currentIndex() == EVENT_WIDGET) ? stackLyt->setCurrentIndex(TABLE_WIDGET) : NULL;
         table->setCurrentCell(row, 0);
-        emit eventAdded(events->eventNames.last());
+        emit eventAdded(event);
+    }else{
+        LogFile::writeToLog("EventsUI: loadedData is nullptr!!");
     }
 }
 
 void EventsUI::removeEvent(){
     if (loadedData){
         disconnect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()));
-        int index = table->currentRow();
-        QString message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isEventReferenced(index);
+        auto index = table->currentRow();
+        auto message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isEventReferenced(index);
         if (message == ""){
             loadedData->removeEvent(index);
-            if (index < table->rowCount()){
-                table->removeRow(index);
-            }
-            if (stackLyt->currentIndex() == EVENT_WIDGET){
-                stackLyt->setCurrentIndex(TABLE_WIDGET);
-            }
+            (index < table->rowCount()) ? table->removeRow(index) : NULL;
+            (stackLyt->currentIndex() == EVENT_WIDGET) ? stackLyt->setCurrentIndex(TABLE_WIDGET) : NULL;
             loadedData->setIsFileChanged(true);
             static_cast<BehaviorFile *>(loadedData->getParentFile())->updateEventIndices(index);
             emit eventRemoved(index);
