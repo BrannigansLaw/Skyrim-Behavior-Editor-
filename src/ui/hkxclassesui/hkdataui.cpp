@@ -942,170 +942,173 @@ void HkDataUI::changeWidget(HkDataUI::DATA_TYPE_LOADED type, HkxObject *olddata,
 }
 
 void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
-    if (icon && icon->itemData){
-        auto oldData = loadedData;
-        (oldData) ? oldData->evaluateDataValidity() : NULL;
-        loadedData = icon->itemData;
-        switch (icon->itemData->getSignature()){
-        case HkxSignature::HKB_CLIP_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::CLIP_GENERATOR, oldData, clipGenUI, variablesTable, characterPropertiesTable, eventsTable, animationsTable); break;
-        case HkxSignature::HKB_STATE_MACHINE_STATE_INFO:
-        {
-            (loadedData != oldData) ? stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId()) : NULL;
-            stack->setCurrentIndex(DATA_TYPE_LOADED::STATE);
-            stateUI->connectToTables(generatorsTable, eventsTable);
-            break;
-        }
-        case HkxSignature::HKB_STATE_MACHINE:
-            changeWidget(DATA_TYPE_LOADED::STATE_MACHINE, oldData, stateMachineUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_MANUAL_SELECTOR_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR, oldData, manSelGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_MODIFIER_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::MODIFIER_GENERATOR, oldData, modGenUI, modifiersTable, generatorsTable); break;
-        case HkxSignature::HKB_BLENDER_GENERATOR_CHILD:
-        {
-            (loadedData != oldData) ? blenderGeneratorChildUI->loadData(loadedData, static_cast<hkbBlenderGeneratorChild *>(loadedData)->getThisIndex()) : NULL;
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD);
-            blenderGeneratorChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        }
-        case HkxSignature::HKB_BLENDER_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::BLENDER_GENERATOR, oldData, blenderGeneratorUI, generatorsTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_BONE_SWITCH_GENERATOR_BONE_DATA:
-        {
-            (loadedData != oldData) ? boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex()) : NULL;
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD);
-            boneSwitchChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
-            break;
-        }
-        case HkxSignature::BS_BONE_SWITCH_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR, oldData, boneSwitchUI, generatorsTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_BEHAVIOR_REFERENCE_GENERATOR:
-        {
-            (loadedData != oldData) ? behaviorRefGenUI->loadData(loadedData) : NULL;
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_REFERENCE_GENERATOR);
-            break;
-        }
-        case HkxSignature::HKB_EVALUATE_EXPRESSION_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER, oldData, evaluateExpModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_IS_ACTIVE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER, oldData, isActiveModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_I_STATE_TAGGING_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN, oldData, iStateTagGenUI, variablesTable, characterPropertiesTable, generatorsTable); break;
-        case HkxSignature::BS_DIRECT_AT_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::DIRECT_AT_MODIFIER, oldData, directAtModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_SYNCHRONIZED_CLIP_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR, oldData, syncClipGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_MODIFIER_LIST:
-            changeWidget(DATA_TYPE_LOADED::MODIFIER_LIST, oldData, modListUI, modifiersTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR, oldData, cyclicBlendTransGenUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_EVENT_DRIVEN_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER, oldData, eventDrivenModUI, modifiersTable, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_TWIST_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::TWIST_MODIFIER, oldData, twistModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER, oldData, eventEveryNEventsModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER, oldData, eventOnFalseToTrueModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_TIMER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_TIMER_MODIFIER, oldData, bsTimerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_GET_TIME_STEP_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER, oldData, getTimeStepModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_DELAYED_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::DELAYED_MODIFIER, oldData, delayedModUI, modifiersTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER, oldData, ragdollContactListenerModUI, variablesTable, characterPropertiesTable, eventsTable, ragdollBonesTable); break;
-        case HkxSignature::BS_EVENT_ON_DEACTIVATE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER, oldData, eventOnDeactivateModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER, oldData, passByTargetTriggerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_POSE_MATCHING_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR, oldData, poseMatchGenUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_DAMPING_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::DAMPING_MODIFIER, oldData, dampingModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_LIMB_IK_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_LIMB_IK_MOD, oldData, limbIKModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_MOVE_CHARACTER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER, oldData, moveCharModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_DECOMPOSE_VECTOR_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER, oldData, decomposeVectorModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_COMPUTE_DIRECTION_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER, oldData, computeDirMod, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER, oldData, computeAddAnimUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_DIST_TRIGGER_MODIFER:
-            changeWidget(DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER, oldData, distTriggerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_INTERP_VALUE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER, oldData, interpValueModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_GET_UP_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::GET_UP_MODIFIER, oldData, getUpModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_GET_WORLD_FROM_MODEL_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER, oldData, getWorldFromModelModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_TIMER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::TIMER_MODIFIER, oldData, timerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_MODIFY_ONCE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER, oldData, modifyOnceModUI, modifiersTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_COMBINE_TRANSFORMS_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER, oldData, combineTransModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER, oldData, computeRotationAxisAngleModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER, oldData, computeRotationToTargetModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_TRANSFORM_VECTOR_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER, oldData, transformVectorModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_EXTRACT_RAGDOLL_POSE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER, oldData, extractRagdollPoseModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_LOOK_AT_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::LOOK_AT_MODIFIER, oldData, lookAtModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_KEY_FRAME_BONES_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER, oldData, keyframeBonesModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
-        case HkxSignature::HKB_FOOT_IK_CONTROLS_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER, oldData, footIKControlsModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_MIRROR_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::MIRROR_MODIFIER, oldData, mirrorModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_DETECT_CLOSE_TO_GROUND_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER, oldData, detectCloseToGroundModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_ROTATE_CHARACTER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER, oldData, rotateCharModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_EVENTS_FROM_RANGE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER, oldData, eventsFromRangeModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_GET_HANDLE_ON_BONE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER, oldData, getHandleOnBoneUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_EVALUATE_HANDLE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER, oldData, evaluateHandleModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_SENSE_HANDLE_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER, oldData, senseHandleModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER, oldData, rigidRagdollControlsModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
-        case HkxSignature::HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER, oldData, poweredRagdollControlsModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
-        case HkxSignature::BGS_GAMEBYRO_SEQUENCE_GENERATOR:
-        {
-            (loadedData != oldData) ? gamebryoSequenceGenUI->loadData(loadedData) : NULL;
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BGS_GAMEBYRO_SEQUENCE_GENERATOR);
-            //gamebryoSequenceGenUI->connectToTables(variablesTable, characterPropertiesTable);
-            break;
-        }
-        case HkxSignature::BS_TWEENER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_TWEENER_MODIFIER, oldData, tweenerModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_LOOK_AT_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER, oldData, bsLookAtModUI, variablesTable, characterPropertiesTable, eventsTable); break;
-        case HkxSignature::BS_SPEED_SAMPLER_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER, oldData, speedSamplerModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::BS_OFFSET_ANIMATION_GENERATOR:
-            changeWidget(DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR, oldData, offsetAnimGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_HAND_IK_CONTROLS_MODIFIER:
-            changeWidget(DATA_TYPE_LOADED::HAND_IK_CONTROLS_MODIFIER, oldData, handIKControlsModUI, variablesTable, characterPropertiesTable); break;
-        case HkxSignature::HKB_BEHAVIOR_GRAPH:
-        {
-            (loadedData != oldData) ? behaviorGraphUI->loadData(loadedData) : NULL;
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_GRAPH);
-            behaviorGraphUI->connectToTables(generatorsTable);
-            break;
-        }
-        default:
-            unloadDataWidget();
+    if (icon){
+        auto icondata = icon->getItemData();
+        if (icondata){
+            auto oldData = loadedData;
+            (oldData) ? oldData->evaluateDataValidity() : NULL;
+            loadedData = icondata;
+            switch (icondata->getSignature()){
+            case HkxSignature::HKB_CLIP_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::CLIP_GENERATOR, oldData, clipGenUI, variablesTable, characterPropertiesTable, eventsTable, animationsTable); break;
+            case HkxSignature::HKB_STATE_MACHINE_STATE_INFO:
+            {
+                (loadedData != oldData) ? stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId()) : NULL;
+                stack->setCurrentIndex(DATA_TYPE_LOADED::STATE);
+                stateUI->connectToTables(generatorsTable, eventsTable);
+                break;
+            }
+            case HkxSignature::HKB_STATE_MACHINE:
+                changeWidget(DATA_TYPE_LOADED::STATE_MACHINE, oldData, stateMachineUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_MANUAL_SELECTOR_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR, oldData, manSelGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_MODIFIER_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::MODIFIER_GENERATOR, oldData, modGenUI, modifiersTable, generatorsTable); break;
+            case HkxSignature::HKB_BLENDER_GENERATOR_CHILD:
+            {
+                (loadedData != oldData) ? blenderGeneratorChildUI->loadData(loadedData, static_cast<hkbBlenderGeneratorChild *>(loadedData)->getThisIndex()) : NULL;
+                stack->setCurrentIndex(DATA_TYPE_LOADED::BLENDER_GENERATOR_CHILD);
+                blenderGeneratorChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+                break;
+            }
+            case HkxSignature::HKB_BLENDER_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::BLENDER_GENERATOR, oldData, blenderGeneratorUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_BONE_SWITCH_GENERATOR_BONE_DATA:
+            {
+                (loadedData != oldData) ? boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex()) : NULL;
+                stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD);
+                boneSwitchChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+                break;
+            }
+            case HkxSignature::BS_BONE_SWITCH_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR, oldData, boneSwitchUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_BEHAVIOR_REFERENCE_GENERATOR:
+            {
+                (loadedData != oldData) ? behaviorRefGenUI->loadData(loadedData) : NULL;
+                stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_REFERENCE_GENERATOR);
+                break;
+            }
+            case HkxSignature::HKB_EVALUATE_EXPRESSION_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER, oldData, evaluateExpModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_IS_ACTIVE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER, oldData, isActiveModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_I_STATE_TAGGING_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN, oldData, iStateTagGenUI, variablesTable, characterPropertiesTable, generatorsTable); break;
+            case HkxSignature::BS_DIRECT_AT_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::DIRECT_AT_MODIFIER, oldData, directAtModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_SYNCHRONIZED_CLIP_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR, oldData, syncClipGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_MODIFIER_LIST:
+                changeWidget(DATA_TYPE_LOADED::MODIFIER_LIST, oldData, modListUI, modifiersTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR, oldData, cyclicBlendTransGenUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_EVENT_DRIVEN_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER, oldData, eventDrivenModUI, modifiersTable, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_TWIST_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::TWIST_MODIFIER, oldData, twistModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER, oldData, eventEveryNEventsModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER, oldData, eventOnFalseToTrueModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_TIMER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_TIMER_MODIFIER, oldData, bsTimerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_GET_TIME_STEP_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER, oldData, getTimeStepModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_DELAYED_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::DELAYED_MODIFIER, oldData, delayedModUI, modifiersTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER, oldData, ragdollContactListenerModUI, variablesTable, characterPropertiesTable, eventsTable, ragdollBonesTable); break;
+            case HkxSignature::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER, oldData, eventOnDeactivateModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER, oldData, passByTargetTriggerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_POSE_MATCHING_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR, oldData, poseMatchGenUI, generatorsTable, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_DAMPING_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::DAMPING_MODIFIER, oldData, dampingModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_LIMB_IK_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_LIMB_IK_MOD, oldData, limbIKModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_MOVE_CHARACTER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER, oldData, moveCharModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_DECOMPOSE_VECTOR_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER, oldData, decomposeVectorModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_COMPUTE_DIRECTION_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER, oldData, computeDirMod, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER, oldData, computeAddAnimUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_DIST_TRIGGER_MODIFER:
+                changeWidget(DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER, oldData, distTriggerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_INTERP_VALUE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER, oldData, interpValueModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_GET_UP_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::GET_UP_MODIFIER, oldData, getUpModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_GET_WORLD_FROM_MODEL_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER, oldData, getWorldFromModelModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_TIMER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::TIMER_MODIFIER, oldData, timerModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_MODIFY_ONCE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_MODIFY_ONCE_MODIFIER, oldData, modifyOnceModUI, modifiersTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_COMBINE_TRANSFORMS_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER, oldData, combineTransModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER, oldData, computeRotationAxisAngleModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER, oldData, computeRotationToTargetModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_TRANSFORM_VECTOR_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER, oldData, transformVectorModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_EXTRACT_RAGDOLL_POSE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER, oldData, extractRagdollPoseModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_LOOK_AT_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::LOOK_AT_MODIFIER, oldData, lookAtModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_KEY_FRAME_BONES_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER, oldData, keyframeBonesModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
+            case HkxSignature::HKB_FOOT_IK_CONTROLS_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER, oldData, footIKControlsModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_MIRROR_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::MIRROR_MODIFIER, oldData, mirrorModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_DETECT_CLOSE_TO_GROUND_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER, oldData, detectCloseToGroundModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_ROTATE_CHARACTER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER, oldData, rotateCharModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_EVENTS_FROM_RANGE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::EVENTS_FROM_RANGE_MODIFIER, oldData, eventsFromRangeModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_GET_HANDLE_ON_BONE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER, oldData, getHandleOnBoneUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_EVALUATE_HANDLE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER, oldData, evaluateHandleModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_SENSE_HANDLE_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER, oldData, senseHandleModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER, oldData, rigidRagdollControlsModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
+            case HkxSignature::HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER, oldData, poweredRagdollControlsModUI, variablesTable, characterPropertiesTable, ragdollBonesTable); break;
+            case HkxSignature::BGS_GAMEBYRO_SEQUENCE_GENERATOR:
+            {
+                (loadedData != oldData) ? gamebryoSequenceGenUI->loadData(loadedData) : NULL;
+                stack->setCurrentIndex(DATA_TYPE_LOADED::BGS_GAMEBYRO_SEQUENCE_GENERATOR);
+                //gamebryoSequenceGenUI->connectToTables(variablesTable, characterPropertiesTable);
+                break;
+            }
+            case HkxSignature::BS_TWEENER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_TWEENER_MODIFIER, oldData, tweenerModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_LOOK_AT_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER, oldData, bsLookAtModUI, variablesTable, characterPropertiesTable, eventsTable); break;
+            case HkxSignature::BS_SPEED_SAMPLER_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER, oldData, speedSamplerModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::BS_OFFSET_ANIMATION_GENERATOR:
+                changeWidget(DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR, oldData, offsetAnimGenUI, generatorsTable, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_HAND_IK_CONTROLS_MODIFIER:
+                changeWidget(DATA_TYPE_LOADED::HAND_IK_CONTROLS_MODIFIER, oldData, handIKControlsModUI, variablesTable, characterPropertiesTable); break;
+            case HkxSignature::HKB_BEHAVIOR_GRAPH:
+            {
+                (loadedData != oldData) ? behaviorGraphUI->loadData(loadedData) : NULL;
+                stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_GRAPH);
+                behaviorGraphUI->connectToTables(generatorsTable);
+                break;
+            }
+            default:
+                unloadDataWidget();
+            }
         }
     }else{
         unloadDataWidget();

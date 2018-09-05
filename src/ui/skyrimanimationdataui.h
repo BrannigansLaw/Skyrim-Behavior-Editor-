@@ -19,36 +19,37 @@ class QGroupBox;
 class AnimationRotationUI;
 class AnimationTranslationUI;
 
-class SkyrimAnimationDataUI: public QStackedWidget
+class SkyrimAnimationDataUI final: public QStackedWidget
 {
     Q_OBJECT
 public:
     SkyrimAnimationDataUI();
-    virtual ~SkyrimAnimationDataUI(){}
+    SkyrimAnimationDataUI& operator=(const SkyrimAnimationDataUI&) = delete;
+    SkyrimAnimationDataUI(const SkyrimAnimationDataUI &) = delete;
+    ~SkyrimAnimationDataUI() = default;
+public:
     void loadData(SkyrimAnimationMotionData * data);
 signals:
     void returnToParent();
 private slots:
-    //void setName();
     void setDuration();
     void viewSelectedChild(int row, int column);
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void addTranslation();
     void removeTranslation(int index);
     void addRotation();
     void removeRotation(int index);
     void loadDynamicTableRows();
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
 private:
     enum ACTIVE_WIDGET{
         MAIN_WIDGET,
-        TRANSLATION_WIDGET = 1,
-        ROTATION_WIDGET = 2
+        TRANSLATION_WIDGET,
+        ROTATION_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     int rotationsButtonRow;
     SkyrimAnimationMotionData *bsData;
     QGroupBox *groupBox;
@@ -57,7 +58,6 @@ private:
     QGridLayout *topLyt;
     TableWidget *table;
     QPushButton *returnPB;
-    //LineEdit *name;
     DoubleSpinBox *duration;
 };
 

@@ -15,6 +15,10 @@ class AnimationTranslationUI final: public QGroupBox
     Q_OBJECT
 public:
     AnimationTranslationUI();
+    AnimationTranslationUI& operator=(const AnimationTranslationUI&) = delete;
+    AnimationTranslationUI(const AnimationTranslationUI &) = delete;
+    ~AnimationTranslationUI() = default;
+public:
     void loadData(SkyrimAnimationTranslation *trans, qreal maxtime);
 signals:
     void returnToParent();

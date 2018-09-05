@@ -31,6 +31,10 @@ class hkbVariableBindingSet;
 class CheckBox final: public QWidget
 {
     Q_OBJECT
+public:
+    CheckBox& operator=(const CheckBox&) = delete;
+    CheckBox(const CheckBox &) = delete;
+    ~CheckBox() = default;
 signals:
     void released();
     void clicked(bool b);
@@ -62,6 +66,10 @@ private:
 class ProgressDialog final: public QProgressDialog
 {
 public:
+    ProgressDialog& operator=(const ProgressDialog&) = delete;
+    ProgressDialog(const ProgressDialog &) = delete;
+    ~ProgressDialog() = default;
+public:
     ProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags())
         : QProgressDialog(labelText, cancelButtonText, minimum, maximum, parent, f)
     {
@@ -79,18 +87,25 @@ public:
 class Validator final: public QValidator
 {
 public:
+    Validator() = default;
+    Validator& operator=(const Validator&) = delete;
+    Validator(const Validator &) = delete;
+    ~Validator() = default;
+public:
     QValidator::State validate(QString & input, int &) const Q_DECL_OVERRIDE{
-        if (input == ""){
-            return QValidator::Invalid;
-        }else{
-            return QValidator::Acceptable;
-        }
+        auto result = QValidator::Acceptable;
+        (input == "") ? result = QValidator::Invalid : NULL;
+        return result;
     }
 };
 
 class LineEdit final: public QLineEdit
 {
     Q_OBJECT
+public:
+    LineEdit& operator=(const LineEdit&) = delete;
+    LineEdit(const LineEdit &) = delete;
+    ~LineEdit() = default;
 public:
     LineEdit(const QString & text = "", QWidget * par = 0)
         : QLineEdit(text, par)
@@ -99,8 +114,13 @@ public:
     }
 };
 
-class CheckButtonCombo final: public QWidget{
+class CheckButtonCombo final: public QWidget
+{
     Q_OBJECT
+public:
+    CheckButtonCombo& operator=(const CheckButtonCombo&) = delete;
+    CheckButtonCombo(const CheckButtonCombo &) = delete;
+    ~CheckButtonCombo() = default;
 public:
     CheckButtonCombo(const QString & buttontip = "", const QString & boxtext = "Enable:", bool disablebutton = true, const QString & buttontext = "Edit", QWidget * par = 0)
         : QWidget(par),
@@ -155,12 +175,15 @@ private:
 class ConditionValidator final: public QValidator
 {
 public:
+    ConditionValidator() = default;
+    ConditionValidator& operator=(const ConditionValidator&) = delete;
+    ConditionValidator(const ConditionValidator &) = delete;
+    ~ConditionValidator() = default;
+public:
     QValidator::State validate(QString & input, int &) const Q_DECL_OVERRIDE{
-        if (input.contains(">") || input.contains("<")){
-            return QValidator::Invalid;
-        }else{
-            return QValidator::Acceptable;
-        }
+        auto result = QValidator::Acceptable;
+        (input.contains(">") || input.contains("<")) ? result = QValidator::Invalid : NULL;
+        return result;
     }
 
     void fixup(QString & input) const{
@@ -172,6 +195,10 @@ public:
 class ConditionLineEdit final: public QLineEdit{
     Q_OBJECT
 public:
+    ConditionLineEdit& operator=(const ConditionLineEdit&) = delete;
+    ConditionLineEdit(const ConditionLineEdit &) = delete;
+    ~ConditionLineEdit() = default;
+public:
     ConditionLineEdit(const QString & text = "", QWidget * par = 0)
         : QLineEdit(text, par)
     {
@@ -182,12 +209,14 @@ public:
 class TableWidgetItem final: public QTableWidgetItem
 {
 public:
+    TableWidgetItem& operator=(const TableWidgetItem&) = delete;
+    TableWidgetItem(const TableWidgetItem &) = delete;
+    ~TableWidgetItem() = default;
+public:
     TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::white), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "", bool checkable = false)
         : QTableWidgetItem(text)
     {
-        if (checkable){
-            setCheckState(Qt::Unchecked);
-        }
+        (checkable) ? setCheckState(Qt::Unchecked) : NULL;
         setTextAlignment(align);
         setBackgroundColor(backgroundColor);
         setForeground(textColor);
@@ -198,13 +227,17 @@ public:
 class TableWidget final: public QTableWidget
 {
     Q_OBJECT
+public:
+    TableWidget& operator=(const TableWidget&) = delete;
+    TableWidget(const TableWidget &) = delete;
+    ~TableWidget() = default;
 signals:
     void itemDropped(int row1, int row2);
 public:
     TableWidget(const QColor & background = QColor(Qt::white), QWidget *parent = 0)
         : QTableWidget(parent)
     {
-        QPalette pal = palette();
+        auto pal = palette();
         pal.setColor(QPalette::Base, background);
         setPalette(pal);
         setMouseTracking(true);
@@ -227,10 +260,10 @@ public:
         if ((oldRow >= range.min && newRow >= range.min) && (oldRow <= range.max && newRow <= range.max)){
             if (swapRowItems(oldRow, newRow)){
                 emit itemDropped(oldRow, newRow);
-                return;
             }
+        }else{
+            emit itemDropped(-1, -1);
         }
-        emit itemDropped(-1, -1);
     }
 
     bool swapRowItems(int row1, int row2){
@@ -269,6 +302,10 @@ class SpinBox final: public QSpinBox
 {
     Q_OBJECT
 public:
+    SpinBox& operator=(const SpinBox&) = delete;
+    SpinBox(const SpinBox &) = delete;
+    ~SpinBox() = default;
+public:
     SpinBox(QWidget* parent = 0)
         : QSpinBox(parent)
     {
@@ -276,18 +313,19 @@ public:
         setMinimum(std::numeric_limits<int>::min());
         setFocusPolicy(Qt::StrongFocus);
     }
-
-    void wheelEvent(QWheelEvent *e)
-    {
-        if(hasFocus()){
-            QSpinBox::wheelEvent(e);
-        }
+protected:
+    void wheelEvent(QWheelEvent *e){
+        (hasFocus()) ? QSpinBox::wheelEvent(e) : NULL;
     }
 };
 
 class DoubleSpinBox final: public QDoubleSpinBox
 {
     Q_OBJECT
+public:
+    DoubleSpinBox& operator=(const DoubleSpinBox&) = delete;
+    DoubleSpinBox(const DoubleSpinBox &) = delete;
+    ~DoubleSpinBox() = default;
 public:
     DoubleSpinBox(QWidget* parent = 0, qreal value = 0, int precision = 6, qreal step = 1.0, qreal max = std::numeric_limits<double>::max(), qreal min = -std::numeric_limits<double>::max())
         : QDoubleSpinBox(parent)
@@ -299,12 +337,9 @@ public:
         setValue(value);
         setFocusPolicy(Qt::StrongFocus);
     }
-
-    void wheelEvent(QWheelEvent *e)
-    {
-        if(hasFocus()){
-            QDoubleSpinBox::wheelEvent(e);
-        }
+protected:
+    void wheelEvent(QWheelEvent *e){
+        (hasFocus()) ? QDoubleSpinBox::wheelEvent(e) : NULL;
     }
 };
 
@@ -312,24 +347,29 @@ class ComboBox final: public QComboBox
 {
     Q_OBJECT
 public:
+    ComboBox& operator=(const ComboBox&) = delete;
+    ComboBox(const ComboBox &) = delete;
+    ~ComboBox() = default;
+public:
     ComboBox(QWidget* parent = 0)
         : QComboBox(parent)
     {
         //setStyleSheet("QComboBox:hover { background-color:red }");
         setFocusPolicy(Qt::StrongFocus);
     }
-
-    void wheelEvent(QWheelEvent *e)
-    {
-        if(hasFocus()){
-            QComboBox::wheelEvent(e);
-        }
+protected:
+    void wheelEvent(QWheelEvent *e){
+        (hasFocus()) ? QComboBox::wheelEvent(e) : NULL;
     }
 };
 
 class QuadVariableWidget final: public QWidget
 {
     Q_OBJECT
+public:
+    QuadVariableWidget& operator=(const QuadVariableWidget&) = delete;
+    QuadVariableWidget(const QuadVariableWidget &) = delete;
+    ~QuadVariableWidget() = default;
 public:
     QuadVariableWidget()
         : lyt(new QHBoxLayout),
@@ -411,6 +451,10 @@ class GenericTableWidget final: public QWidget
     friend class HkDataUI;
 public:
     GenericTableWidget(const QString & title);
+    GenericTableWidget& operator=(const GenericTableWidget&) = delete;
+    GenericTableWidget(const GenericTableWidget &) = delete;
+    ~GenericTableWidget() = default;
+public:
     void loadTable(const QStringList & names, const QStringList & types, const QString & firstElement = "");
     void loadTable(const QStringList & names, const QString & type, const QString & firstElement = "");
     void addItem(const QString & name, const QString & type);
@@ -428,6 +472,8 @@ private slots:
     void filterItems();
     void resetFilter();
     void setTypeFilter(const QString & typeallowed, const QStringList &typesdisallowed = QStringList());
+private:
+    void setitem(int row, const QString & column0, const QString & column1);
 private:
     QString onlyTypeAllowed;
     QStringList typesDisallowed;

@@ -17,8 +17,6 @@ GenericTableWidget::GenericTableWidget(const QString & title)
       filterLE(new QLineEdit),
       selectPB(new QPushButton("Select")),
       cancelPB(new QPushButton("Cancel")),
-      //newPB(new QPushButton("New")),
-      //typeSelector(new ComboBox),
       lastSelectedRow(-1)
 {
     setWindowTitle(title);
@@ -58,97 +56,46 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     connect(resetFilterPB, SIGNAL(released()), this, SLOT(resetFilter()), Qt::UniqueConnection);
 }
 
-void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & firstElement){
-    int start = 0;
-    table->setRowCount(0);
-    if (!types.isEmpty()){
-        table->setColumnHidden(1, false);
+void GenericTableWidget::setitem(int row, const QString & column0, const QString & column1){
+    if (row < table->rowCount()){
+        auto item = table->item(row, 0);
+        (item) ? item->setText(column0) : table->setItem(row, 0, new QTableWidgetItem(column0));
+        item = table->item(row, 1);
+        (item) ? item->setText(column1) : table->setItem(row, 1, new QTableWidgetItem(column1));
+    }else{
+        table->setRowCount(table->rowCount() + 1);
+        table->setItem(row, 0, new QTableWidgetItem(column0));
+        table->setItem(row, 1, new QTableWidgetItem(column1));
     }
+}
+
+void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & firstElement){
+    auto start = 0;
+    table->setRowCount(0);
+    (!types.isEmpty()) ? table->setColumnHidden(1, false) : table->setColumnHidden(1, true);
     if (names.size() == types.size()){
         if (firstElement != ""){
             start = 1;
-            if (table->rowCount() > 0){
-                if (table->item(0, 0)){
-                    table->item(0, 0)->setText(firstElement);
-                }else{
-                    table->setItem(0, 0, new QTableWidgetItem(firstElement));
-                }
-                if (table->item(0, 1)){
-                    table->item(0, 1)->setText(firstElement);
-                }else{
-                    table->setItem(0, 1, new QTableWidgetItem(firstElement));
-                }
-            }else{
-                table->setRowCount(table->rowCount() + 1);
-                table->setItem(0, 0, new QTableWidgetItem(firstElement));
-                table->setItem(0, 1, new QTableWidgetItem(firstElement));
-            }
+            setitem(0, firstElement, firstElement);
         }
         for (auto i = start, j = 0; j < names.size(); i++, j++){
-            if (i < table->rowCount()){
-                if (table->item(i, 0)){
-                    table->item(i, 0)->setText(names.at(j));
-                }else{
-                    table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
-                }
-                if (table->item(i, 1)){
-                    table->item(i, 1)->setText(types.at(j));
-                }else{
-                    table->setItem(i, 1, new QTableWidgetItem(types.at(j)));
-                }
-            }else{
-                table->setRowCount(table->rowCount() + 1);
-                table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
-                table->setItem(i, 1, new QTableWidgetItem(types.at(j)));
-            }
+            setitem(i, names.at(j), types.at(j));
         }
     }else{
-        WARNING_MESSAGE(QString("GenericTableWidget: loadTable()\nThe stringlist arguments have different sizes!!!"));
+        WARNING_MESSAGE("GenericTableWidget: loadTable(): The stringlist arguments have different sizes!!!");
     }
 }
 
 void GenericTableWidget::loadTable(const QStringList & names, const QString & type, const QString & firstElement){
-    int start = 0;
+    auto start = 0;
     table->setRowCount(0);
-    if (type != ""){
-        table->setColumnHidden(1, false);
-    }
+    (type != "") ? table->setColumnHidden(1, false) : table->setColumnHidden(1, true);
     if (firstElement != ""){
         start = 1;
-        if (table->rowCount() > 0){
-            if (table->item(0, 0)){
-                table->item(0, 0)->setText(firstElement);
-            }else{
-                table->setItem(0, 0, new QTableWidgetItem(firstElement));
-            }
-            if (table->item(0, 1)){
-                table->item(0, 1)->setText(firstElement);
-            }else{
-                table->setItem(0, 1, new QTableWidgetItem(firstElement));
-            }
-        }else{
-            table->setRowCount(table->rowCount() + 1);
-            table->setItem(0, 0, new QTableWidgetItem(firstElement));
-            table->setItem(0, 1, new QTableWidgetItem(firstElement));
-        }
+        setitem(0, firstElement, firstElement);
     }
     for (auto i = start, j = 0; j < names.size(); i++, j++){
-        if (i < table->rowCount()){
-            if (table->item(i, 0)){
-                table->item(i, 0)->setText(names.at(j));
-            }else{
-                table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
-            }
-            if (table->item(i, 1)){
-                table->item(i, 1)->setText(type);
-            }else{
-                table->setItem(i, 1, new QTableWidgetItem(type));
-            }
-        }else{
-            table->setRowCount(table->rowCount() + 1);
-            table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
-            table->setItem(i, 1, new QTableWidgetItem(type));
-        }
+        setitem(i, names.at(j), type);
     }
 }
 
@@ -158,7 +105,7 @@ int GenericTableWidget::getNumRows() const{
 
 void GenericTableWidget::addItem(const QString & name, const QString & type){
     table->blockSignals(true);
-    int i = table->rowCount();
+    auto i = table->rowCount();
     table->setRowCount(table->rowCount() + 1);
     table->setItem(i, 0, new QTableWidgetItem(name));
     table->setItem(i, 1, new QTableWidgetItem(type));
@@ -168,96 +115,62 @@ void GenericTableWidget::addItem(const QString & name, const QString & type){
 
 void GenericTableWidget::renameItem(int index, const QString & newname){
     table->blockSignals(true);
-    if (index < table->rowCount() && index >= 0){
-        table->item(index, 0)->setText(newname);
-    }else{
-        WARNING_MESSAGE("GenericTableWidget::renameItem(): \nInvalid index!!!");
-    }
+    (index < table->rowCount() && index >= 0) ? table->item(index, 0)->setText(newname) : LogFile::writeToLog("GenericTableWidget::renameItem(): Invalid index!!!");
     table->blockSignals(false);
 }
 
 void GenericTableWidget::removeItem(int index){
     if (index < table->rowCount() && index >= 0){
-        if (table->currentRow() == index){
-            lastSelectedRow = -1;
-        }
+        (table->currentRow() == index) ? lastSelectedRow = -1 : NULL;
         table->removeRow(index);
     }
 }
 
-/*void GenericTableWidget::itemAdded(){
-    addItem("New"+typeSelector->currentText(), typeSelector->currentText());
-    emit elementAdded(table->rowCount() - 1, typeSelector->currentText());
-}*/
-
 void GenericTableWidget::showTable(int index, const QString & typeallowed, const QStringList &typesdisallowed){
     lastSelectedRow = index;
-    /*for (auto i = 1; i < table->rowCount(); i++){
-        if (table->isRowHidden(i)){
-            table->setRowHidden(i, false);
-        }
-    }*/
-    if (index < table->rowCount() && index >= 0){
-        table->setCurrentCell(index, 0);
-    }
+    (index < table->rowCount() && index >= 0) ? table->setCurrentCell(index, 0) : NULL;
     setTypeFilter(typeallowed, typesdisallowed);
     show();
 }
 
 void GenericTableWidget::showTable(const QString & name, const QString & typeallowed, const QStringList &typesdisallowed){
-    int index = -1;
+    auto index = -1;
     for (auto i = 0; i < table->rowCount(); i++){
-        /*if (table->isRowHidden(i)){
-            table->setRowHidden(i, false);
-        }*/
-        if (table->item(i, 0) && table->item(i, 0)->text() == name){
+        auto item = table->item(i, 0);
+        if (item && item->text() == name){
             lastSelectedRow = i;
             break;
         }
     }
     index = lastSelectedRow;
-    if (index < table->rowCount() && index >= 0){
-        table->setCurrentCell(index, 0);
-    }
+    (index < table->rowCount() && index >= 0) ? table->setCurrentCell(index, 0) : NULL;
     setTypeFilter(typeallowed, typesdisallowed);
     show();
 }
 
 void GenericTableWidget::filterItems(){
-    QTableWidgetItem *item = nullptr;
+    auto hiderows = [&](int row, const QString & string, Qt::CaseSensitivity casesensitivity){
+        auto item = table->item(row, 0);
+        if (item){
+            (item->text() != string && !item->text().contains(string, casesensitivity)) ? table->hideRow(row) : NULL;
+        }else{
+            LogFile::writeToLog("GenericTableWidget: Missing table widget item for row "+QString::number(row)+"!!!");
+        }
+    };
     if (filterLE->text() != ""){
         for (auto i = 1; i < table->rowCount(); i++){
-            item = table->item(i, 0);
-            if (item){
-                if (!item->text().contains(filterLE->text(), Qt::CaseInsensitive)){
-                    table->hideRow(i);
-                }
-            }else{
-                LogFile::writeToLog(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
-            }
+            hiderows(i, filterLE->text(), Qt::CaseInsensitive);
         }
     }else{
         if (onlyTypeAllowed != ""){
             for (auto i = 1; i < table->rowCount(); i++){
-                if (table->isRowHidden(i)){
-                    item = table->item(i, 1);
-                    if (item){
-                        if (item->text() == onlyTypeAllowed){
-                            table->setRowHidden(i, false);
-                        }
-                    }else{
-                        LogFile::writeToLog(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
-                    }
-                }
+                (table->isRowHidden(i)) ? hiderows(i, onlyTypeAllowed, Qt::CaseInsensitive) : NULL;
             }
         }else if (!typesDisallowed.isEmpty()){
             for (auto i = 1; i < table->rowCount(); i++){
                 if (table->isRowHidden(i)){
-                    item = table->item(i, 1);
-                    if (item){
-                        if (!typesDisallowed.contains(item->text())){
-                            table->setRowHidden(i, false);
-                        }
+                    if (table->item(i, 1)){
+                        (!typesDisallowed.contains(table->item(i, 1)->text())) ? table->setRowHidden(i, false) : NULL;
                     }else{
                         LogFile::writeToLog(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                     }
@@ -265,26 +178,18 @@ void GenericTableWidget::filterItems(){
             }
         }else{
             for (auto i = 1; i < table->rowCount(); i++){
-                if (table->isRowHidden(i)){
-                    table->setRowHidden(i, false);
-                }
+                (table->isRowHidden(i)) ? table->setRowHidden(i, false) : NULL;
             }
         }
     }
 }
 
 void GenericTableWidget::resetFilter(){
-    QTableWidgetItem *item = nullptr;
     if (onlyTypeAllowed != ""){
         if (table->columnCount() == 2 && !table->isColumnHidden(1)){
             for (auto i = 1; i < table->rowCount(); i++){
-                item = table->item(i, 1);
-                if (item){
-                    if (item->text() != onlyTypeAllowed){
-                        table->hideRow(i);
-                    }else{
-                        table->setRowHidden(i, false);
-                    }
+                if (table->item(i, 1)){
+                    (table->item(i, 1)->text() != onlyTypeAllowed)? table->hideRow(i) : table->setRowHidden(i, false);
                 }else{
                     LogFile::writeToLog(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                 }
@@ -293,13 +198,8 @@ void GenericTableWidget::resetFilter(){
     }else if (!typesDisallowed.isEmpty()){
         if (table->columnCount() == 2 && !table->isColumnHidden(1)){
             for (auto i = 1; i < table->rowCount(); i++){
-                item = table->item(i, 1);
-                if (item){
-                    if (typesDisallowed.contains(item->text())){
-                        table->hideRow(i);
-                    }else{
-                        table->setRowHidden(i, false);
-                    }
+                if (table->item(i, 1)){
+                    (typesDisallowed.contains(table->item(i, 1)->text())) ? table->hideRow(i) : table->setRowHidden(i, false);
                 }else{
                     LogFile::writeToLog(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                 }
@@ -307,9 +207,7 @@ void GenericTableWidget::resetFilter(){
         }
     }else{
         for (auto i = 1; i < table->rowCount(); i++){
-            if (table->isRowHidden(i)){
-                table->setRowHidden(i, false);
-            }
+            (table->isRowHidden(i)) ? table->setRowHidden(i, false) : NULL;
         }
     }
 }
@@ -318,16 +216,10 @@ void GenericTableWidget::setTypeFilter(const QString &typeallowed, const QString
     if (typeallowed != ""){
         onlyTypeAllowed = typeallowed;
         typesDisallowed = QStringList();
-        QTableWidgetItem *item = nullptr;
         if (table->columnCount() == 2 && !table->isColumnHidden(1)){
             for (auto i = 1; i < table->rowCount(); i++){
-                item = table->item(i, 1);
-                if (item){
-                    if (item->text() != typeallowed){
-                        table->hideRow(i);
-                    }else{
-                        table->setRowHidden(i, false);
-                    }
+                if (table->item(i, 1)){
+                    (table->item(i, 1)->text() != typeallowed) ? table->hideRow(i) : table->setRowHidden(i, false);
                 }else{
                     LogFile::writeToLog(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                 }
@@ -336,16 +228,11 @@ void GenericTableWidget::setTypeFilter(const QString &typeallowed, const QString
     }else if (!typesdisallowed.isEmpty()){
         onlyTypeAllowed = "";
         typesDisallowed = typesdisallowed;
-        QTableWidgetItem *item = nullptr;
         if (table->columnCount() == 2 && !table->isColumnHidden(1)){
             for (auto i = 1; i < table->rowCount(); i++){
-                item = table->item(i, 1);
+                auto item = table->item(i, 1);
                 if (item){
-                    if (typesdisallowed.contains(item->text())){
-                        table->hideRow(i);
-                    }else{
-                        table->setRowHidden(i, false);
-                    }
+                    (typesdisallowed.contains(item->text())) ? table->hideRow(i) : table->setRowHidden(i, false);
                 }else{
                     LogFile::writeToLog(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                 }
@@ -355,20 +242,16 @@ void GenericTableWidget::setTypeFilter(const QString &typeallowed, const QString
         onlyTypeAllowed = "";
         typesDisallowed = QStringList();
         for (auto i = 1; i < table->rowCount(); i++){
-            if (table->isRowHidden(i)){
-                table->setRowHidden(i, false);
-            }
+            (table->isRowHidden(i)) ? table->setRowHidden(i, false) : NULL;
         }
     }
 }
 
 void GenericTableWidget::itemSelected(){
     QString name;
-    int row = table->currentRow();
+    auto row = table->currentRow();
     if (row != lastSelectedRow){
-        if (table->item(row, 0)){
-            name = table->item(row, 0)->text();
-        }
+        (table->item(row, 0)) ? name = table->item(row, 0)->text() : NULL;
         lastSelectedRow = row;
         emit elementSelected(row, name);
         hide();
@@ -378,9 +261,7 @@ void GenericTableWidget::itemSelected(){
 void GenericTableWidget::itemSelectedAt(int row, int ){
     QString name;
     if (row != lastSelectedRow){
-        if (table->item(row, 0)){
-            name = table->item(row, 0)->text();
-        }
+        (table->item(row, 0)) ? name = table->item(row, 0)->text() : NULL;
         lastSelectedRow = row;
         emit elementSelected(row, name);
         hide();
@@ -436,7 +317,7 @@ void setBinding(int index, int row, int column, const QString & variableName, co
 }
 
 void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path, TableWidget *table, HkxObject *bsData){
-    QString varName;
+    auto varName = QString("NONE");
     auto settextitem = [&](){
         auto tableitem = table->item(row, column);
         (tableitem) ? tableitem->setText(BINDING_ITEM_LABEL+varName) : LogFile::writeToLog("loadBinding(): 'tableitem' is nullptr!!");

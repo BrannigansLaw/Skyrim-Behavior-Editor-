@@ -91,7 +91,7 @@ TreeGraphicsItem *TreeGraphicsView::getSelectedItem() const{
 
 DataIconManager *TreeGraphicsView::getSelectedData() const{
     if (treeScene->selectedIcon){
-        return treeScene->selectedIcon->itemData;
+        return treeScene->selectedIcon->getItemData();
     }
     return nullptr;
 }

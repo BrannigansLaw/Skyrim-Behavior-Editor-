@@ -31,7 +31,7 @@ bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBin
     std::lock_guard <std::mutex> guard(mutex);
     auto index = -1;
     auto exists = false;
-    for (auto i = 0; i < bindings.size(); i++){//Do this for below but remove the binding if the paths are the same...
+    for (auto i = 0; i < bindings.size(); i++){ //Do this for below but remove the binding if the paths are the same...
         if (bindings.at(i).memberPath == path){
             if (type == hkBinding::BINDING_TYPE_VARIABLE){
                 bindings[i].variableIndex = varIndex;
@@ -72,21 +72,21 @@ bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBin
 void hkbVariableBindingSet::removeBinding(const QString & path){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < bindings.size(); i++){
-        (bindings.at(i).memberPath == path) ? bindings.removeAt(i) : NULL;
+        (bindings.at(i).memberPath == path) ? bindings.removeAt(i), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+"removeBinding(): Binding was not removed!!");
     }
 }
 
 void hkbVariableBindingSet::removeBinding(int varIndex){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < bindings.size(); i++){
-        (bindings.at(i).variableIndex == varIndex) ? bindings.removeAt(i) : NULL;
+        (bindings.at(i).variableIndex == varIndex) ? bindings.removeAt(i), setIsFileChanged(true) : LogFile::writeToLog(getClassname()+"removeBinding(): Binding was not removed!!");
     }
 }
 
 QString hkbVariableBindingSet::getPathOfBindingAt(int index){
     std::lock_guard <std::mutex> guard(mutex);
     QString path;
-    (index < bindings.size() && index >= 0) ? path = bindings.at(index).memberPath : NULL;
+    (index < bindings.size() && index >= 0) ? path = bindings.at(index).memberPath : LogFile::writeToLog(getClassname()+"getPathOfBindingAt(): Invalid binding index!!");
     return path;
 }
 

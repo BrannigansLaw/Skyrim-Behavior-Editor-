@@ -13,8 +13,8 @@ class TreeGraphicsItem;
 
 class TreeGraphicsView: public QGraphicsView
 {
-    friend class BehaviorGraphView;
     Q_OBJECT
+    friend class BehaviorGraphView;
 public:
     TreeGraphicsView(QMenu *menu);
     QSize sizeHint() const Q_DECL_OVERRIDE;

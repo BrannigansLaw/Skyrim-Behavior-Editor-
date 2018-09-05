@@ -15,6 +15,10 @@ class AnimationRotationUI final: public QGroupBox
     Q_OBJECT
 public:
     AnimationRotationUI();
+    AnimationRotationUI& operator=(const AnimationRotationUI&) = delete;
+    AnimationRotationUI(const AnimationRotationUI &) = delete;
+    ~AnimationRotationUI() = default;
+public:
     void loadData(SkyrimAnimationRotation *quaternion, qreal maxtime);
 signals:
     void returnToParent();

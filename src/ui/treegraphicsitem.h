@@ -20,10 +20,7 @@ protected:
 class TreeGraphicsItem: public QGraphicsItem
 {
     friend class TreeGraphicsScene;
-    friend class DataIconManager;
-    friend class HkDataUI;
     friend class BehaviorGraphView;
-    friend class TreeGraphicsView;
 public:
     TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *obj, int indexToInsert = -1, Qt::GlobalColor color = Qt::gray);
     virtual ~TreeGraphicsItem();
@@ -40,30 +37,31 @@ protected:
     virtual void unselect();
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void setPosition(const QPointF &pos);
-private:
-    qreal getYCoordinate();
-    void reposition();
+public:
     bool isDataDescendant(TreeGraphicsItem *icon) const;
     bool isDataDescendant(DataIconManager *data) const;
-    bool isPrimaryIcon() const;
-    TreeGraphicsItem * getPrimaryIcon() const;
-    TreeGraphicsItem * setParent(TreeGraphicsItem *newParent, int indexToInsert = -1);
-    TreeGraphicsItem *reconnectToNextDuplicate();
-    bool hasIcons() const;
-    TreeGraphicsItem * getNextChildAfter(TreeGraphicsItem *child);
     bool hasSameData(TreeGraphicsItem *icon) const;
     bool hasSameData(DataIconManager *data) const;
     int getIconIndex();
-    TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
+    bool hasIcons() const;
+    bool isPrimaryIcon() const;
     int getIndexOfChild(TreeGraphicsItem *child) const;
     int getIndexofIconWithData(DataIconManager *data) const;
+    DataIconManager *getItemData() const;
+    TreeGraphicsItem * setParent(TreeGraphicsItem *newParent, int indexToInsert = -1);
+    void reposition();
+private:
+    TreeGraphicsItem * getPrimaryIcon() const;
+    QVector <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
+    qreal getYCoordinate();
+    TreeGraphicsItem *reconnectToNextDuplicate();
+    TreeGraphicsItem * getNextChildAfter(TreeGraphicsItem *child);
+    TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
     void setIsExpanded(bool value);
     void setPathToParent();
-    QVector <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
 protected:
     bool getIsExpanded() const;
     Qt::GlobalColor getPenColor() const;
-    DataIconManager *getItemData() const;
 private:
     Qt::GlobalColor brushColor;
     Qt::GlobalColor penColor;
