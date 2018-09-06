@@ -17,6 +17,10 @@ class TreeGraphicsView: public QGraphicsView
     friend class BehaviorGraphView;
 public:
     TreeGraphicsView(QMenu *menu);
+    TreeGraphicsView& operator=(const TreeGraphicsView&) = delete;
+    TreeGraphicsView(const TreeGraphicsView &) = delete;
+    ~TreeGraphicsView() = default;
+public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
     void zoom(int delta);
     bool drawGraphMT(DataIconManager *rootData, bool allowDuplicates, int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
@@ -38,8 +42,6 @@ protected:
 private:
     QMenu *popUpMenu;
     TreeGraphicsScene *treeScene;
-    //const qreal minScale;
-    //const qreal maxScale;
     const qreal initScale;
     const qreal iconFocusScale;
     qreal currentScale;

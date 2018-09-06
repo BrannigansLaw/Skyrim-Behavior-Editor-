@@ -1,6 +1,7 @@
 #include "treegraphicsview.h"
 #include "treegraphicsscene.h"
 #include "treegraphicsitem.h"
+#include "src/utility.h"
 
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -8,8 +9,6 @@
 TreeGraphicsView::TreeGraphicsView(QMenu *menu)
     : popUpMenu(menu),
       treeScene(new TreeGraphicsScene()),
-      //minScale(0.001),
-      //maxScale(0.5),
       initScale(1),
       iconFocusScale(1.5),
       currentScale(1),
@@ -26,7 +25,7 @@ QSize TreeGraphicsView::sizeHint() const{
 }
 
 bool TreeGraphicsView::drawGraphMT(DataIconManager *rootData, bool allowDuplicates, int &taskcount, std::mutex & mutex, std::condition_variable & conditionVar){
-    bool value = treeScene->drawGraph(rootData, allowDuplicates);
+    auto value = treeScene->drawGraph(rootData, allowDuplicates);
     mutex.lock();
     taskcount--;
     conditionVar.notify_one();
@@ -43,41 +42,38 @@ void TreeGraphicsView::wheelEvent(QWheelEvent *event){
 }
 
 void TreeGraphicsView::zoom(int delta){
-    if (delta > 0/* && currentScale < maxScale*/){
+    if (delta > 0){
         scale(scaleUpFactor, scaleUpFactor);
         currentScale = currentScale*scaleUpFactor;
-    }else/* if (currentScale > minScale)*/{
+    }else{
         scale(scaleDownFactor, scaleDownFactor);
         currentScale = currentScale*scaleDownFactor;
     }
 }
 
 void TreeGraphicsView::mousePressEvent(QMouseEvent *event){
-    if (event->button() == Qt::LeftButton){
-        setDragMode(QGraphicsView::ScrollHandDrag);
-    }
+    (event->button() == Qt::LeftButton) ? setDragMode(QGraphicsView::ScrollHandDrag) : NULL;
     QGraphicsView::mousePressEvent(event);
 }
 
 void TreeGraphicsView::mouseReleaseEvent(QMouseEvent *event){
-    if (event->button() == Qt::LeftButton){
-        setDragMode(QGraphicsView::NoDrag);
-    }
+    (event->button() == Qt::LeftButton) ? setDragMode(QGraphicsView::NoDrag) : NULL;
     QGraphicsView::mouseReleaseEvent(event);
 }
 
 void TreeGraphicsView::contractBranch(){
-    if (getSelectedItem()){
-        //getSelectedItem()->setIsExpanded(false);
-        treeScene->contractBranch(getSelectedItem(), true);
-        getSelectedItem()->reposition();
+    auto selected = getSelectedItem();
+    if (selected){
+        treeScene->contractBranch(selected, true);
+        selected->reposition();
     }
 }
 
 void TreeGraphicsView::expandBranch(){
-    if (getSelectedItem()){
-        treeScene->expandBranch(getSelectedItem(), true);
-        getSelectedItem()->reposition();
+    auto selected = getSelectedItem();
+    if (selected){
+        treeScene->expandBranch(selected, true);
+        selected->reposition();
     }
 }
 
@@ -97,9 +93,7 @@ DataIconManager *TreeGraphicsView::getSelectedData() const{
 }
 
 bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, int replaceindex, DataIconManager *replacementData, bool removeData){
-    bool result = treeScene->reconnectIcon(oldIconParent, dataToReplace, replaceindex, replacementData, removeData);
-    //oldIconParent->reposition();
-    return result;
+    return treeScene->reconnectIcon(oldIconParent, dataToReplace, replaceindex, replacementData, removeData);
 }
 
 bool TreeGraphicsView::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData, bool removeAllSameData){

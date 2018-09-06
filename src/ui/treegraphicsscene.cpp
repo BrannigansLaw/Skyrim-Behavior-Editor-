@@ -23,55 +23,27 @@ void TreeGraphicsScene::setCanDeleteRoot(bool value){
     canDeleteRoot = value;
 }
 
-/*void TreeGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
-    QGraphicsScene::mouseReleaseEvent(event);
-    QList <QGraphicsItem *> children;
-    QPainterPath path(event->scenePos());
-    path.addRect(event->scenePos().x(), event->scenePos().y(), 1, 1);
-    setSelectionArea(path);
-    children = selectedItems();
-    if (!children.isEmpty() && !dynamic_cast<QGraphicsPathItem *>(children.first())){
-        if (event->button() == Qt::RightButton){
-            //Test...
-            //addItemToGraph((TreeGraphicsItem *)children.first(), new DataIconManager(), 0);
-            removeItemFromGraph((TreeGraphicsItem *)children.first(), -1);
-            //Test End
-        }
-    }
-    clearSelection();
-}*/
-
 void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, BranchBehaviorEnum expand){    //Change so expand all sub branches on right click on expand box!!!!!!
-    QVector <TreeGraphicsItem *> branch;
-    if (selectedIcon){
-        selectedIcon->unselect();
-    }
+    (selectedIcon) ? selectedIcon->unselect() : NULL;
     selectedIcon = icon;
     if (selectedIcon){
         if (expand > EXPAND_CONTRACT_ZERO){
             if (selectedIcon->getIsExpanded()){
-                if (expand == EXPAND_CONTRACT_ALL){
-                    contractBranch(selectedIcon, true);
-                }else{
-                    contractBranch(selectedIcon);
-                }
+                (expand == EXPAND_CONTRACT_ALL) ? contractBranch(selectedIcon, true) : contractBranch(selectedIcon);
                 selectedIcon->setIsExpanded(false);
             }else{
-                if (expand == EXPAND_CONTRACT_ONE){
-                    expandBranch(selectedIcon);
-                }else{
-                    expandBranch(selectedIcon, true);
-                }
+                (expand == EXPAND_CONTRACT_ONE) ? expandBranch(selectedIcon) : expandBranch(selectedIcon, true);
             }
             if (!selectedIcon->isPrimaryIcon()){
                 selectedIcon = selectedIcon->getPrimaryIcon();
                 if (!selectedIcon->isVisible()){
-                    branch = selectedIcon->getAllIconsInBranch();
+                    auto branch = selectedIcon->getAllIconsInBranch();
                     for (auto i = 0; i < branch.size(); i++){
                         expandBranch(branch.at(i));
                     }
                 }
-                static_cast<BehaviorGraphView *>(views().first())->refocus();//May need to expand the branch???
+                auto behaviorviews = views();
+                (!behaviorviews.isEmpty()) ? static_cast<BehaviorGraphView *>(views().first())->refocus() : LogFile::writeToLog("TreeGraphicsScene: No views!!!");//May need to expand the branch???
             }
             selectedIcon->reposition();
         }
@@ -81,64 +53,50 @@ void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, BranchBehaviorEnum ex
 }
 
 void TreeGraphicsScene::contractBranch(TreeGraphicsItem *icon, bool contractAll){
-    QList <QGraphicsItem *> children;
     if (icon){
-        children = icon->childItems();
+        auto children = icon->childItems();
         for (auto i = 0; i < children.size(); i++){
-            children.at(i)->setVisible(false);
-            ((TreeGraphicsItem *)children.at(i))->path->setVisible(false);
-            if (contractAll){
-                ((TreeGraphicsItem *)children.at(i))->setIsExpanded(false);
-                contractBranch((TreeGraphicsItem *)children.at(i), true);
-            }else{
-                contractBranch((TreeGraphicsItem *)children.at(i));
-            }
+            auto child = static_cast<TreeGraphicsItem *>(children.at(i));
+            child->setVisible(false);
+            child->path->setVisible(false);
+            (contractAll) ? child->setIsExpanded(false), contractBranch(child, true) : contractBranch(child);
         }
     }
-    //update();
 }
 
 void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
-    QList <QGraphicsItem *> children;
     if (icon){
-        children = icon->childItems();
+        auto children = icon->childItems();
         icon->setIsExpanded(true);
         for (auto i = 0; i < children.size(); i++){
-            children.at(i)->setVisible(true);
-            ((TreeGraphicsItem *)children.at(i))->path->setVisible(true);
+            auto child = static_cast<TreeGraphicsItem *>(children.at(i));
+            child->setVisible(true);
+            child->path->setVisible(true);
             if (expandAll){
-                expandBranch((TreeGraphicsItem *)children.at(i), true);
-            }else if (((TreeGraphicsItem *)children.at(i))->getIsExpanded()){
-                expandBranch((TreeGraphicsItem *)children.at(i));
+                expandBranch(child, true);
+            }else if (child->getIsExpanded()){
+                expandBranch(child);
             }
         }
     }
-    //update();
 }
 
 bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicates){
-    QVector <DataIconManager *> objects;
-    QVector <DataIconManager *> children;
     QVector <TreeGraphicsItem *> parentIcons;
     QVector <short> numChildren;
-    TreeGraphicsItem *newIcon = nullptr;
     if (rootData){
-        children = rootData->getChildren();
+        auto children = rootData->getChildren();
         rootIcon = new BehaviorGraphIcon(nullptr, rootData);
         addItem(rootIcon);
-        objects.append(children);
+        auto objects = children;
         numChildren.append(children.size());
         parentIcons.append(rootIcon);
         while (!objects.isEmpty() && !numChildren.isEmpty() && !parentIcons.isEmpty()){
-            newIcon = addItemToGraph(parentIcons.first(), objects.first(), 0, false, allowDuplicates, true);
+            auto newIcon = addItemToGraph(parentIcons.first(), objects.first(), 0, false, allowDuplicates, true);
             if (newIcon && newIcon->isDataDescendant(newIcon)){
                 return false;
             }
-            if (objects.first()->hasIcons()){
-                children.clear();
-            }else{
-                children = objects.first()->getChildren();
-            }
+            (objects.first()->hasIcons()) ? children.clear() : children = objects.first()->getChildren();
             numChildren.first()--;
             if (!numChildren.first()){
                 numChildren.removeFirst();
@@ -153,36 +111,38 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
                 }
             }
         }
-        QList <QGraphicsView *> view = views();
+        auto view = views();
         if (!view.isEmpty()){
-            QGraphicsView *ptr = view.front();
-            QRectF rect = ptr->sceneRect();
-            ptr->setSceneRect(rect.marginsAdded(QMarginsF(rect.width(), rect.height(), rect.width(), rect.height())));
+            auto thisview = view.first();
+            auto rect = thisview->sceneRect();
+            thisview->setSceneRect(rect.marginsAdded(QMarginsF(rect.width(), rect.height(), rect.width(), rect.height())));
+            return true;
         }else{
-            CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: No view!!!");return false;
+            CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: No view!!!");
         }
-        return true;
     }else{
-        CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: rootData is null!!!");return false;
+        CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: rootData is null!!!");
     }
+    return false;
 }
 
 //Appends "data" to the 'itemData' of "selectedIcon" after creating a new icon representing "data" and appending it to "selectedIcon"...
 TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject, bool allowDuplicates, bool isFirstDraw){
     TreeGraphicsItem *newIcon = nullptr;
     if (selectedIcon){
-        TreeGraphicsItem *parent = ((TreeGraphicsItem *)selectedIcon->parentItem());
-        QList <QGraphicsItem *> children;
+        auto parent = static_cast<TreeGraphicsItem *>(selectedIcon->parentItem());
         if (data){
             if (selectedIcon){
                 if (!allowDuplicates){
-                    children = selectedIcon->childItems();
+                    auto children = selectedIcon->childItems();
                     for (auto i = 0; i < children.size(); i++){
-                        if (((TreeGraphicsItem *)children.at(i))->itemData == data){
+                        auto itemdata = static_cast<TreeGraphicsItem *>(children.at(i))->getItemData();
+                        if (itemdata == data){
+                            itemdata = selectedIcon->getItemData();
                             if (!inject && !isFirstDraw){
-                                selectedIcon->itemData->insertObjectAt(indexToInsert, data);
+                                itemdata->insertObjectAt(indexToInsert, data);
                             }else if (parent && inject){
-                                selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
+                                itemdata->wrapObjectAt(indexToInsert, data, parent->getItemData());
                                 //selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
                             }
                             return nullptr;
@@ -202,12 +162,13 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
                     newIcon = new BehaviorGraphIcon(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
                 }else{
                     newIcon = new BehaviorGraphIcon(selectedIcon, data, indexToInsert);
-                    selectedIcon->itemData->insertObjectAt(indexToInsert, data);
+                    selectedIcon->getItemData()->insertObjectAt(indexToInsert, data);
                 }
             }else if (parent){
-                newIcon = new BehaviorGraphIcon(parent, data, parent->getIndexofIconWithData(selectedIcon->itemData));
-                selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
-                selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));
+                auto tempdata = selectedIcon->getItemData();
+                newIcon = new BehaviorGraphIcon(parent, data, parent->getIndexofIconWithData(tempdata));
+                tempdata->wrapObjectAt(indexToInsert, data, parent->getItemData());
+                selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(tempdata));
             }else{
                 delete newIcon;
                 return nullptr;
@@ -216,13 +177,9 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
                 delete newIcon;
                 return nullptr;
             }
-            if (!newIcon->scene()){
-                addItem(newIcon);  //newIcon is added to scene already???
-            }
+            (!newIcon->scene()) ? addItem(newIcon) : NULL;  //newIcon is added to scene already???
             //newIcon->reposition();
-            if (!newIcon->path->scene()){
-                addItem(newIcon->path);
-            }
+            (!newIcon->path->scene()) ? addItem(newIcon->path) : NULL;
         }
     }else{
         CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::addItemToGraph(): selectedIcon is nullptr!!!");
@@ -231,45 +188,27 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
 }
 
 bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, int replaceindex, DataIconManager *replacementData, bool removeData){
-    TreeGraphicsItem *iconToReplace = nullptr;
-    TreeGraphicsItem *replacementIcon = nullptr;
-    TreeGraphicsItem *oldParent = nullptr;
     if (oldIconParent){
         if (!dataToReplace || (dataToReplace == replacementData && !oldIconParent->hasSameData(replacementData))){
             addItemToGraph(oldIconParent, replacementData, replaceindex);
             oldIconParent->reposition();
         }else if (dataToReplace != replacementData){
-            iconToReplace = oldIconParent->getChildWithData(dataToReplace);
+            auto iconToReplace = oldIconParent->getChildWithData(dataToReplace);
             if (replacementData == nullptr){
                 removeItemFromGraph(iconToReplace, replaceindex, removeData);
             }else if ((!oldIconParent->isDataDescendant(replacementData) && !oldIconParent->hasSameData(replacementData))){
-                replacementIcon = oldIconParent->getReplacementIcon(replacementData);
-                if (iconToReplace){
-                    removeItemFromGraph(iconToReplace, replaceindex, removeData, false, replacementData);
-                }
+                auto replacementIcon = oldIconParent->getReplacementIcon(replacementData);
+                (iconToReplace) ? removeItemFromGraph(iconToReplace, replaceindex, removeData, false, replacementData) : NULL;
                 if (replacementIcon){
-                    oldParent = replacementIcon->setParent(oldIconParent, replaceindex);
+                    auto oldParent = replacementIcon->setParent(oldIconParent, replaceindex);
                     addItemToGraph(oldParent, replacementData, replaceindex);
-                    oldIconParent->itemData->insertObjectAt(replaceindex, replacementData);
+                    oldIconParent->getItemData()->insertObjectAt(replaceindex, replacementData);
                 }else{
                     addItemToGraph(oldIconParent, replacementData, replaceindex);
                 }
                 if (!oldIconParent->reorderChildren()){
                     return false;
                 }
-                /*if (replacementIcon){
-                    oldParent = replacementIcon->setParent(oldIconParent, replaceindex);
-                    addItemToGraph(oldParent, replacementData, replaceindex);
-                    oldIconParent->itemData->insertObjectAt(replaceindex, replacementData);
-                    if (iconToReplace){
-                        removeItemFromGraph(iconToReplace, replaceindex, removeData, false, replacementData);
-                    }
-                }else{
-                    addItemToGraph(oldIconParent, replacementData, replaceindex);
-                }
-                if (!oldIconParent->reorderChildren()){
-                    return false;
-                }*/
             }
         }
     }
@@ -288,23 +227,21 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
     int count = 0;  //Used to prevent possible infinite looping due to icons referencing ancestors...
     int index = -1; //Used to store the index of the position of "itemToDelete" in "children"...
     if (item){
-        itemToDeleteParent = (TreeGraphicsItem *)item->parentItem();
+        itemToDeleteParent = static_cast<TreeGraphicsItem *>(item->parentItem());
         if (itemToDeleteParent){
-            childrenData = itemToDeleteParent->itemData->getChildren();
+            childrenData = itemToDeleteParent->getItemData()->getChildren();
             if (!childrenData.isEmpty()){
-                dataCount = childrenData.count(item->itemData);
+                dataCount = childrenData.count(item->getItemData());
             }
             if (dataCount < 2 || removeAllSameData){
                 children.append(item);
                 for (; count < MAX_NUM_GRAPH_ICONS, !children.isEmpty(); count++){  //Start cycling through children...
                     itemToDelete = nullptr;
-                    iconChild = (TreeGraphicsItem *)children.first();
+                    iconChild = static_cast<TreeGraphicsItem *>(children.first());
                     if (iconChild->hasSameData(dataToKeep)){
-                        iconChild->setParent(itemToDeleteParent, itemToDeleteParent->getIndexofIconWithData(item->itemData));
-                        //
+                        iconChild->setParent(itemToDeleteParent, itemToDeleteParent->getIndexofIconWithData(item->getItemData()));
                         itemToDelete = iconChild->reconnectToNextDuplicate();
                         iconsToRemove.append(itemToDelete);
-                        //
                         tempList.clear();
                     }else{
                         tempList = iconChild->childItems();
@@ -325,19 +262,19 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                 }
                 if (removeAllSameData){
                     for (auto i = childrenData.size() - 1; i >= 0; i--){
-                        if (childrenData.at(i) == item->itemData){
-                            itemToDeleteParent->itemData->removeObjectAt(i);
+                        if (childrenData.at(i) == item->getItemData()){
+                            itemToDeleteParent->getItemData()->removeObjectAt(i);
                         }
                     }
                 }else if (removeData){
-                    itemToDeleteParent->itemData->removeObjectAt(indexToRemove);
+                    itemToDeleteParent->getItemData()->removeObjectAt(indexToRemove);
                 }
                 for (auto i = iconsToRemove.size() - 1; i >= 0; i--){//Duplicates sometimes...
                     delete iconsToRemove.at(i);
                 }
                 itemToDeleteParent->reposition();
             }else if (removeData){
-                itemToDeleteParent->itemData->removeObjectAt(indexToRemove);
+                itemToDeleteParent->getItemData()->removeObjectAt(indexToRemove);
                 if (!itemToDeleteParent->reorderChildren()){
                     return false;
                 }
@@ -346,7 +283,6 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
             delete item;
             rootIcon = nullptr;
         }
-        //itemToDeleteParent->reorderChildren();
         if (count < MAX_NUM_GRAPH_ICONS){
             return true;
         }

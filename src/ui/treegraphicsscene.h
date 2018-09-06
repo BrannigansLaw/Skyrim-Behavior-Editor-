@@ -6,7 +6,7 @@
 class DataIconManager;
 class TreeGraphicsItem;
 
-class TreeGraphicsScene: public QGraphicsScene
+class TreeGraphicsScene final: public QGraphicsScene
 {
     Q_OBJECT
     friend class TreeGraphicsView;
@@ -14,16 +14,18 @@ class TreeGraphicsScene: public QGraphicsScene
     friend class BehaviorGraphView;
 public:
     TreeGraphicsScene();
+    TreeGraphicsScene& operator=(const TreeGraphicsScene&) = delete;
+    TreeGraphicsScene(const TreeGraphicsScene &) = delete;
+    ~TreeGraphicsScene() = default;
+public:
     void setCanDeleteRoot(bool value);
     enum BranchBehaviorEnum{
-        EXPAND_CONTRACT_ZERO = 0,
+        EXPAND_CONTRACT_ZERO,
         EXPAND_CONTRACT_ONE,
         EXPAND_CONTRACT_ALL
     };
 signals:
     void iconSelected(TreeGraphicsItem *selected);
-protected:
-    //virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     void selectIcon(TreeGraphicsItem *icon, BranchBehaviorEnum expand);
     void contractBranch(TreeGraphicsItem *icon, bool contractAll = false);

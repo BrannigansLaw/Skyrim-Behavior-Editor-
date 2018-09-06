@@ -7,8 +7,13 @@
 class TreeGraphicsScene;
 class DataIconManager;
 
-class GraphicsPathItem: public QGraphicsPathItem
+class GraphicsPathItem final: public QGraphicsPathItem
 {
+public:
+    GraphicsPathItem() = default;
+    GraphicsPathItem& operator=(const GraphicsPathItem&) = delete;
+    GraphicsPathItem(const GraphicsPathItem &) = delete;
+    ~GraphicsPathItem() = default;
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
         painter->setRenderHints(QPainter::Antialiasing);
@@ -23,7 +28,10 @@ class TreeGraphicsItem: public QGraphicsItem
     friend class BehaviorGraphView;
 public:
     TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *obj, int indexToInsert = -1, Qt::GlobalColor color = Qt::gray);
-    virtual ~TreeGraphicsItem();
+    TreeGraphicsItem& operator=(const TreeGraphicsItem&) = delete;
+    TreeGraphicsItem(const TreeGraphicsItem &) = delete;
+    ~TreeGraphicsItem();
+public:
     virtual QRectF boundingRect() const;
     virtual QRectF branchExpandCollapseBox() const;
     void setBrushColor(Qt::GlobalColor color);
@@ -37,6 +45,8 @@ protected:
     virtual void unselect();
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void setPosition(const QPointF &pos);
+    bool getIsExpanded() const;
+    Qt::GlobalColor getPenColor() const;
 public:
     bool isDataDescendant(TreeGraphicsItem *icon) const;
     bool isDataDescendant(DataIconManager *data) const;
@@ -59,9 +69,6 @@ private:
     TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
     void setIsExpanded(bool value);
     void setPathToParent();
-protected:
-    bool getIsExpanded() const;
-    Qt::GlobalColor getPenColor() const;
 private:
     Qt::GlobalColor brushColor;
     Qt::GlobalColor penColor;

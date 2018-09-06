@@ -81,7 +81,7 @@ private slots:
     void addNewBehavior(bool initData);
 private:
     enum HKXCMD_RETURN{
-        HKXCMD_SUCCESS = 0
+        HKXCMD_SUCCESS
     };
     QString generateUniqueBehaviorName();
     BehaviorFile *openBehaviorForMerger(QString & filepath);
