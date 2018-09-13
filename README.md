@@ -1,5 +1,6 @@
 # Skyrim-Behavior-Editor-
 ![statemachine](https://user-images.githubusercontent.com/8378075/45464759-e8048880-b709-11e8-9448-0abd26b31944.png)
+
 This tool is a GUI viewer/editor for Havok’s Behavior files utilized
 by the Creation Engine powering the video game Skyrim. Havok Behavior
 is used in this engine to select/manipulate actor animations in
