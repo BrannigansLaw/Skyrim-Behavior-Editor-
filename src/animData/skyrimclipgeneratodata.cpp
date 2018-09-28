@@ -50,7 +50,7 @@ bool SkyrimClipGeneratoData::read(QFile *file, ulong &lineCount){
     }
     QByteArray line;
     QList <QByteArray> list;
-    bool ok = false;
+    auto ok = false;
     auto index = 0U;
     auto size = 0U;
     auto value = 0.0;

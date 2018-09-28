@@ -18,9 +18,9 @@ bool AnimationFile::addObjectToFile(HkxObject *, long ){
 
 bool AnimationFile::parse(){
     std::lock_guard <std::mutex> guard(mutex);
-    bool ok = false;
+    auto ok = false;
     if (getReader().parse()){
-        QByteArray value = getReader().findFirstValueWithAttributeValue("duration");
+        auto value = getReader().findFirstValueWithAttributeValue("duration");
         duration = value.toFloat(&ok);
         if (!ok){
             LogFile::writeToLog(getFileName()+" :parse(): The animation duration was not found!");

@@ -24,7 +24,7 @@ bool AnimCacheVariable::read(QFile *file){
         return false;
     }
     QByteArray line;
-    bool ok = false;
+    auto ok = false;
     if (file->atEnd()){
         return false;
     }

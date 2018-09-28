@@ -124,15 +124,15 @@ BehaviorFile::BehaviorFile(MainWindow *window, ProjectFile *projectfile, Charact
 }
 
 void BehaviorFile::generateNewBehavior(){
-    hkRootLevelContainer *root = new hkRootLevelContainer(this);
-    hkbBehaviorGraph *graph = new hkbBehaviorGraph(this);
-    hkbBehaviorGraphStringData *strings = new hkbBehaviorGraphStringData(this);
-    hkbVariableValueSet *values = new hkbVariableValueSet(this);
+    auto root = new hkRootLevelContainer(this);
+    auto graph = new hkbBehaviorGraph(this);
+    auto strings = new hkbBehaviorGraphStringData(this);
+    auto values = new hkbVariableValueSet(this);
     graph->setName(getFileName().replace(".hkx", ".hkb"));
     behaviorGraph = HkxSharedPtr(graph);
     stringData = HkxSharedPtr(strings);
     variableValues = HkxSharedPtr(values);
-    hkbBehaviorGraphData *data = new hkbBehaviorGraphData(this, -1, strings, values);
+    auto data = new hkbBehaviorGraphData(this, -1, strings, values);
     graphData = HkxSharedPtr(data);
     graph->setData(data);
     root->addVariant("hkbBehaviorGraph", behaviorGraph.data());
@@ -142,7 +142,7 @@ void BehaviorFile::generateNewBehavior(){
 
 void BehaviorFile::generateDefaultCharacterData(){
     generateNewBehavior();
-    hkbBehaviorGraphData *data = static_cast<hkbBehaviorGraphData *>(graphData.data());
+    auto data = static_cast<hkbBehaviorGraphData *>(graphData.data());
     if (data){
         //Add common variables...
         data->addVariable(VARIABLE_TYPE_BOOL, "bEquipOk");   //Needs to be initialized to one or custom creatures don't work...
@@ -286,7 +286,7 @@ void BehaviorFile::generateDefaultCharacterData(){
 /*
 void BehaviorFile::generateDefaultCharacterData(){
     generateNewBehavior();
-    hkbBehaviorGraphData *data = static_cast<hkbBehaviorGraphData *>(graphData.data());
+    auto data = static_cast<hkbBehaviorGraphData *>(graphData.data());
     if (data){
         //Add common variables...
         data->addVariable(VARIABLE_TYPE_BOOL, "bEquipOk");   //Needs to be initialized to one or custom creatures don't work...
@@ -624,7 +624,7 @@ void BehaviorFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int
 
 QString BehaviorFile::isEventReferenced(int eventindex) const{
     //std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     QString objnames;
     int size;
     auto getreferencedevents = [&](const QVector <HkxSharedPtr> & list){
@@ -654,7 +654,7 @@ QString BehaviorFile::isEventReferenced(int eventindex) const{
 
 void BehaviorFile::updateEventIndices(int index){
     //std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (stringdata && stringdata->getNumberOfEvents() >= index && index > -1){
         for (auto i = 0; i < generators.size(); i++){
             generators.at(i)->updateEventIndices(index);
@@ -671,7 +671,7 @@ QString BehaviorFile::isVariableReferenced(int variableindex) const{
     //std::lock_guard <std::mutex> guard(mutex);
     int size;
     QString objnames;
-    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     auto getreferencedvars = [&](const QVector <HkxSharedPtr> & list){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i).constData()->isVariableReferenced(variableindex)){
@@ -708,7 +708,7 @@ QString BehaviorFile::isVariableReferenced(int variableindex) const{
 
 void BehaviorFile::updateVariableIndices(int index){
     //std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (stringdata && stringdata->getNumberOfVariables() >= index && index > -1){
         for (auto i = 0; i < otherTypes.size(); i++){
             if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
@@ -727,11 +727,10 @@ void BehaviorFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *
 
 QStringList BehaviorFile::getReferencedBehaviors(const hkbBehaviorReferenceGenerator *gentoignore) const{
     //std::lock_guard <std::mutex> guard(mutex);
-    QString name;
     QStringList list;
     for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR && gentoignore != generators.at(i).constData()){
-            name = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data())->getBehaviorName();
+            auto name = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data())->getBehaviorName();
             (!list.contains(name)) ? list.append(name) : NULL;
         }
     }
@@ -794,19 +793,17 @@ bool BehaviorFile::isNameUniqueInProject(HkxObject *object) const{
 
 bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) const{
     //std::lock_guard <std::mutex> guard(mutex);
-    bool found = false;
-    HkxObject::HkxType type;
-    DataIconManager *obj;
+    auto found = false;
     HkxSignature objsig;
     HkxSignature listobjsig;
     QString objanimationname;
     QString listobjanimationname;
     QString objname;
-    QString listobjname;
+    DataIconManager *obj;
     auto search = [&](const QVector <HkxSharedPtr> & list){
         for (auto i = startindex; i < list.size(); i++){
             listobjsig = list.at(i)->getSignature();
-            listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
+            auto listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
             if (objsig == HKB_CLIP_GENERATOR){
                 objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
             }
@@ -821,7 +818,7 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
         if (!found){
             for (auto i = 0; i < startindex; i++){
                 listobjsig = list.at(i)->getSignature();
-                listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
+                auto listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
                 if (objsig == HKB_CLIP_GENERATOR){
                     objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
                     listobjanimationname = static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName();
@@ -835,7 +832,7 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
     };
     if (object && startindex > -1){
         obj = static_cast<DataIconManager *>(object);
-        type = object->getType();
+        auto type = object->getType();
         objsig = obj->getSignature();
         objname = obj->getName();
         if (type == HkxObject::TYPE_GENERATOR){
@@ -1156,9 +1153,8 @@ bool BehaviorFile::link(){
         (!behaviorGraph->link()) ? result = false : NULL;
         (!variableValues->link()) ? result = false : NULL;
         (!graphData->link()) ? result = false : NULL;
-        HkxSignature sig;
         for (auto i = 0; i < generators.size(); i++){
-            sig = generators.at(i)->getSignature();
+            auto sig = generators.at(i)->getSignature();
             (sig == HKB_STATE_MACHINE || sig == HKB_BLENDER_GENERATOR || sig == BS_BONE_SWITCH_GENERATOR) ? ((generators.at(i)->link()) ? result = false : NULL) : NULL;
         }
         return result;
@@ -1182,10 +1178,9 @@ QVector <int> BehaviorFile::removeDataNoLock(QVector <HkxSharedPtr> & objects){
 QStringList BehaviorFile::getRefedAnimations() const{
     //std::lock_guard <std::mutex> guard(mutex);
     QStringList refedanimations;
-    QString temp;
     for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i).constData() && generators.at(i).constData()->getSignature() == HKB_CLIP_GENERATOR){
-            temp = static_cast<const hkbClipGenerator *>(generators.at(i).constData())->getAnimationName();
+            auto temp = static_cast<const hkbClipGenerator *>(generators.at(i).constData())->getAnimationName();
             if (!refedanimations.contains(temp, Qt::CaseInsensitive)){
                 refedanimations.append(temp);
             }
@@ -1196,13 +1191,11 @@ QStringList BehaviorFile::getRefedAnimations() const{
 
 QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::condition_variable & conditionVar){
     errorList.clear();
-    bool errors = false;
-    HkxObject *obj;
-    QString error;
+    auto errors = false;
     auto checkError = [&](QVector <HkxSharedPtr> & objects, int index){
-        obj = static_cast<HkxObject *>(objects.at(index).data());
+        auto obj = static_cast<HkxObject *>(objects.at(index).data());
         if (obj){
-            error = obj->evaluateDataValidity();
+            auto error = obj->evaluateDataValidity();
             if (error != ""){
                 errorList.append(error);
                 if (obj->getType() != HkxObject::TYPE_OTHER){
@@ -1243,13 +1236,11 @@ QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::c
 QString BehaviorFile::detectErrors(){
     //std::lock_guard <std::mutex> guard(mutex);
     errorList.clear();
-    QString error;
-    HkxObject *obj;
     auto errors = false;
     auto checkError = [&](QVector <HkxSharedPtr> & objects, int index){
-        obj = static_cast<HkxObject *>(objects.at(index).data());
+        auto obj = static_cast<HkxObject *>(objects.at(index).data());
         if (obj){
-            error = obj->evaluateDataValidity();
+            auto error = obj->evaluateDataValidity();
             if (error != ""){
                 errorList.append(error);
                 if (obj->getType() != HkxObject::TYPE_OTHER){
@@ -1429,7 +1420,7 @@ void BehaviorFile::mergeObjects(QVector <DataIconManager *> & recessiveobjects){
 void BehaviorFile::mergedWrite(){
     //std::lock_guard <std::mutex> guard(mutex);
     long ref = 100;
-    HkxObject *root = getRootObject().data();
+    auto root = getRootObject().data();
     if (root){
         root->setIsWritten(false);
         stringData->setIsWritten(false);
@@ -1446,11 +1437,10 @@ void BehaviorFile::mergedWrite(){
         ref++;
         behaviorGraph->setReference(ref);
         ref++;
-        QVector <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
+        auto objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
         QVector <DataIconManager *> children;
-        DataIconManager *obj = nullptr;
         while (!objects.isEmpty()){
-            obj = objects.last();
+            auto obj = objects.last();
             if (!obj->getRefsUpdated()){
                 obj->updateReferences(ref);
                 obj->setRefsUpdated(true);
@@ -1487,7 +1477,7 @@ void BehaviorFile::mergedWrite(){
 void BehaviorFile::write(){
     //std::lock_guard <std::mutex> guard(mutex);
     long ref = 100;
-    HkxObject *root = getRootObject().data();
+    auto root = getRootObject().data();
     if (root){
         root->setIsWritten(false);
         stringData->setIsWritten(false);
@@ -1735,9 +1725,8 @@ QStringList BehaviorFile::getModifierTypeNames() const{
 
 int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) const{
     //std::lock_guard <std::mutex> guard(mutex);
-    hkbBehaviorGraphStringData *strings = nullptr;
     if (stringData.data()){
-        strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+        auto strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
         for (auto i = 0; i < strings->characterPropertyNames.size(); i++){
             if (strings->characterPropertyNames.at(i) == name){
                 return i;
@@ -1774,10 +1763,9 @@ QStringList BehaviorFile::getCharacterPropertyNames() const{
 QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
     //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
-    hkbBehaviorReferenceGenerator *ptr = nullptr;
     for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i).constData() && generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
-            ptr = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data());
+            auto ptr = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data());
             list.append(ptr->getBehaviorName());
         }
     }
