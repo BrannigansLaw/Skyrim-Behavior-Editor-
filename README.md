@@ -48,7 +48,7 @@ names.
 
 • Merge projects or single behavior files together.
 
-<b><ul>SETTING UP PROJECTS</ul></b>
+<b><u>SETTING UP PROJECTS</u></b>
 
-![Update.bsa](https://user-images.githubusercontent.com/8378075/94979814-015d1500-051d-11eb-9094-a5c35d74a112.png)
+![Update.bsa](https://user-images.githubusercontent.com/8378075/94980098-a5938b80-051e-11eb-965e-09143daf4831.png)
 <b>Extract the "meshes/actors/character" from the 'Update.bsa' first, then extract the "meshes/actors/character" from the 'DragonBorn.bsa' next (overwriting any files if prompted) and finally extract the skelton files from the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories in the 'Animations.bsa'.</b>
