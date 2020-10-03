@@ -11,9 +11,7 @@ hkx and hkx xml. It parses the hkx xml files associated with a character
 project, graphs all the data in each behavior file and exposes all
 of the important data to the user via a number of different widgets.
 
-<b>NOTE: As hkxcmd cannot work with SSE animation/behavior files, you will need to use the original Skyrim animation/behavior files for this tool to work!</b>
-
-<b>Extract the "meshes/actors/character" from the 'Update.bsa' first, then extract the "meshes/actors/character" from the 'DragonBorn.bsa' next (overwriting any files if prompted) and finally extract the skelton files from the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories in the 'Animations.bsa'.</b>
+<b>NOTE: As hkxcmd cannot work with SSE animation/behavior files, you will need to use the original Skyrim animation/behavior files for this tool to work! See the bottom of this readme for how to set up your project!</b>
 
 It also parses the animation text files that contain data representing
 animation translation and rotation data along with information used
@@ -49,3 +47,7 @@ names.
 • Convert and export project or behavior files to the game directory.
 
 • Merge projects or single behavior files together.
+
+<b>SETTING UP PROJECTS</B>
+
+<b>Extract the "meshes/actors/character" from the 'Update.bsa' first, then extract the "meshes/actors/character" from the 'DragonBorn.bsa' next (overwriting any files if prompted) and finally extract the skelton files from the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories in the 'Animations.bsa'.</b>
