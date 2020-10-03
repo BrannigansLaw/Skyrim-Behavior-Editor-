@@ -13,7 +13,7 @@ of the important data to the user via a number of different widgets.
 
 <b>NOTE: As hkxcmd cannot work with SSE animation/behavior files, you will need to use the original Skyrim animation/behavior files for this tool to work!</b>
 
-<b>Extract the "meshes/actors/character" from the 'Update.bsa' first, then extract the "meshes/actors/character" from the 'DragonBorn.bsa' next overwriting any files if prompted and finally extract the skelton files from the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories in the 'Animations.bsa'.</b>
+<b>Extract the "meshes/actors/character" from the 'Update.bsa' first, then extract the "meshes/actors/character" from the 'DragonBorn.bsa' next (overwriting any files if prompted) and finally extract the skelton files from the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories in the 'Animations.bsa'.</b>
 
 It also parses the animation text files that contain data representing
 animation translation and rotation data along with information used
