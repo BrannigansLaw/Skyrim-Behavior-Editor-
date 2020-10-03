@@ -48,23 +48,24 @@ names.
 
 • Merge projects or single behavior files together.
 
-<b><u>SETTING UP PROJECTS USING <a href ="https://www.nexusmods.com/skyrimspecialedition/mods/974" target="_blank">BSA EXTRACTOR</a></b>
-  
+
+<b><u>SETTING UP PROJECTS USING <a href ="https://www.nexusmods.com/skyrimspecialedition/mods/974" target="_blank">BSA EXTRACTOR</a></u></b>
+
+<b>Extract the "meshes/actors/character/" directory from the 'Update.bsa'.</b>
+
 ![update](https://user-images.githubusercontent.com/8378075/94980095-a4faf500-051e-11eb-8376-9af79e69bb1d.png)
 ![Update.bsa](https://user-images.githubusercontent.com/8378075/94980098-a5938b80-051e-11eb-965e-09143daf4831.png)
 
-<b>Extract the "meshes/actors/character/" directory from the 'Update.bsa'.</b>
+<b>Extract the "meshes/actors/character/animations" directory from the 'DragonBorn.bsa'.</b>
 
 ![dragonborn](https://user-images.githubusercontent.com/8378075/94980090-a4625e80-051e-11eb-81a2-eb17ad78a5a6.png)
 ![dragonborn.bsa](https://user-images.githubusercontent.com/8378075/94980093-a4625e80-051e-11eb-8e17-4f20bb13b36a.png)
 
-<b>Extract the "meshes/actors/character/animations" directory from the 'DragonBorn.bsa'.</b>
+<b>Extract the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories from the 'Animations.bsa'.</b>
 
 ![animations](https://user-images.githubusercontent.com/8378075/94980087-a3c9c800-051e-11eb-9984-953ef3f74ee9.png)
 ![animations.bsa](https://user-images.githubusercontent.com/8378075/94980088-a4625e80-051e-11eb-88e9-e92e291bcdb0.png)
 
-<b>Extract the "meshes/actors/character/character assets" and "meshes/actors/character/character assets female" directories from the 'Animations.bsa'.</b>
+<b>What the Character project directory should look like. To open the project, select either 'defaultmale.hkx' or 'defaultfemale.hkx'</b>
 
 ![character](https://user-images.githubusercontent.com/8378075/94980096-a5938b80-051e-11eb-8882-c33f0bae8fc0.png)
-
-<b>What the Character project directory should look like.</b>
